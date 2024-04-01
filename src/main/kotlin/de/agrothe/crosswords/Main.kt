@@ -1,8 +1,10 @@
 package de.agrothe.crosswords
 
 import java.io.File
+import io.github.oshai.kotlinlogging.KotlinLogging
 
-val config = readConfig()
+private val logger = KotlinLogging.logger{}
+private val config = readConfig()
 
 fun main() {
     // Kurs
@@ -10,7 +12,7 @@ fun main() {
     // Linie, Parcours
     val dict: List<Pair<String, List<String>>> = readDictFile()
 
-    dict.take(50).forEach { println(it) }
+    dict.take(50).forEach {logger.debug {it}}
 
     fun getMatches(patt: String): List<Pair<String, List<String>>> =
         dict.mapNotNull {entry ->
@@ -23,9 +25,11 @@ fun main() {
         StringBuilder((1..len).fold("") {acc, _ -> acc + "."})
             .apply {this.setCharAt(pos, other[otherPos])}.toString()
 
-    getMatches(".ruckm....l").forEach{println(it);println()}
+    getMatches(".ruckm....l").forEach {
+        logger.debug{".ruckm....l '$it'\n"}
+    }
     getMatches(getPattern("KRssne", 2, 3, 5))
-        .forEach{println(it)}
+        .forEach{logger.debug{it}}
 }
 
 fun readDictFile(): List<Pair<String, List<String>>> {
