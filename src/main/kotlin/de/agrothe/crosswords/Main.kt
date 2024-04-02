@@ -10,7 +10,8 @@ fun main() {
     // Kurs
     // Works, Weiterb ..., Wechsel, Dvisen, Reisepl, Route, Konzept,
     // Linie, Parcours
-    val dict: List<Pair<String, List<String>>> = readDictFile()
+    val dict: List<Pair<String, List<String>>> =
+        readDictFile(config.DICT_CONFIG)
 
     dict.take(50).forEach {logger.debug {it}}
 
@@ -32,16 +33,21 @@ fun main() {
         .forEach{logger.debug{it}}
 }
 
-fun readDictFile(): List<Pair<String, List<String>>> {
-    val negatives = File(config.NEGATIVE_LIST_FILE_NAME).readLines().toSet()
+fun readDictFile(pConfig: DictConfig): List<Pair<String, List<String>>> {
+    val negatives = File(pConfig.NEGATIVE_LIST_FILE_NAME).readLines().toSet()
 
-    return File(config.DICT_FILE_NAME).useLines {lines ->
+    return File(pConfig.DICT_FILE_NAME).useLines { lines ->
         lines
+            .filterNot {
+                pConfig.SKIP_TEST_LINES &&
+                    it.contains(pConfig.TEST_MARKER)}
+            // strip tailing comments
+            .map {it.substringBefore(pConfig.COMMENT_CHAR)}
             .map {it.split(';')}
-            .filterNot {it.size < 2 }
+            .filterNot {it.size < 2}
             .mapNotNull {line ->
                 line.first().trim().let {first ->
-                    if (config.LEGAL_CHARS.matches(first))
+                    if (pConfig.LEGAL_CHARS.matches(first))
                         Pair(first, line.drop(1).map {it.trim()})
                     else null
                 }
@@ -53,12 +59,12 @@ fun readDictFile(): List<Pair<String, List<String>>> {
         .map { keyValue ->
             fun String.adjustChars(): String =
                 this.run {
-                    if(config.SUBST_CHARS)
-                        config.CHAR_SUBSTS.fold (this) {acc, subst ->
+                    if(pConfig.SUBST_CHARS)
+                        pConfig.CHAR_SUBSTS.fold (this) { acc, subst ->
                             acc.replace(subst.first, subst.second)}
                     else this
                 }
-                .run {if (config.TO_UPPER_CASE) this.uppercase() else this}
+                .run {if (pConfig.TO_UPPER_CASE) this.uppercase() else this}
 
             Pair(keyValue.first.adjustChars(), keyValue.second)
         }
