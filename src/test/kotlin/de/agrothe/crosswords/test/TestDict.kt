@@ -1,7 +1,7 @@
 package de.agrothe.crosswords.test
 
+import de.agrothe.crosswords.Dict
 import de.agrothe.crosswords.readConfig
-import de.agrothe.crosswords.readDictFile
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -11,13 +11,13 @@ private val logger = KotlinLogging.logger{}
 
 private val config = readConfig()
 private val dict: List<Pair<String, List<String>>> =
-    readDictFile(config.dict)
+    Dict(readConfig().dict).dict
 
 class TestDict {
     @Test
     fun numKeys() {
         assertEquals(true,
-            dict.size > 22_600 && dict.size < 22_750)
+        dict.size in 22601..22749)
     }
 
     @Test
@@ -26,7 +26,7 @@ class TestDict {
             acc[0] = acc[0] + entry.second.size; acc}[0]
 
         assertEquals(true,
-            numEntries > 64_000 && numEntries < 65_000)
+            numEntries in 64001..64999)
     }
 
     @Test
