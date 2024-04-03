@@ -4,6 +4,7 @@ import java.io.File
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 private val logger = KotlinLogging.logger{}
+
 private val config = readConfig()
 
 fun main() {
@@ -11,7 +12,7 @@ fun main() {
     // Works, Weiterb ..., Wechsel, Dvisen, Reisepl, Route, Konzept,
     // Linie, Parcours
     val dict: List<Pair<String, List<String>>> =
-        readDictFile(config.DICT_CONFIG)
+        readDictFile(config.dict)
 
     dict.take(50).forEach {logger.debug {it}}
 
@@ -33,7 +34,7 @@ fun main() {
         .forEach{logger.debug{it}}
 }
 
-fun readDictFile(pConfig: DictConfig): List<Pair<String, List<String>>> {
+fun readDictFile(pConfig: ReadDictConfig): List<Pair<String, List<String>>> {
     val negatives = File(pConfig.NEGATIVE_LIST_FILE_NAME).readLines().toSet()
 
     return File(pConfig.DICT_FILE_NAME).useLines{lines ->
@@ -64,7 +65,7 @@ fun readDictFile(pConfig: DictConfig): List<Pair<String, List<String>>> {
                             else this
                         }
                         .run{if(TO_UPPER_CASE) this.uppercase()
-                                else this
+                            else this
                         }
                     Pair(keyValue.first.adjustChars(), keyValue.second)
                 }
