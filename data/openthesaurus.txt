@@ -18,13 +18,21 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
   # NO
 
-;
-
-OnlyOne;
-;OnlyTwo
-One;Two TEST
-# OneComment;Two;Three
-One;Two;Three TEST # Comment
+; TEST
+;; TEST
+;;; TEST
+# CommentKey;CommentValue TEST
+EmptyValue; TEST
+EmptyValues;; TEST
+;EmptyKey TEST
+;;EmptyKey TEST
+;;EmptyKey; TEST
+;EmptyKey;; TEST
+;EmptyKey;EmptyKey TEST
+;EmptyKey;Value TEST
+Key;Value TEST
+Key;Value1;Value2 TEST
+Key;Value1;Value2 TEST # Comment
 
 ChrÄ;TEST
 ChrÖ;TEST

@@ -10,23 +10,26 @@ import kotlin.test.assertEquals
 private val logger = KotlinLogging.logger{}
 
 private val config = readConfig()
-private val dict: List<Pair<String, List<String>>> =
+private val dict: List<Pair<String, Collection<String>>> =
     Dict(readConfig().dict).dict
 
 class TestDict {
     @Test
     fun numKeys() {
         assertEquals(true,
-        dict.size in 22601..22749)
+        dict.count() in 22_600..22_750)
+    }
+
+    fun testLineRegEx() {
+
     }
 
     @Test
     fun numValues() {
         val numEntries = dict.fold(arrayOf(1)){acc, entry ->
-            acc[0] = acc[0] + entry.second.size; acc}[0]
-
+            acc[0] = acc[0] + entry.second.count(); acc}[0]
         assertEquals(true,
-            numEntries in 64001..64999)
+            numEntries in 64_000..65_000)
     }
 
     @Test
@@ -42,9 +45,12 @@ class TestDict {
     }
 
     @Test
-    fun emptyValues() {
-        dict.forEach{assertEquals(false, it.second.isEmpty())}
-    }
+    fun emptyValues() = dict.forEach{entry->assertEquals(false,
+        entry.second.let{
+            val isEmpty = it.isEmpty()
+            if(isEmpty)logger.error{"empty value: $entry"}
+            isEmpty
+         })}
 
     @Test
     fun emptyValue() {
@@ -59,5 +65,13 @@ class TestDict {
             .toSet()
         dict.forEach{
             assertEquals(false, negatives.contains(it.first))}
+    }
+
+    @Test
+    fun noDuplicateValues() {
+        dict.forEach {
+            assertEquals(true,
+            it.second.size == it.second.distinct().size)
+        }
     }
 }
