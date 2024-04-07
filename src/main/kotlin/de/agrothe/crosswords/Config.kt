@@ -12,7 +12,7 @@ open class DictConfig(
 )
 class ReadDictConfig(
     val DICT_FILE_NAME: String,
-    val NEGATIVE_LIST_FILE_NAME: String,
+    val NEGATIVES_LIST: Set<String>,
     val COMMENT_CHAR: String,
     val TEST_MARKER: String,
     val SKIP_TEST_LINES: Boolean,
@@ -24,7 +24,7 @@ class ReadDictConfig(
     DictConfig(
         LEGAL_KEY_CHARS = Regex(LEGAL_KEY_CHARS_PATT),
         CHAR_SUBSTS = CHAR_SUBSTS_LIST.map {Pair(it.first(), it.last())}
-)
+    )
 
 data class AppConfig(
     val dict: ReadDictConfig,

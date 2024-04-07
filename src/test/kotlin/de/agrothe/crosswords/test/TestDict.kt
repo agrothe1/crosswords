@@ -13,19 +13,14 @@ private val config = readConfig()
 private val dict: List<Pair<String, Collection<String>>> =
     Dict(readConfig().dict).dict
 
-class TestDict {
+class TestDict{
     @Test
-    fun numKeys() {
+    fun numKeys() =
         assertEquals(true,
         dict.count() in 22_600..22_750)
-    }
-
-    fun testLineRegEx() {
-
-    }
 
     @Test
-    fun numValues() {
+    fun numValues(){
         val numEntries = dict.fold(arrayOf(1)){acc, entry ->
             acc[0] = acc[0] + entry.second.count(); acc}[0]
         assertEquals(true,
@@ -33,12 +28,11 @@ class TestDict {
     }
 
     @Test
-    fun emptyKey() {
+    fun emptyKey() =
         dict.forEach{assertEquals(false, it.first.isBlank())}
-    }
 
     @Test
-    fun illegalKey() {
+    fun illegalKey(){
         val illegalChars = Regex("[^\\p{Alpha}]+")
         dict.forEach{assertEquals(false,
             it.first.contains(illegalChars))}
@@ -53,25 +47,26 @@ class TestDict {
          })}
 
     @Test
-    fun emptyValue() {
+    fun emptyValue() =
         dict.forEach{
             it.second.forEach{
                 assertEquals(false, it.isBlank())}}
-    }
 
     @Test
     fun noNegatives() {
-        val negatives = File(config.dict.NEGATIVE_LIST_FILE_NAME).readLines()
-            .toSet()
+        val negatives = config.dict.NEGATIVES_LIST
         dict.forEach{
             assertEquals(false, negatives.contains(it.first))}
     }
 
+    fun noDupicateKeys() {
+
+    }
+
     @Test
-    fun noDuplicateValues() {
+    fun noDuplicateValues() =
         dict.forEach {
             assertEquals(true,
             it.second.size == it.second.distinct().size)
         }
-    }
 }

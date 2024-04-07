@@ -25,11 +25,9 @@ class Dict(conf: ReadDictConfig){
 // Linie, Parcours
 private
 fun readDictFile(pConfig: ReadDictConfig):
-        List<Pair<String, Collection<String>>> {
-    val negatives = File(pConfig.NEGATIVE_LIST_FILE_NAME).readLines()
-        .filter{it.isNotBlank()}.toSet()
+        List<Pair<String, Collection<String>>>{
 
-    return File(pConfig.DICT_FILE_NAME).useLines{lines ->
+    return File(pConfig.DICT_FILE_NAME).useLines{lines->
         pConfig.run{
             lines
                 .filterNot{SKIP_TEST_LINES && it.contains(TEST_MARKER)}
@@ -39,7 +37,7 @@ fun readDictFile(pConfig: ReadDictConfig):
                 .filterNot{it.count() < 2}
                 .filter{LEGAL_KEY_CHARS.matches(it.first())}
                 .filter{line->line.drop(1).all{it.isNotBlank()}}
-                .filterNot{negatives.contains(it.first())}
+                .filterNot{NEGATIVES_LIST.contains(it.first())}
                 .map{line->Pair(line.first().trim(),
                     line.drop(1).map{it.trim()})}
 
