@@ -9,15 +9,29 @@ private val config = readConfig()
 private val dict = Dict(config.dict)
 
 fun main() {
-    dict.dict.take(50).forEach {logger.debug{it}}
+    //dict.dict.keys.take(50).forEach {logger.debug{it}}
 
+    /*
     dict.getMatches(".ruckm....l").forEach{
-        logger.debug{ ".ruckm....l '$it'\n"}
+        logger.debug{".ruckm....l '$it'"}
     }
+     */
 
-    dict.getMatches("Haushalt".getPattern(1, 0, 5))
-        .forEach{logger.debug{it}}
+    val word = "Bier"
+    val (srcPos, destPos, destLen) = listOf(1, 1, 4)
+    val pattern = word.getPattern(srcPos, destPos, destLen)
+    val regex = Regex(pattern)
+
+    logger.debug{
+        "$word (src:$srcPos, dest:$destPos, len:$destLen): '$pattern'"}
+
+    val matches = dict.getMatches(regex)
+
+    logger.debug{"matches"}
+    matches.forEach{logger.debug{"\t$it"}}
+    logger.debug{"XXX"}
 }
+
 
 
 

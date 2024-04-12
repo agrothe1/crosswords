@@ -3,67 +3,69 @@ package de.agrothe.crosswords
 import java.io.File
 
 class Dict(conf: ReadDictConfig){
-    val dict: List<Pair<String, Collection<String>>> = readDictFile(conf)
+    private val entries = readDictFile(conf)
 
-    fun getMatches(pattern: String): List<Pair<String, Collection<String>>> =
-        dict.mapNotNull{entry ->
-            if (Regex(pattern, RegexOption.IGNORE_CASE).matches(entry.first))
-                entry
+    fun getMatches(pattern: Regex) =
+        entries.mapNotNull{entry->
+            if(pattern.matches(entry.first)) entry
             else null
         }
 
     companion object{
-        fun String.getPattern(
-                recvPos: Int, otherPos: Int, otherLen: Int) : String =
-            let{recv -> StringBuilder().apply{repeat(otherLen){append(".")}}
-                .apply{setCharAt(otherPos, recv[recvPos])}.toString()}
+        fun String.getPattern(srcPos: Int, destPos: Int, destLen: Int)
+                : String =
+            let{src->StringBuilder().apply{repeat(destLen){append(".")}}
+                .apply{setCharAt(destPos, src[srcPos])}.toString()}
     }
 }
 
-// Kurs
-// Works, Weiterb ..., Wechsel, Dvisen, Reisepl, Route, Konzept,
-// Linie, Parcours
-private
-fun readDictFile(pConfig: ReadDictConfig):
-        List<Pair<String, Collection<String>>>{
+fun readDictFile(pConf: ReadDictConfig) =
+   File(pConf.DICT_FILE_NAME).useLines{lines->
+       lines.parseDict(pConf)
+   }
 
-    return File(pConfig.DICT_FILE_NAME).useLines{lines->
-        pConfig.run{
-            lines
-                .filterNot{SKIP_TEST_LINES && it.contains(TEST_MARKER)}
-                // strip tailing comments
-                .map{it.substringBefore(COMMENT_CHAR)}
-                .map{it.split(';')}
-                .filterNot{it.count() < 2}
-                .filter{LEGAL_KEY_CHARS.matches(it.first())}
-                .filter{line->line.drop(1).all{it.isNotBlank()}}
-                .filterNot{NEGATIVES_LIST.contains(it.first())}
-                .map{line->Pair(line.first().trim(),
-                    line.drop(1).map{it.trim()})}
+fun Sequence<String>.parseDict(pConf: ReadDictConfig) =
+    pConf.parseDict(this)
 
-                .toList() // file will be closed hereafter
-                .map{keyValue->
-                    fun String.adjustChars(): String =
-                        this.run{
-                            if(SUBST_CHARS)
-                                CHAR_SUBSTS.fold(this){acc, subst->
-                                    acc.replace(subst.first, subst.second)
-                                }
-                            else this
-                        }
-                        .run{if(TO_UPPER_CASE)this.uppercase()
-                            else this
-                        }
-                    Pair(keyValue.first.adjustChars(), keyValue.second)
-                }
-                // put entries w/ same key into one group
-                .groupBy{it.first}
-                .map{keyValue->
-                    Pair(keyValue.key,
-                        keyValue.value.fold(arrayListOf<String>())
-                            {acc, elem->acc.addAll(elem.second); acc}
-                                .toSet())
-                }
+/*
+a;b;c -> a(b,c) b(a,c) c(a,b)
+ */
+fun ReadDictConfig.parseDict(pDict: Sequence<String>) =
+    pDict
+        .filterNot{SKIP_TEST_LINES && it.contains(TEST_MARKER)}
+        // strip tailing comments
+        .map{it.substringBefore(COMMENT_SEP)}
+        .map{line->
+            line.split(ENTRY_DELIMITER)
+                // trim all entries
+                .map{it.trim()}
+                // remove empty entries
+                .filter{it.isNotBlank()}
+                // no duplicate elements per line
+                .toSet()
         }
-    }
-}
+        // remove single value entries
+        .filter{it.count() > 1}
+        .toList() // todo file will be closed hereafter
+        // build entrySet permutations
+        // Set(a,b,c) -> Set(Pair(a,b),Pair(b,c), Pair(c,a))
+        //.map{it.first().run{Pair(this, it.minus(this))}} todo
+        .flatMap{entry->entry.map{Pair(it, entry.minus(it))}}
+        .map{(entry, synms)->
+            fun String.substituteChars(): String =
+                if(SUBST_CHARS) CHAR_SUBSTS.fold(this)
+                    {acc, subst->acc.replace(subst.first, subst.second)}
+                else this
+            Pair(entry.substituteChars(), synms)
+        }
+        //.filter{it.first.isEmpty()} todo remove ?
+        // do not include keys w/ illegal chars
+        .filter{(entry, _)->LEGAL_KEY_CHARS.matches(entry)}
+        .filter{(entry, _)->NEGATIVES_REGEXPRS.all{!it.matches(entry)}}
+        .map{(entry, synms)->
+            Pair(if(TO_UPPER_CASE) entry.uppercase() else entry, synms)}
+        .groupBy{(entry, _)->entry}
+        .map{(entry, synms)->
+            Pair(entry,
+                synms.fold(arrayListOf<String>())
+                    {acc, synm->acc.addAll(synm.second); acc}.toSet())}

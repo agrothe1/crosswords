@@ -4,26 +4,33 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import com.typesafe.config.ConfigFactory
 import io.github.config4k.extract
 
-private val logger by lazy { KotlinLogging.logger{} }
+private val logger by lazy{KotlinLogging.logger{}}
 
 open class DictConfig(
     val LEGAL_KEY_CHARS: Regex,
     val CHAR_SUBSTS: List<Pair<String, String>>,
+    val ENTRY_DELIMITER: Char,
+    val COMMENT_SEP: Char,
+    val NEGATIVES_REGEXPRS: List<Regex>
 )
 class ReadDictConfig(
     val DICT_FILE_NAME: String,
-    val NEGATIVES_LIST: Set<String>,
-    val COMMENT_CHAR: String,
     val TEST_MARKER: String,
     val SKIP_TEST_LINES: Boolean,
     val TO_UPPER_CASE: Boolean,
     val SUBST_CHARS: Boolean,
+    NEGATIVES_LIST: Set<String>,
+    ENTRY_DELIMITER_CHAR: String,
     LEGAL_KEY_CHARS_PATT: String,
+    COMMENT_SEP_CHAR: String,
     CHAR_SUBSTS_LIST: List<List<String>>,
 ) :
     DictConfig(
         LEGAL_KEY_CHARS = Regex(LEGAL_KEY_CHARS_PATT),
-        CHAR_SUBSTS = CHAR_SUBSTS_LIST.map {Pair(it.first(), it.last())}
+        CHAR_SUBSTS = CHAR_SUBSTS_LIST.map{Pair(it.first(), it.last())},
+        ENTRY_DELIMITER = ENTRY_DELIMITER_CHAR.toCharArray().first(),
+        COMMENT_SEP = COMMENT_SEP_CHAR.toCharArray().first(),
+        NEGATIVES_REGEXPRS = NEGATIVES_LIST.map{Regex(it)}
     )
 
 data class AppConfig(
@@ -47,23 +54,4 @@ fun main() {
         }
         return res
     }
-/*
-    val dict = readConfig().dict
-    val patt = dict.LINE_PATT
-    val key = patt.matchLine("a; b; c ;d  # X", dict.KEY_GRP_NAME)
-    val values = patt.matchLine("a;b;c;d", dict.VALUE_GRP_NAME)
-    println("stop '$key'")
-    values.forEach{println("\t$it")}
-*/
-
-/*
-false:
-    "" " "
-    ";" ";;" ";;;" "a;" ";a" ";;a" "a;;" ";a;b"
-    " ;" "; " " ;;" ";; " "; ;" " ; ; "
-true:
-    "a;b" "a;b;c" "a;b;c;d"
-    " a ; b " " a ; b ; c" "a ; b ; c; d  # X"
-    "a;b;c # " "a;b# c" "a;b# c#"
-*/
 }
