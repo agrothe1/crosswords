@@ -11,7 +11,7 @@ open class DictConfig(
     val CHAR_SUBSTS: List<Pair<String, String>>,
     val ENTRY_DELIMITER: Char,
     val COMMENT_SEP: Char,
-    val NEGATIVES_REGEXPRS: List<Regex>
+    val NEGATIVES_REGEXPRS: Regex
 )
 class ReadDictConfig(
     val DICT_FILE_NAME: String,
@@ -30,7 +30,8 @@ class ReadDictConfig(
         CHAR_SUBSTS = CHAR_SUBSTS_LIST.map{Pair(it.first(), it.last())},
         ENTRY_DELIMITER = ENTRY_DELIMITER_CHAR.toCharArray().first(),
         COMMENT_SEP = COMMENT_SEP_CHAR.toCharArray().first(),
-        NEGATIVES_REGEXPRS = NEGATIVES_LIST.map{Regex(it)}
+        NEGATIVES_REGEXPRS = Regex(NEGATIVES_LIST.fold(StringBuilder())
+            {acc, s->acc.append("|"+s)}.deleteCharAt(0).toString())
     )
 
 data class AppConfig(
