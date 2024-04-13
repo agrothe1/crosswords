@@ -13,6 +13,7 @@ open class DictConfig(
     val COMMENT_SEP: Char,
     val NEGATIVES_REGEXPR: Regex
 )
+
 class ReadDictConfig(
     val DICT_FILE_NAME: String,
     val TEST_MARKER: String,

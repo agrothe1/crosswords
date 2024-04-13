@@ -2,14 +2,22 @@ package de.agrothe.crosswords
 
 import java.io.File
 
-class Dict(conf: ReadDictConfig){
-    private val entries by lazy {readDictFile(conf)}
+typealias DictKey = String
+typealias DictValues = Collection<String>
+typealias DictEntry = Map<DictKey, DictValues>
 
-    fun getMatches(pattern: Regex) =
-        entries.mapNotNull{entry->
-            if(pattern.matches(entry.first)) entry
+class Dict(conf: ReadDictConfig){
+    val entries: DictEntry by lazy {readDictFile(conf)}
+
+    fun getMatches(pattern: Regex): Collection<DictKey> =
+        entries.keys.mapNotNull{entry->
+            if(pattern.matches(entry)) entry
             else null
         }
+
+    fun getRandomMatch(pattern: Regex):  DictKey =
+        getMatches(pattern).random()
+
 
     companion object{
         fun String.getPattern(srcPos: Int, destPos: Int, destLen: Int)
@@ -68,3 +76,4 @@ fun ReadDictConfig.parseDict(pDict: Sequence<String>) =
             Pair(entry,
                 synms.fold(arrayListOf<String>())
                     {acc, synm->acc.addAll(synm.second); acc}.toSet())}
+        .toMap()

@@ -26,7 +26,8 @@ fun main() {
     logger.debug{
         "$word (src:$srcPos, dest:$destPos, len:$destLen): '$pattern'"}
 
-    var matches: List<Pair<String, Set<String>>>
+    var matches: DictValues = dict.getMatches(regex)
+    /*
     var timeTaken = measureTime{
         matches = dict.getMatches(regex)
     }
@@ -36,10 +37,11 @@ fun main() {
         matches = dict.getMatches(regex)
     }
     println("HOT dict search time: $timeTaken")
+     */
 
-    logger.debug{"matches"}
-    logger.debug{"XXX"}
-    matches.forEach{logger.debug{"\t$it"}}
+    logger.debug{"matches: ${dict.getRandomMatch(regex)}"}
+
+    //matches.forEach{logger.debug{"\t$it"}}
 }
 
 

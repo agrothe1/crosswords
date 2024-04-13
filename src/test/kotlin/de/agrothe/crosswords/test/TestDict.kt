@@ -27,6 +27,8 @@ class TestDict{
             numEntries in 64_000..65_000)
     }
 
+     */
+
     @Test
     fun emptyKey() =
         dict.forEach{assertEquals(false, it.first.isBlank())}
@@ -65,7 +67,7 @@ class TestDict{
 
     @Test
     fun noDuplicateValues() =
-        dict.forEach {
+        entries.forEach {
             assertEquals(true,
             it.second.size == it.second.distinct().size)
         }
