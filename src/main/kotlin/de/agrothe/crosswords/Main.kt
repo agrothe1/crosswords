@@ -38,8 +38,8 @@ fun main() {
     println("HOT dict search time: $timeTaken")
 
     logger.debug{"matches"}
-    matches.forEach{logger.debug{"\t$it"}}
     logger.debug{"XXX"}
+    matches.forEach{logger.debug{"\t$it"}}
 }
 
 

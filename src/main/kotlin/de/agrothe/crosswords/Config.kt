@@ -11,7 +11,7 @@ open class DictConfig(
     val CHAR_SUBSTS: List<Pair<String, String>>,
     val ENTRY_DELIMITER: Char,
     val COMMENT_SEP: Char,
-    val NEGATIVES_REGEXPRS: Regex
+    val NEGATIVES_REGEXPR: Regex
 )
 class ReadDictConfig(
     val DICT_FILE_NAME: String,
@@ -30,8 +30,10 @@ class ReadDictConfig(
         CHAR_SUBSTS = CHAR_SUBSTS_LIST.map{Pair(it.first(), it.last())},
         ENTRY_DELIMITER = ENTRY_DELIMITER_CHAR.toCharArray().first(),
         COMMENT_SEP = COMMENT_SEP_CHAR.toCharArray().first(),
-        NEGATIVES_REGEXPRS = Regex(NEGATIVES_LIST.fold(StringBuilder())
-            {acc, s->acc.append("|"+s)}.deleteCharAt(0).toString())
+        NEGATIVES_REGEXPR = Regex( // entry -> \bentry1\b|\bentry2\b
+            NEGATIVES_LIST.fold(StringBuilder()){acc, entry->
+                acc.append("|$entry")}
+                .deleteCharAt(0).toString())
     )
 
 data class AppConfig(
@@ -41,18 +43,3 @@ data class AppConfig(
 fun readConfig(): AppConfig =
     ConfigFactory.load().extract<AppConfig>()
 
-fun main() {
-    fun Regex.matchLine(pLine: String, pGroupName: String): ArrayList<String?>
-    {
-        val matchRes = find(pLine)
-        val group = (matchRes?.groups)?.get(pGroupName)
-        val res = arrayListOf(group?.value)
-        var next = matchRes?.next()
-        while(next != null){
-            res += next.groups[pGroupName]?.value
-            next = next.next()
-            println("XXX $next")
-        }
-        return res
-    }
-}

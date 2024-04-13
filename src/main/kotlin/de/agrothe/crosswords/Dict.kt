@@ -35,13 +35,15 @@ fun ReadDictConfig.parseDict(pDict: Sequence<String>) =
         .filterNot{SKIP_TEST_LINES && it.contains(TEST_MARKER)}
         // strip tailing comments
         .map{it.substringBefore(COMMENT_SEP)}
+        .filter{it.isNotBlank()}
         .map{line->
             line.split(ENTRY_DELIMITER)
                 // trim all entries
                 .map{it.trim()}
                 // remove empty entries
                 .filter{it.isNotBlank()}
-                .filterNot{NEGATIVES_REGEXPRS.matches(it)}
+                // remove entries contained in negative list
+                .filterNot{NEGATIVES_REGEXPR.matches(it)}
                 // no duplicate elements per line
                 .toSet()
         }
