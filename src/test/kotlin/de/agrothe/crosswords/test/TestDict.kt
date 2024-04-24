@@ -1,64 +1,54 @@
 package de.agrothe.crosswords.test
 
-import de.agrothe.crosswords.Dict
-import de.agrothe.crosswords.readConfig
+import de.agrothe.crosswords.*
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import java.io.File
 import kotlin.test.assertEquals
 
 private val logger = KotlinLogging.logger{}
 
 private val config = readConfig()
-private val dict: List<Pair<String, Collection<String>>> =
-    Dict(readConfig().dict).dict
+private val entries by lazy {Dict(config.dict).entries}
 
 class TestDict{
     @Test
     fun numKeys() =
         assertEquals(true,
-        dict.count() in 22_600..22_750)
+        entries.count() in 69_500..69_800)
 
     @Test
-    fun numValues(){
-        val numEntries = dict.fold(arrayOf(1)){acc, entry ->
-            acc[0] = acc[0] + entry.second.count(); acc}[0]
-        assertEquals(true,
-            numEntries in 64_000..65_000)
-    }
-
-     */
+    fun noEmptyKey() =
+        entries.forEach{assertEquals(false, it.key.isBlank())}
 
     @Test
-    fun emptyKey() =
-        dict.forEach{assertEquals(false, it.first.isBlank())}
-
-    @Test
-    fun illegalKey(){
+    fun legalKeys(){
         val illegalChars = Regex("[^\\p{Alpha}]+")
-        dict.forEach{assertEquals(false,
-            it.first.contains(illegalChars))}
+        entries.forEach{assertEquals(false,
+            it.key.contains(illegalChars))}
     }
 
     @Test
-    fun emptyValues() = dict.forEach{entry->assertEquals(false,
-        entry.second.let{
-            val isEmpty = it.isEmpty()
-            if(isEmpty)logger.error{"empty value: $entry"}
-            isEmpty
-         })}
+    fun noEmptyValues() =
+        entries.forEach{entry->assertEquals(false,
+            entry.value.let{
+                val isEmpty = it.isEmpty()
+                if(isEmpty)logger.error{"empty value: $entry"}
+                isEmpty
+             })}
+
 
     @Test
-    fun emptyValue() =
-        dict.forEach{
-            it.second.forEach{
+    fun noEmptyValue() =
+        entries.forEach{it ->
+            it.value.forEach{
                 assertEquals(false, it.isBlank())}}
 
     @Test
     fun noNegatives() {
-        val negatives = config.dict.NEGATIVES_LIST
-        dict.forEach{
-            assertEquals(false, negatives.contains(it.first))}
+        val negatives = config.dict.NEGATIVES_REGEXPR
+        entries.forEach{
+            assertEquals(false, negatives.matches(it.key))}
     }
 
     fun noDupicateKeys() {
@@ -69,6 +59,31 @@ class TestDict{
     fun noDuplicateValues() =
         entries.forEach {
             assertEquals(true,
-            it.second.size == it.second.distinct().size)
+            it.value.size == it.value.distinct().size)
         }
+
+    @Test //todo does not work
+    fun permutations(){
+        val testDict = listOf(
+           "", ";", ";;", "x", "x;", "x;;", ";x;", ";;x",
+           "#A;B;C",
+           " a ; b;c#",
+           "a; b ;c# ",
+           "a;  b; c # C",
+           "a;b;b;a;c;b;c",
+           "ä; b; c",
+           " a ; b;ô",
+           " ä ; b;ô",
+           "b;1;2",
+           "1;b;2",
+           "Ää;öxÖ;üyÜ;ßzß",
+           "Äsen;Über;Öffi;mästen;grübeln;lösen;daß",
+           " w/ Space;KEY;;B C;D#"
+        ).asSequence()
+        val dict = testDict.parseDict(config.dict).toString()
+        assertTrue( dict ==
+"""{a=[b, c, ô], b=[a, c, ä, ô, 1, 2], c=[a, b, ä], ae=[b, c, ô], Aeae=[öxÖ, üyÜ, ßzß], oexOe=[Ää, üyÜ, ßzß], ueyUe=[Ää, öxÖ, ßzß], sszss=[Ää, öxÖ, üyÜ], Aesen=[Über, Öffi, mästen, grübeln, lösen, daß], Ueber=[Äsen, Öffi, mästen, grübeln, lösen, daß], Oeffi=[Äsen, Über, mästen, grübeln, lösen, daß], maesten=[Äsen, Über, Öffi, grübeln, lösen, daß], gruebeln=[Äsen, Über, Öffi, mästen, lösen, daß], loesen=[Äsen, Über, Öffi, mästen, grübeln, daß], dass=[Äsen, Über, Öffi, mästen, grübeln, lösen], KEY=[w/ Space, B C, D], D=[w/ Space, KEY, B C]}"""
+        )
+    }
+
 }

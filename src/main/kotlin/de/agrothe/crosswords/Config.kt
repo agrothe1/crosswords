@@ -33,7 +33,7 @@ class ReadDictConfig(
         COMMENT_SEP = COMMENT_SEP_CHAR.toCharArray().first(),
         NEGATIVES_REGEXPR = Regex( // entry -> \bentry1\b|\bentry2\b
             NEGATIVES_LIST.fold(StringBuilder()){acc, entry->
-                acc.append("|$entry")}
+                acc.append("|\\b$entry\\b")}
                 .deleteCharAt(0).toString())
     )
 
