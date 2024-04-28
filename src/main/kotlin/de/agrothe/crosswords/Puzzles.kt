@@ -9,17 +9,9 @@ private val logger by lazy{KotlinLogging.logger{}}
 private val dict by lazy {Dict(readConfig().dict)}
 private val keys by lazy {dict.keys}
 
-/*
-typealias Pos = Pair<X, Y>
-fun Pos.x() = this.first
-fun Pos.y() = this.second
-fun Pos.incrY() = Pos(this.first, this.second+1)
-
- */
-
 typealias Puzzle = Array<CharArray>
 
-enum class Axis(){
+enum class Axis{
     X, Y;
 
     companion object{
@@ -92,7 +84,7 @@ fun Puzzle.fillGrid(dir: Axis, pos: Pos, dimen: Int,
                 usedWords.run{plus(word)})
              */
         }
-        return null
+        return@fillGrid null
     }
 }
 
