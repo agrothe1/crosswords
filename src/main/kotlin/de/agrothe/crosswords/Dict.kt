@@ -56,10 +56,6 @@ fun ReadDictConfig.parseDict(pDict: Sequence<String>) =
         // Set(a,b,c) -> Set(Pair(a,b),Pair(b,c), Pair(c,a))
         .flatMap{entry->entry.map{Pair(it, entry.minus(it))}}
         .map{(entry, synms)->
-            fun String.substituteChars(): String =
-                if(SUBST_CHARS) CHAR_SUBSTS.fold(this)
-                    {acc, subst->acc.replace(subst.first, subst.second)}
-                else this
             Pair(entry.substituteChars(), synms)
         }
         // do not include keys w/ illegal chars

@@ -37,7 +37,6 @@ class TestDict{
                 isEmpty
              })}
 
-
     @Test
     fun noEmptyValue() =
         entries.forEach{it ->
@@ -45,14 +44,15 @@ class TestDict{
                 assertEquals(false, it.isBlank())}}
 
     @Test
-    fun noNegatives() {
+    fun noNegatives(){
         val negatives = config.dict.NEGATIVES_REGEXPR
-        entries.forEach{
-            assertEquals(false, negatives.matches(it.key))}
-    }
-
-    fun noDupicateKeys() {
-
+        entries.forEach{entry->assertEquals(false,
+            entry.key.let{
+                val isNegative = negatives.matches(it)
+                if(isNegative)logger.error{"should be excluded: $entry"}
+                isNegative
+             })
+        }
     }
 
     @Test
@@ -62,7 +62,7 @@ class TestDict{
             it.value.size == it.value.distinct().size)
         }
 
-    @Test //todo does not work
+    @Test
     fun permutations(){
         val testDict = listOf(
            "", ";", ";;", "x", "x;", "x;;", ";x;", ";;x",
@@ -85,5 +85,4 @@ class TestDict{
 """{a=[b, c, ô], b=[a, c, ä, ô, 1, 2], c=[a, b, ä], ae=[b, c, ô], Aeae=[öxÖ, üyÜ, ßzß], oexOe=[Ää, üyÜ, ßzß], ueyUe=[Ää, öxÖ, ßzß], sszss=[Ää, öxÖ, üyÜ], Aesen=[Über, Öffi, mästen, grübeln, lösen, daß], Ueber=[Äsen, Öffi, mästen, grübeln, lösen, daß], Oeffi=[Äsen, Über, mästen, grübeln, lösen, daß], maesten=[Äsen, Über, Öffi, grübeln, lösen, daß], gruebeln=[Äsen, Über, Öffi, mästen, lösen, daß], loesen=[Äsen, Über, Öffi, mästen, grübeln, daß], dass=[Äsen, Über, Öffi, mästen, grübeln, lösen], KEY=[w/ Space, B C, D], D=[w/ Space, KEY, B C]}"""
         )
     }
-
 }

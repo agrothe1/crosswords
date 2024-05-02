@@ -1,8 +1,10 @@
 package de.agrothe.crosswords
 
-import de.agrothe.crosswords.Axis.Companion.other
-import de.agrothe.crosswords.Dict.Companion.getPattern
+import de.agrothe.crosswords.Axis.X
+import de.agrothe.crosswords.Axis.Y
+import de.agrothe.crosswords.Pos.Companion.advance
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlin.random.Random
 
 private val logger by lazy{KotlinLogging.logger{}}
 
@@ -12,48 +14,43 @@ private val keys by lazy {dict.keys}
 typealias Puzzle = Array<CharArray>
 
 enum class Axis{
-    X, Y;
-
-    companion object{
-        fun Axis.other(): Axis =
-            when(this){
-                X->Y
-                Y->X
-            }
-    }
+    X, Y
 }
 
 class Pos(val row: Int, val col: Int){
-    fun incr(axis: Axis) =
-        when(axis){
-            Axis.X->Pos(row, col+1)
-            Axis.Y->Pos(row+1, col)
+    override fun toString() = "$row,$col"
+
+    companion object{
+        fun Pos.advance(pAxis: Axis): Pair<Axis, Pos> =
+            when(pAxis){
+                X->Pair(Y, this)
+                Y->Pair(X, Pos(this.row+1, this.col+1))
+            }
         }
 }
 
-fun Puzzle.put(axis: Axis, pos: Pos, str: String): Puzzle{
-    with(this.clone())
-    {
-        for((idx, c) in str.withIndex()){
-             when(axis){
-                 Axis.X->this[pos.row][idx] = c
-                 Axis.Y->this[idx][pos.col] = c
-             }
-        }
-        return this
-    }
-}
-
-fun Puzzle.getStringAt(axis: Axis, pos: Pos): String =
-    when(axis){
-        Axis.X -> String(this[pos.row])
-        Axis.Y -> pos.col.let{col->this.fold(StringBuilder())
-            {sb, row->sb.append(row[col])}.toString()}
+fun Puzzle.put(pAxis: Axis, pPos: Pos, pStr: String): Puzzle =
+    foldIndexed(copyOf()) // clone/copy Puzzle
+            {idx, arr, line->arr[idx]=line.copyOf(); arr}
+        .also{newPuzzle->
+            for((idx, c) in pStr.withIndex()){
+                when(pAxis){
+                    X->newPuzzle[pPos.row][idx] = c
+                    Y->newPuzzle[idx][pPos.col] = c
+                }
+            }
     }
 
-fun getMatchingKeys(pattern: Regex): Collection<DictKey> =
+fun Puzzle.getStringAt(pAxis: Axis, pPos: Pos): String =
+    when(pAxis){
+        X -> String(this[pPos.row])
+        Y -> pPos.col.let{col->this.fold(StringBuilder())
+            {sb, row->sb.append(row[col])}}.toString()
+    }
+
+fun getMatchingKeys(pPattern: Regex): Collection<DictKey> =
     keys.mapNotNull{entry->
-        if(pattern.matches(entry)) entry else null
+        if(pPattern.matches(entry)) entry else null
     }
 
 fun Puzzle.print(){
@@ -61,39 +58,42 @@ fun Puzzle.print(){
     println()
 }
 
-fun Puzzle.fillGrid(dir: Axis, pos: Pos, dimen: Int,
-        usedWords: Set<String>): Puzzle?{
-    let{puzzle->
-        fun Axis.getMatches(idx: Int, strPos: Int): Collection<String> =
-            getMatchingKeys(
-                Regex(puzzle.getStringAt(axis=this, Pos(idx, strPos))
-                    .getPattern(srcPos=0, destPos=0, destLen=dimen)))
-            .minus(usedWords)
+fun Puzzle?.fillGrid(pAxis: Axis, pPos: Pos, pDimen: Int,
+        pUsedWords: Set<String>): Puzzle?{
+    if(pPos.row == pDimen || pPos.col == pDimen) return this // solved
+    this?.let{puzzle->
+        //puzzle.print()
+        fun Axis.getMatches(): Collection<String> =
+            getMatchingKeys(Regex(puzzle.getStringAt(pAxis=this, pPos),
+                    RegexOption.IGNORE_CASE))
+                .minus(pUsedWords)
 
-        val myUsedWords = usedWords.toMutableSet()
-        dir.getMatches(pos.row, pos.col).shuffled()
-            .forEach{word->
-                puzzle.put(dir, Pos(0, pos.col), word)
-                puzzle.print()
-                dir.other().let{newDir->
-                    puzzle.fillGrid(newDir,
-                        pos, dimen, myUsedWords.apply{add(word)}.toSet())
+        pUsedWords.toMutableSet().let{usedWords->
+            pPos.advance(pAxis).let{(nextAxis, nextPos)->
+                pAxis.getMatches()
+                    .shuffled()
+                    .forEach{word->
+                        usedWords.add(word)
+                        println("$nextAxis $nextPos: $word")
+                        put(pAxis, pPos, word)
+                            .fillGrid(nextAxis, nextPos, pDimen,
+                                    usedWords.toSet())
+                                ?.run{return@fillGrid this}
+                    }
             }
-            /*
-            puzzle.fillGrid(dir.other(), row+1, col+1, dimen,
-                usedWords.run{plus(word)})
-             */
         }
-        return@fillGrid null
     }
+    return null
 }
 
-fun emptyPuzzle(dimen: Int) =
-    Array(dimen){_->CharArray(dimen){_-> '.'}}
+fun emptyPuzzle(pDimen: Int) =
+    Array(pDimen){_->CharArray(pDimen){_-> '.'}}
 
 fun main(){ // Saum Baum
     val dimen = 4
     val puzzle = emptyPuzzle(dimen)
     puzzle.fillGrid(Axis.X, Pos(0, 0), dimen, setOf())
+        ?.print()
 }
+
 

@@ -11,7 +11,6 @@ open class DictConfig(
     val CHAR_SUBSTS: List<Pair<String, String>>,
     val ENTRY_DELIMITER: Char,
     val COMMENT_SEP: Char,
-    val NEGATIVES_REGEXPR: Regex
 )
 
 class ReadDictConfig(
@@ -31,11 +30,21 @@ class ReadDictConfig(
         CHAR_SUBSTS = CHAR_SUBSTS_LIST.map{Pair(it.first(), it.last())},
         ENTRY_DELIMITER = ENTRY_DELIMITER_CHAR.toCharArray().first(),
         COMMENT_SEP = COMMENT_SEP_CHAR.toCharArray().first(),
-        NEGATIVES_REGEXPR = Regex( // entry -> \bentry1\b|\bentry2\b
-            NEGATIVES_LIST.fold(StringBuilder()){acc, entry->
-                acc.append("|\\b$entry\\b")}
-                .deleteCharAt(0).toString())
     )
+    {
+        val NEGATIVES_REGEXPR: Regex
+
+        init{
+            NEGATIVES_REGEXPR = Regex(NEGATIVES_LIST.fold(StringBuilder())
+                {acc, entry->acc.append("|\\b$entry\\b")}
+                    .deleteCharAt(0).toString())
+        }
+
+        fun String.substituteChars(): String =
+           if(SUBST_CHARS) CHAR_SUBSTS.fold(this)
+               {acc, subst->acc.replace(subst.first, subst.second)}
+           else this
+    }
 
 data class AppConfig(
     val dict: ReadDictConfig,
