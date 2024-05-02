@@ -6,6 +6,10 @@ import io.github.config4k.extract
 
 private val logger by lazy{KotlinLogging.logger{}}
 
+class PuzzleConfig(
+    val ALLOW_DUPLICATES: Boolean,
+)
+
 open class DictConfig(
     val LEGAL_KEY_CHARS: Regex,
     val CHAR_SUBSTS: List<Pair<String, String>>,
@@ -19,6 +23,8 @@ class ReadDictConfig(
     val SKIP_TEST_LINES: Boolean,
     val TO_UPPER_CASE: Boolean,
     val SUBST_CHARS: Boolean,
+    val BIDECTIONAL: Boolean,
+
     NEGATIVES_LIST: Set<String>,
     ENTRY_DELIMITER_CHAR: String,
     LEGAL_KEY_CHARS_PATT: String,
@@ -32,13 +38,10 @@ class ReadDictConfig(
         COMMENT_SEP = COMMENT_SEP_CHAR.toCharArray().first(),
     )
     {
-        val NEGATIVES_REGEXPR: Regex
-
-        init{
-            NEGATIVES_REGEXPR = Regex(NEGATIVES_LIST.fold(StringBuilder())
+        val NEGATIVES_REGEXPR: Regex =
+            Regex(NEGATIVES_LIST.fold(StringBuilder())
                 {acc, entry->acc.append("|\\b$entry\\b")}
                     .deleteCharAt(0).toString())
-        }
 
         fun String.substituteChars(): String =
            if(SUBST_CHARS) CHAR_SUBSTS.fold(this)
@@ -48,6 +51,7 @@ class ReadDictConfig(
 
 data class AppConfig(
     val dict: ReadDictConfig,
+    val puzzle: PuzzleConfig,
 )
 
 fun readConfig(): AppConfig =

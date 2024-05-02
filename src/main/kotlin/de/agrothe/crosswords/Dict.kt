@@ -17,8 +17,6 @@ class Dict(conf: ReadDictConfig){
                 : String =
             let{src->StringBuilder().apply{repeat(destLen){append(ANY_CHR)}}
                 .apply{setCharAt(destPos, src[srcPos])}.toString()}
-
-        fun getEmptyPattern(len: Int) = "".padStart(len, ANY_CHR)
     }
 }
 
@@ -64,6 +62,9 @@ fun ReadDictConfig.parseDict(pDict: Sequence<String>) =
             Pair(if(TO_UPPER_CASE) entry.uppercase() else entry, synms)}
         .groupBy{(entry, _)->entry}
         .map{(entry, synms)->
-            Pair(entry,
-                synms.flatMap{synm->synm.second}.toSet())}
+            Pair(entry, synms.flatMap{synm->synm.second}.toSet())}
+        .flatMap{entry->if(BIDECTIONAL)
+                setOf(entry, Pair(entry.first.reversed(), entry.second))
+            else setOf(entry)
+        }
         .toMap()
