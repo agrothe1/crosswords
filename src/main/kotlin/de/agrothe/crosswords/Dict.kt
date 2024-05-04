@@ -6,18 +6,9 @@ typealias DictKey = String
 typealias DictValues = Collection<String>
 typealias DictEntry = Map<DictKey, DictValues>
 
-const val ANY_CHR = '.'
-
 class Dict(conf: ReadDictConfig){
     val entries: DictEntry by lazy {readDictFile(conf)}
     val keys: Collection<DictKey> by lazy {entries.keys}
-
-    companion object{
-        fun String.getPattern(srcPos: Int, destPos: Int, destLen: Int)
-                : String =
-            let{src->StringBuilder().apply{repeat(destLen){append(ANY_CHR)}}
-                .apply{setCharAt(destPos, src[srcPos])}.toString()}
-    }
 }
 
 fun readDictFile(pConf: ReadDictConfig) =
@@ -63,8 +54,7 @@ fun ReadDictConfig.parseDict(pDict: Sequence<String>) =
         .groupBy{(entry, _)->entry}
         .map{(entry, synms)->
             Pair(entry, synms.flatMap{synm->synm.second}.toSet())}
-        .flatMap{entry->if(BIDECTIONAL)
-                setOf(entry, Pair(entry.first.reversed(), entry.second))
-            else setOf(entry)
+        .flatMap{entry->if(!BIDECTIONAL) setOf(entry)
+            else setOf(entry, with(entry){Pair(first.reversed(), second)})
         }
         .toMap()

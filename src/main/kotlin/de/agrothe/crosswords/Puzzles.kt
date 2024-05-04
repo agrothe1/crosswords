@@ -2,10 +2,13 @@ package de.agrothe.crosswords
 
 import de.agrothe.crosswords.Axis.X
 import de.agrothe.crosswords.Axis.Y
-import de.agrothe.crosswords.Pos.Companion.advance
 import io.github.oshai.kotlinlogging.KotlinLogging
 
 private val logger by lazy{KotlinLogging.logger{}}
+
+typealias Puzzle = Array<CharArray>
+typealias Keys = Collection<DictKey>
+typealias Pos = Int
 
 private val config by lazy{
     readConfig()
@@ -13,26 +16,17 @@ private val config by lazy{
 private val dict by lazy {
     Dict(config.dict)
 }
-private val keys by lazy {dict.keys}
-private val puzzleConf by lazy {config.puzzle}
-
-typealias Puzzle = Array<CharArray>
+private val conf by lazy {config.puzzle}
 
 enum class Axis{
     X, Y
 }
 
-class Pos(val pos: Int){
-    override fun toString() = "$pos"
-
-    companion object{
-        fun Pos.advance(pAxis: Axis): Pair<Axis, Pos> =
-            when(pAxis){
-                X->Pair(Y, this)
-                Y->Pair(X, Pos(pos+1))
-            }
-        }
-}
+fun Pos.advance(pAxis: Axis): Pair<Axis, Pos> =
+    when(pAxis){
+        X->Pair(Y, this)
+        Y->Pair(X, this+1)
+    }
 
 fun Puzzle.put(pAxis: Axis, pPos: Pos, pStr: String): Puzzle =
     foldIndexed(copyOf()) // clone/copy Puzzle
@@ -40,22 +34,22 @@ fun Puzzle.put(pAxis: Axis, pPos: Pos, pStr: String): Puzzle =
         .also{newPuzzle->
             for((idx, c) in pStr.withIndex()){
                 when(pAxis){
-                    X->newPuzzle[pPos.pos][idx] = c
-                    Y->newPuzzle[idx][pPos.pos] = c
+                    X->newPuzzle[pPos][idx] = c
+                    Y->newPuzzle[idx][pPos] = c
                 }
             }
         }
 
 fun Puzzle.getStringAt(pAxis: Axis, pPos: Pos): String =
     when(pAxis){
-        X -> String(this[pPos.pos])
-        Y -> pPos.pos.let{col->this.fold(StringBuilder())
-            {sb, row->sb.append(row[col])}}.toString()
+        X -> String(this[pPos])
+        Y -> this.fold(StringBuilder())
+            {sb, row->sb.append(row[pPos])}.toString()
     }
 
-fun getMatchingKeys(pPattern: String): Collection<DictKey> =
+fun Keys.getMatchingKeys(pPattern: String): Collection<DictKey> =
     Regex(pPattern, RegexOption.IGNORE_CASE).let{regex->
-        keys.mapNotNull{entry->
+        mapNotNull{entry->
             if(entry.matches(regex)) entry else null
         }
     }
@@ -66,30 +60,26 @@ fun Puzzle.print(){
 }
 
 fun Puzzle?.fillGrid(pAxis: Axis, pPos: Pos, pDimen: Int,
-        pUsedWords: MutableSet<String>): Puzzle?{
-    if(pPos.pos == pDimen) return this // solved
-    this?.also{puzzle->
-        //puzzle.print()
+        pUsedWords: MutableSet<String>, pKeys: Keys): Puzzle? =
+    this?.let{puzzle->
+        if(pPos == pDimen) return this // solved
         fun Axis.getMatches(): Collection<String> =
-            getMatchingKeys(puzzle.getStringAt(pAxis=this, pPos))
+            pKeys.getMatchingKeys(puzzle.getStringAt(pAxis=this, pPos))
                 .minus(pUsedWords)
 
         pPos.advance(pAxis).also{(nextAxis, nextPos)->
-            pAxis.getMatches()
-                .shuffled()
+            pAxis.getMatches().shuffled()
                 .forEach{word->
-                    pUsedWords.addAll(if(puzzleConf.ALLOW_DUPLICATES)
-                        setOf(word) else setOf(word, word.reversed()))
+                    pUsedWords.addAll(setOf(word, word.reversed()))
                     logger.debug{"$nextAxis $nextPos: $word"}
                     puzzle.put(pAxis, pPos, word)
                         .fillGrid(nextAxis, nextPos, pDimen,
-                                HashSet(pUsedWords))
+                                HashSet(pUsedWords), pKeys)
                             ?.run{return@fillGrid this}
                 }
         }
+        return null
     }
-    return null
-}
 
 fun emptyPuzzle(pDimen: Int) =
     Array(pDimen){_->CharArray(pDimen){_-> '.'}}
@@ -97,8 +87,9 @@ fun emptyPuzzle(pDimen: Int) =
 fun main(){ // Saum Baum
     val dimen = 4
     val puzzle = emptyPuzzle(dimen)
-    puzzle.fillGrid(X, Pos(0), dimen, mutableSetOf())
-        ?.print()
+    puzzle.fillGrid(X, 0, dimen, hashSetOf(),
+        dict.keys.filter{it.length == dimen})
+            ?.print()
 }
 
 
