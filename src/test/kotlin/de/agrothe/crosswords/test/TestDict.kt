@@ -4,7 +4,9 @@ import de.agrothe.crosswords.*
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.io.File
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 private val logger = KotlinLogging.logger{}
 
@@ -12,25 +14,33 @@ private val config = readConfig()
 private val entries by lazy {Dict(config.dict).entries}
 
 class TestDict{
+    val numEntries = 69_500 ..69_800
+
     @Test
-    fun numKeys() =
-        assertEquals(true,
-        entries.count() in 69_500..69_800)
+    fun numKeysUniDir(){
+        assertTrue(Dict(config.dict.apply{BIDECTIONAL=false})
+            .entries.count() in numEntries)
+    }
+
+    @Test
+    fun numKeysBiDir(){
+        assertTrue(Dict(config.dict.apply{BIDECTIONAL=true})
+            .entries.count() in numEntries.map{it.times(2)})
+    }
 
     @Test
     fun noEmptyKey() =
-        entries.forEach{assertEquals(false, it.key.isBlank())}
+        entries.forEach{assertFalse(it.key.isBlank())}
 
     @Test
     fun legalKeys(){
         val illegalChars = Regex("[^\\p{Alpha}]+")
-        entries.forEach{assertEquals(false,
-            it.key.contains(illegalChars))}
+        entries.forEach{assertFalse(it.key.contains(illegalChars))}
     }
 
     @Test
     fun noEmptyValues() =
-        entries.forEach{entry->assertEquals(false,
+        entries.forEach{entry->assertFalse(
             entry.value.let{
                 val isEmpty = it.isEmpty()
                 if(isEmpty)logger.error{"empty value: $entry"}
@@ -41,12 +51,12 @@ class TestDict{
     fun noEmptyValue() =
         entries.forEach{it ->
             it.value.forEach{
-                assertEquals(false, it.isBlank())}}
+                assertFalse(it.isBlank())}}
 
     @Test
     fun noNegatives(){
         val negatives = config.dict.NEGATIVES_REGEXPR
-        entries.forEach{entry->assertEquals(false,
+        entries.forEach{entry->assertFalse(
             entry.key.let{
                 val isNegative = negatives.matches(it)
                 if(isNegative)logger.error{"should be excluded: $entry"}
@@ -57,10 +67,21 @@ class TestDict{
 
     @Test
     fun noDuplicateValues() =
-        entries.forEach {
-            assertEquals(true,
-            it.value.size == it.value.distinct().size)
+        entries.forEach{
+            assertTrue(it.value.size == it.value.distinct().size)
         }
+
+    @Test
+    fun writeRead(){
+        File.createTempFile("crwds", "").let{file->
+            generate(3)?.apply{save(file)}
+                ?.zip(file.read())?.forEach{
+                    (rowOut, rowIn)->
+                        assertTrue(rowOut contentEquals rowIn)
+            }
+            file.delete()
+        }
+    }
 
     @Test
     fun permutations(){
@@ -80,8 +101,9 @@ class TestDict{
            "Äsen;Über;Öffi;mästen;grübeln;lösen;daß",
            " w/ Space;KEY;;B C;D#"
         ).asSequence()
-        val dict = testDict.parseDict(config.dict).toString()
-        assertTrue( dict ==
+        val dict =
+            testDict.parseDict(config.dict.apply{BIDECTIONAL=false}).toString()
+        assertTrue(dict ==
 """{a=[b, c, ô], b=[a, c, ä, ô, 1, 2], c=[a, b, ä], ae=[b, c, ô], Aeae=[öxÖ, üyÜ, ßzß], oexOe=[Ää, üyÜ, ßzß], ueyUe=[Ää, öxÖ, ßzß], sszss=[Ää, öxÖ, üyÜ], Aesen=[Über, Öffi, mästen, grübeln, lösen, daß], Ueber=[Äsen, Öffi, mästen, grübeln, lösen, daß], Oeffi=[Äsen, Über, mästen, grübeln, lösen, daß], maesten=[Äsen, Über, Öffi, grübeln, lösen, daß], gruebeln=[Äsen, Über, Öffi, mästen, lösen, daß], loesen=[Äsen, Über, Öffi, mästen, grübeln, daß], dass=[Äsen, Über, Öffi, mästen, grübeln, lösen], KEY=[w/ Space, B C, D], D=[w/ Space, KEY, B C]}"""
         )
     }

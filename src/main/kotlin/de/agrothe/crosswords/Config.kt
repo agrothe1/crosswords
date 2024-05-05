@@ -22,8 +22,8 @@ class ReadDictConfig(
     val TEST_MARKER: String,
     val SKIP_TEST_LINES: Boolean,
     val TO_UPPER_CASE: Boolean,
-    val SUBST_CHARS: Boolean,
-    val BIDECTIONAL: Boolean,
+    private val SUBST_CHARS: Boolean,
+    var BIDECTIONAL: Boolean,
 
     NEGATIVES_LIST: Set<String>,
     ENTRY_DELIMITER_CHAR: String,
@@ -52,6 +52,8 @@ class ReadDictConfig(
 data class AppConfig(
     val dict: ReadDictConfig,
     val puzzle: PuzzleConfig,
+    val GENERATED_PUZZLES_DIR: Array<String>,
+    val GENERATED_PUZZLE_SUFFX: String,
 )
 
 fun readConfig(): AppConfig =

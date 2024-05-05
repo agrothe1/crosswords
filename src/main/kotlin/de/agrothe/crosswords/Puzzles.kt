@@ -3,6 +3,9 @@ package de.agrothe.crosswords
 import de.agrothe.crosswords.Axis.X
 import de.agrothe.crosswords.Axis.Y
 import io.github.oshai.kotlinlogging.KotlinLogging
+import java.io.File
+import java.lang.System.currentTimeMillis
+import kotlin.io.path.*
 
 private val logger by lazy{KotlinLogging.logger{}}
 
@@ -16,7 +19,7 @@ private val config by lazy{
 private val dict by lazy {
     Dict(config.dict)
 }
-private val conf by lazy {config.puzzle}
+private val puzzleConf by lazy {config.puzzle}
 
 enum class Axis{
     X, Y
@@ -70,7 +73,8 @@ fun Puzzle?.fillGrid(pAxis: Axis, pPos: Pos, pDimen: Int,
         pPos.advance(pAxis).also{(nextAxis, nextPos)->
             pAxis.getMatches().shuffled()
                 .forEach{word->
-                    pUsedWords.addAll(setOf(word, word.reversed()))
+                    if(!config.puzzle.ALLOW_DUPLICATES)
+                        pUsedWords.addAll(setOf(word, word.reversed()))
                     logger.debug{"$nextAxis $nextPos: $word"}
                     puzzle.put(pAxis, pPos, word)
                         .fillGrid(nextAxis, nextPos, pDimen,
@@ -81,15 +85,47 @@ fun Puzzle?.fillGrid(pAxis: Axis, pPos: Pos, pDimen: Int,
         return null
     }
 
+fun Puzzle.save(pFile: File): Puzzle =
+    apply{pFile.writeText(this.fold(StringBuilder()){acc, row->
+        acc.append(row.joinToString("", postfix="\n"))}
+            .toString().removeSuffix("\n"))}
+
+
+fun Puzzle.save(): Puzzle =
+    save(File(Path("",
+        *config.GENERATED_PUZZLES_DIR.plus(
+            arrayOf(this.size.toString(), currentTimeMillis().toString()
+                +config.GENERATED_PUZZLE_SUFFX))
+        ).toAbsolutePath().createParentDirectories().toString()))
+
+
+fun File.read(): Puzzle =
+    readLines().map{it.toCharArray()}.toTypedArray()
+
+fun read(pDimen: Int): Puzzle =
+    File(Path("", *config.GENERATED_PUZZLES_DIR.plus(pDimen.toString()))
+        .listDirectoryEntries().random().toString())
+            .read()
+
 fun emptyPuzzle(pDimen: Int) =
     Array(pDimen){_->CharArray(pDimen){_-> '.'}}
 
-fun main(){ // Saum Baum
+fun generate(pDimen: Int): Puzzle? =
+    emptyPuzzle(pDimen)
+        .fillGrid(X, 0, pDimen, hashSetOf(),
+            dict.keys.filter{it.length == pDimen})
+
+fun main(){
+    val numPuzzls = 10
     val dimen = 4
-    val puzzle = emptyPuzzle(dimen)
-    puzzle.fillGrid(X, 0, dimen, hashSetOf(),
-        dict.keys.filter{it.length == dimen})
-            ?.print()
+
+    (1..numPuzzls).forEach{
+        generate(dimen)?.run{
+            println("--> solution: $it")
+            print()
+            save()
+        }
+    }
 }
 
 
