@@ -2,27 +2,44 @@ package de.agrothe.crosswords
 
 import java.io.File
 
-typealias DictKey = String
-typealias DictValues = Collection<String>
-typealias DictEntry = Map<DictKey, DictValues>
+typealias DictWord = String
+typealias DictSynms = Collection<String>
+typealias DictEntry = Map<DictWord, DictSynmsOrnt>
+
+class DictSynmsOrnt(
+    val synms: DictSynms,
+    val ornt: KeyDirct
+)
+{
+    fun reversed() =
+        DictSynmsOrnt(synms,
+            when(ornt){
+               KeyDirct.NORMAL->KeyDirct.REVERSED
+               KeyDirct.REVERSED->KeyDirct.NORMAL
+            })
+}
+
+enum class KeyDirct{
+    NORMAL, REVERSED
+}
 
 class Dict(conf: ReadDictConfig){
     val entries: DictEntry by lazy {readDictFile(conf)}
-    val keys: Collection<DictKey> by lazy {entries.keys}
+    val words: Collection<DictWord> by lazy {entries.keys}
 }
 
-fun readDictFile(pConf: ReadDictConfig) =
+fun readDictFile(pConf: ReadDictConfig): DictEntry =
    File(pConf.DICT_FILE_NAME).useLines{lines->
        lines.parseDict(pConf)
    }
 
-fun Sequence<String>.parseDict(pConf: ReadDictConfig) =
+fun Sequence<String>.parseDict(pConf: ReadDictConfig): DictEntry =
     pConf.parseDict(this)
 
 /*
 a;b;c -> a(b,c) b(a,c) c(a,b)
  */
-fun ReadDictConfig.parseDict(pDict: Sequence<String>) =
+fun ReadDictConfig.parseDict(pDict: Sequence<String>): DictEntry =
     pDict
         .filterNot{SKIP_TEST_LINES && it.contains(TEST_MARKER)}
         // strip tailing comments
@@ -53,8 +70,12 @@ fun ReadDictConfig.parseDict(pDict: Sequence<String>) =
             Pair(if(TO_UPPER_CASE) entry.uppercase() else entry, synms)}
         .groupBy{(entry, _)->entry}
         .map{(entry, synms)->
-            Pair(entry, synms.flatMap{synm->synm.second}.toSet())}
-        .flatMap{entry->if(!BIDECTIONAL) setOf(entry)
-            else setOf(entry, with(entry){Pair(first.reversed(), second)})
+            Pair(entry, DictSynmsOrnt(synms.flatMap{synm->synm.second}.toSet(),
+                KeyDirct.NORMAL))}
+        .flatMap{entry->
+            if(BIDECTIONAL)
+                setOf(entry,
+                    Pair(entry.first.reversed(), entry.second.reversed()))
+            else setOf(entry)
         }
-        .toMap()
+        .associate{it}

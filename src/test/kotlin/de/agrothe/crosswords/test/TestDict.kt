@@ -5,7 +5,6 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import java.io.File
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
 private val logger = KotlinLogging.logger{}
@@ -14,7 +13,7 @@ private val config = readConfig()
 private val entries by lazy {Dict(config.dict).entries}
 
 class TestDict{
-    val numEntries = 69_500 ..69_800
+    private val numEntries = 69_500 ..69_800
 
     @Test
     fun numKeysUniDir(){
@@ -41,7 +40,7 @@ class TestDict{
     @Test
     fun noEmptyValues() =
         entries.forEach{entry->assertFalse(
-            entry.value.let{
+            entry.value.synms.let{
                 val isEmpty = it.isEmpty()
                 if(isEmpty)logger.error{"empty value: $entry"}
                 isEmpty
@@ -50,7 +49,7 @@ class TestDict{
     @Test
     fun noEmptyValue() =
         entries.forEach{it ->
-            it.value.forEach{
+            it.value.synms.forEach{
                 assertFalse(it.isBlank())}}
 
     @Test
@@ -67,8 +66,8 @@ class TestDict{
 
     @Test
     fun noDuplicateValues() =
-        entries.forEach{
-            assertTrue(it.value.size == it.value.distinct().size)
+        entries.values.forEach{
+            assertTrue(it.synms.size == it.synms.distinct().size)
         }
 
     @Test
@@ -102,7 +101,8 @@ class TestDict{
            " w/ Space;KEY;;B C;D#"
         ).asSequence()
         val dict =
-            testDict.parseDict(config.dict.apply{BIDECTIONAL=false}).toString()
+            testDict.parseDict(config.dict.apply{BIDECTIONAL=false})
+                .map{Pair(it.key, it.value.synms)}.toMap().toString()
         assertTrue(dict ==
 """{a=[b, c, ô], b=[a, c, ä, ô, 1, 2], c=[a, b, ä], ae=[b, c, ô], Aeae=[öxÖ, üyÜ, ßzß], oexOe=[Ää, üyÜ, ßzß], ueyUe=[Ää, öxÖ, ßzß], sszss=[Ää, öxÖ, üyÜ], Aesen=[Über, Öffi, mästen, grübeln, lösen, daß], Ueber=[Äsen, Öffi, mästen, grübeln, lösen, daß], Oeffi=[Äsen, Über, mästen, grübeln, lösen, daß], maesten=[Äsen, Über, Öffi, grübeln, lösen, daß], gruebeln=[Äsen, Über, Öffi, mästen, lösen, daß], loesen=[Äsen, Über, Öffi, mästen, grübeln, daß], dass=[Äsen, Über, Öffi, mästen, grübeln, lösen], KEY=[w/ Space, B C, D], D=[w/ Space, KEY, B C]}"""
         )

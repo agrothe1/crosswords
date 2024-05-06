@@ -10,7 +10,7 @@ import kotlin.io.path.*
 private val logger by lazy{KotlinLogging.logger{}}
 
 typealias Puzzle = Array<CharArray>
-typealias Keys = Collection<DictKey>
+typealias Keys = Collection<DictWord>
 typealias Pos = Int
 
 private val config by lazy{
@@ -50,7 +50,7 @@ fun Puzzle.getStringAt(pAxis: Axis, pPos: Pos): String =
             {sb, row->sb.append(row[pPos])}.toString()
     }
 
-fun Keys.getMatchingKeys(pPattern: String): Collection<DictKey> =
+fun Keys.getMatchingKeys(pPattern: String): Collection<DictWord> =
     Regex(pPattern, RegexOption.IGNORE_CASE).let{regex->
         mapNotNull{entry->
             if(entry.matches(regex)) entry else null
@@ -102,7 +102,7 @@ fun Puzzle.save(): Puzzle =
 fun File.read(): Puzzle =
     readLines().map{it.toCharArray()}.toTypedArray()
 
-fun read(pDimen: Int): Puzzle =
+fun getRandom(pDimen: Int): Puzzle =
     File(Path("", *config.GENERATED_PUZZLES_DIR.plus(pDimen.toString()))
         .listDirectoryEntries().random().toString())
             .read()
@@ -113,7 +113,7 @@ fun emptyPuzzle(pDimen: Int) =
 fun generate(pDimen: Int): Puzzle? =
     emptyPuzzle(pDimen)
         .fillGrid(X, 0, pDimen, hashSetOf(),
-            dict.keys.filter{it.length == pDimen})
+            dict.words.filter{it.length == pDimen})
 
 fun main(){
     val numPuzzls = 10
