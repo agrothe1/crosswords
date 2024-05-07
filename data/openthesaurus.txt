@@ -40344,7 +40344,7 @@ schwarz-amerikanisch;afroamerikanisch;schwarzamerikanisch
 Knallpatronengerät;Manöverpatronengerät
 Verschwörungstheoretiker;Verschwörungs-"Theoretiker";Aluhutleute (ugs., Pluraletantum, abwertend, fig.);Verschwörungsschwurbler (ugs., abwertend);Anhänger von Verschwörungstheorien;Aluhutträger (ugs., abwertend, fig.);Verschwörungsanhänger
 Schlaggitarre;Flatpicking (engl.)
-Urucum;Achote;Bixin;Orlean;Anatto;Achiote;Annatto;Ruku;Roucou;Achote
+#Urucum;Achote;Bixin;Orlean;Anatto;Achiote;Annatto;Ruku;Roucou;Achote
 ohne (weitere) Konsequenzen;ohne Konsequenzen fürchten zu müssen;ungestraft
 niedergelassener Arzt;Arzt mit eigener Praxis
 (sich) klein machen;(sich) ducken;den Kopf einziehen

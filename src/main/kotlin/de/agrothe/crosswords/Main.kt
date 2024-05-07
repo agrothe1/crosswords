@@ -6,8 +6,8 @@ import kotlin.time.measureTime
 
 private val logger by lazy {KotlinLogging.logger{}}
 
-private val config = readConfig()
-private val dict by lazy {Dict(config.dict)}
+//private val config = readConfig()
+//private val dict by lazy {Dict(config.dict)}
 
 fun main() {
     //dict.dict.keys.take(50).forEach {logger.debug{it}}

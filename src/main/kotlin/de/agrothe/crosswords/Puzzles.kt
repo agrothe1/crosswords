@@ -13,12 +13,10 @@ typealias Puzzle = Array<CharArray>
 typealias Keys = Collection<DictWord>
 typealias Pos = Int
 
-private val config by lazy{
-    readConfig()
-}
-private val dict by lazy {
-    Dict(config.dict)
-}
+private val config by lazy{readConfig()}
+
+val dict by lazy {Dict(config.dict)}
+
 private val puzzleConf by lazy {config.puzzle}
 
 enum class Axis{
