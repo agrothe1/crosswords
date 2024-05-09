@@ -49,9 +49,14 @@ class ReadDictConfig(
            else this
     }
 
+class WebAppConfig(
+    val DIRCTN_IMG: String
+)
+
 data class AppConfig(
     val dict: ReadDictConfig,
     val puzzle: PuzzleConfig,
+    val webApp: WebAppConfig,
     val GENERATED_PUZZLES_DIR: Array<String>,
     val GENERATED_PUZZLE_SUFFX: String,
 )
