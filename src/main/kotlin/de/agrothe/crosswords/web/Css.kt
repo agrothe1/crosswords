@@ -15,62 +15,38 @@ val CSS = fun CSSBuilder.(){
         color=Color.blue
         fontSize=5.vh
     }
-    rule(".gridTable"){
+    rule(".${confCss.GRID_TABLE}"){
         border="0.5vh solid blue"
-        //borderCollapse=BorderCollapse.collapse
     }
-    rule(".gridTable td"){
-        //border="0.3vh solid black"
+    rule(".${confCss.GRID_TABLE} td"){
         fontFamily="Monospace"
         borderCollapse=BorderCollapse.collapse
     }
-    rule(".gridTable td"){
-        borderStyle=BorderStyle.none
-        //fontSize=3.0.vh
-        //fontFamily="Monospace"
-        //fontWeight=FontWeight.bolder
-        //fontStyle=FontStyle.italic
-        //color=rgb(233, 30, 99)
-        //zIndex=1
-    }
-    rule(".puzzleRow"){
-        //gridAutoRows= GridAutoRows.auto
-        //gridTemplateAreas=GridTemplateAreas("idx . dir")
-        //gridTemplateAreas=GridTemplateAreas("lett")
-        //gridTemplateColumns=GridTemplateColumns(1.0.fr, 1.0.fr, 1.0.fr)
-        //gridTemplateRows=GridTemplateRows()
-    }
-    rule(".gridTableCell"){
+    rule(".${confCss.GRID_TABLE_CELL}"){
+        fontSize=3.0.vh
+        textAlign=TextAlign.end
         display=Display.grid
         gridTemplateColumns=GridTemplateColumns(1.fr, 1.fr)
         gridTemplateRows=GridTemplateRows(3.0.vh, 10.vh)
     }
-    rule(".puzzleCellIdxNum"){
-        fontSize=3.0.vh
-    }
-    rule(".puzzleCellChar"){
+    rule(".${confCss.PUZZLE_CELL_CHAR}"){
         fontSize=10.vh
         gridColumnStart=GridColumnStart("1")
         gridColumnEnd=GridColumnEnd("3")
     }
-    //"gridTableCell"
-    rule(".gridTableCell"){
-        fontSize=3.0.vh
-        textAlign=TextAlign.end
-    }
-    rule(".idxImageRotateSouth"){
+    rule(".${confCss.IDX_SLCT_ROT_SOUTH}"){
         height=2.5.vh
         transform.rotate(0.grad)
     }
-    rule("idxImageRotateEast"){
+    rule(".${confCss.IDX_SLCT_ROT_EAST}"){
         height=2.5.vh
         transform.rotate(100.grad)
     }
-    rule(".idxImageRotateNorth"){
-        transform.rotate(200.grad)
+    rule(".${confCss.IDX_SLCT_ROT_NORTH}"){
         height=2.5.vh
+        transform.rotate(200.grad)
     }
-    rule(".idxImageRotateWest"){
+    rule(".${confCss.IDX_SLCT_ROT_WEST}"){
         height=2.5.vh
         transform.rotate(300.grad)
     }

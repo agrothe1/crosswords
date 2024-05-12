@@ -2,7 +2,6 @@ package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.*
 import io.ktor.server.html.*
-import kotlinx.css.span
 import kotlinx.html.*
 
 private val conf by lazy{config.webApp}
@@ -35,7 +34,7 @@ class PuzzleTplt: Template<FlowContent>{
 
     override fun FlowContent.apply(){
         val cellTmplt = TemplatePlaceholder<CellTmplt>()
-        table("gridTable"){
+        table(confCss.GRID_TABLE){
             tbody{
                 puzzle.forEachIndexed{rowIdx, row->
                     val dictEntryRow= entries.get(
@@ -62,23 +61,7 @@ class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val char: Char,
         val wordAtX: DictSynmsOrnt?, val wordAtY: DictSynmsOrnt?,
         val pDimen: Int): Template<FlowContent>{
     override fun FlowContent.apply(){
-        /*
-        fun getOrntAndClss(pAxis: Axis) =
-            pEntries[pPuzzle.getStringAt(pAxis, pColIdx)]?.let{entry->
-                Pair(entry.ornt,
-                    if(pAxis == Axis.X)
-                        when(entry.ornt){
-                            KeyDirct.NORMAL->confCss.IDX_SLCT_ROT_NORTH
-                            else->confCss.IDX_SLCT_ROT_SOUTH}
-                    else
-                        when(entry.ornt){
-                            KeyDirct.NORMAL->confCss.IDX_SLCT_ROT_EAST
-                            else->confCss.IDX_SLCT_ROT_WEST}
-                    )
-            }
-         */
-
-        span("gridTableCell"){
+        span(confCss.GRID_TABLE_CELL){
             wordAtY?.ornt.let{ornt->
                 when(pRowIdx){
                     0->         ornt==KeyDirct.NORMAL
@@ -86,7 +69,7 @@ class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val char: Char,
                     else->      false
                 }.let{show->
                     if(show){
-                        span("puzzleCellIdxNum"){
+                        span(confCss.PUZZLE_CELL_IDX_NUM){
                             +pColIdx.inc().toString()}
                         img(classes=
                                 if(ornt==KeyDirct.NORMAL)
@@ -97,25 +80,9 @@ class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val char: Char,
                     else{span(); span()}
                 }
             }
-            span("puzzleCellChar"){+char.toString()}
+            span(confCss.PUZZLE_CELL_CHAR){+char.toString()}
         }
     }
-    /*
-        span("idx"){
-            getOrntAndClss(Axis.Y)?.let{(ornt, imgDirct)->
-                when(pRowIdx){
-                    0->if(ornt == KeyDirct.NORMAL){
-                        +"${pColIdx+1}"
-                        //img(classes=imgDirct, src=conf.DIRCTN_IMG)
-                    }
-                    (pDimen-1)->if(ornt == KeyDirct.REVERSED){
-                        +"${pColIdx+1}"
-                        //img(classes=imgDirct, src=conf.DIRCTN_IMG)
-                    }
-                }
-            }
-        }
-*/
 }
 
 
