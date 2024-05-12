@@ -28,7 +28,7 @@ fun Pos.advance(pAxis: Axis): Pair<Axis, Pos> =
     }
 
 fun Puzzle.put(pAxis: Axis, pPos: Pos, pStr: String): Puzzle =
-    foldIndexed(copyOf()) // clone/copy Puzzle
+    foldIndexed(this) // clone/copy Puzzle
             {idx, arr, line->arr[idx]=line.copyOf(); arr}
         .also{newPuzzle->
             for((idx, c) in pStr.withIndex()){
@@ -72,7 +72,7 @@ fun Puzzle?.fillGrid(pAxis: Axis, pPos: Pos, pDimen: Int,
                     if(!config.puzzle.ALLOW_DUPLICATES)
                         pUsedWords.addAll(setOf(word, word.reversed()))
                     logger.debug{"$nextAxis $nextPos: $word"}
-                    puzzle.put(pAxis, pPos, word)
+                    puzzle.copyOf().put(pAxis, pPos, word)
                         .fillGrid(nextAxis, nextPos, pDimen,
                                 HashSet(pUsedWords), pKeys)
                             ?.run{return@fillGrid this}
@@ -100,8 +100,10 @@ fun File.read(): Puzzle =
 
 fun getRandom(pDimen: Int): Puzzle =
     File(Path("", *config.GENERATED_PUZZLES_DIR.plus(pDimen.toString()))
-        .listDirectoryEntries().random().toString())
-            .read()
+        .listDirectoryEntries().random().toString()).run{
+            logger.info{"reading puzzle: ${this.name}"}
+            read()
+        }
 
 fun emptyPuzzle(pDimen: Int) =
     Array(pDimen){_->CharArray(pDimen){_-> '.'}}
@@ -113,7 +115,7 @@ fun generate(pDimen: Int): Puzzle? =
 
 fun main(){
     val numPuzzls = 10
-    val dimen = 4
+    val dimen = 5
 
     (1..numPuzzls).forEach{
         generate(dimen)?.run{

@@ -50,7 +50,16 @@ class ReadDictConfig(
     }
 
 class WebAppConfig(
-    val DIRCTN_IMG: String
+    val DIRCTN_IMG: String,
+    val CSS: Css,
+)
+
+class Css(
+    val IDX_SLCT: String,
+    val IDX_SLCT_ROT_EAST: String,
+    val IDX_SLCT_ROT_WEST: String,
+    val IDX_SLCT_ROT_SOUTH: String,
+    val IDX_SLCT_ROT_NORTH: String,
 )
 
 data class AppConfig(

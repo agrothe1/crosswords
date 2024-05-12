@@ -1,51 +1,77 @@
 package de.agrothe.crosswords.web
 
+import de.agrothe.crosswords.config
 import kotlinx.css.*
 import kotlinx.css.properties.*
+
+private val confCss=config.webApp.CSS
 
 val CSS = fun CSSBuilder.(){
     rule("body"){
         backgroundColor=Color.white
         margin(5.vh)
     }
-    rule("h1.page-title"){
+    rule("h1"){
         color=Color.blue
-        fontSize=50.vh
+        fontSize=5.vh
     }
-    rule("table"){
-        color=Color.black
-        fontSize=10.vh
-        //border="1.vh solid black"
+    rule(".gridTable"){
+        border="0.5vh solid blue"
+        //borderCollapse=BorderCollapse.collapse
+    }
+    rule(".gridTable td"){
+        //border="0.3vh solid black"
+        fontFamily="Monospace"
         borderCollapse=BorderCollapse.collapse
     }
-    rule("td"){
-        border="0.3vh solid black"
+    rule(".gridTable td"){
+        borderStyle=BorderStyle.none
+        //fontSize=3.0.vh
+        //fontFamily="Monospace"
+        //fontWeight=FontWeight.bolder
+        //fontStyle=FontStyle.italic
+        //color=rgb(233, 30, 99)
+        //zIndex=1
     }
-    rule("td"){
-        textAlign=TextAlign.center
-        fontFamily="Monospace"
+    rule(".puzzleRow"){
+        //gridAutoRows= GridAutoRows.auto
+        //gridTemplateAreas=GridTemplateAreas("idx . dir")
+        //gridTemplateAreas=GridTemplateAreas("lett")
+        //gridTemplateColumns=GridTemplateColumns(1.0.fr, 1.0.fr, 1.0.fr)
+        //gridTemplateRows=GridTemplateRows()
     }
-    rule(".idx"){
+    rule(".gridTableCell"){
+        display=Display.grid
+        gridTemplateColumns=GridTemplateColumns(1.fr, 1.fr)
+        gridTemplateRows=GridTemplateRows(3.0.vh, 10.vh)
+    }
+    rule(".puzzleCellIdxNum"){
         fontSize=3.0.vh
-        fontFamily="Monospace"
-        fontWeight=FontWeight.bolder
-        fontStyle=FontStyle.italic
-        color=rgb(233, 30, 99)
-        zIndex=1
-        position=Position.absolute
-        justifyContent=JustifyContent.spaceBetween
     }
-    rule(".idx>img"){
-        height=3.0.vh
-        position=Position.relative
+    rule(".puzzleCellChar"){
+        fontSize=10.vh
+        gridColumnStart=GridColumnStart("1")
+        gridColumnEnd=GridColumnEnd("3")
     }
-    rule(".idx>img.idxImageRotateLeft"){
+    //"gridTableCell"
+    rule(".gridTableCell"){
+        fontSize=3.0.vh
+        textAlign=TextAlign.end
+    }
+    rule(".idxImageRotateSouth"){
+        height=2.5.vh
+        transform.rotate(0.grad)
+    }
+    rule("idxImageRotateEast"){
+        height=2.5.vh
         transform.rotate(100.grad)
     }
-    rule(".idx>img.idxImageRotateUp"){
+    rule(".idxImageRotateNorth"){
         transform.rotate(200.grad)
+        height=2.5.vh
     }
-    rule(".idx>img.idxImageRotateRight"){
+    rule(".idxImageRotateWest"){
+        height=2.5.vh
         transform.rotate(300.grad)
     }
 }
