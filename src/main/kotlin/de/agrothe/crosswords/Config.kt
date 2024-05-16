@@ -57,6 +57,7 @@ class WebAppConfig(
 class Css(
     val GRID_TABLE: String,
     val GRID_TABLE_CELL: String,
+    val GRID_TABLE_CELL_TOP: String,
     val PUZZLE_CELL_CHAR: String,
     val PUZZLE_CELL_IDX_NUM: String,
     val IDX_SLCT_ROT_EAST: String,

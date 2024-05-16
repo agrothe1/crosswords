@@ -42,8 +42,8 @@ class PuzzleTplt: Template<FlowContent>{
                     tr{
                         row.forEachIndexed{colIdx, char->
                             td{
-                                insert(CellTmplt(rowIdx, colIdx, char, puzzle,
-                                    dictEntryRow,
+                                insert(CellTmplt(rowIdx, colIdx,
+                                    char, puzzle, dictEntryRow,
                                     entries.get(
                                         puzzle.getStringAt(Axis.Y, colIdx)),
                                     dimen), cellTmplt)
@@ -59,31 +59,100 @@ class PuzzleTplt: Template<FlowContent>{
 class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val char: Char,
         val pPuzzle: Puzzle,
         val wordAtX: DictSynmsOrnt?, val wordAtY: DictSynmsOrnt?,
-        val pDimen: Int): Template<FlowContent>{
+        val pDimen: Int): Template<FlowContent>
+{
     override fun FlowContent.apply(){
-        span(confCss.GRID_TABLE_CELL){
-            wordAtY?.ornt.let{ornt->
-                when(pRowIdx){
-                    0->         ornt==KeyDirct.NORMAL
-                    pDimen-1->  ornt==KeyDirct.REVERSED
-                    else->      false
-                }.let{show->
-                    if(show){
-                        span(confCss.PUZZLE_CELL_IDX_NUM){
-                            +pColIdx.inc().toString()}
-                        img(classes=
-                                if(ornt==KeyDirct.NORMAL)
-                                    confCss.IDX_SLCT_ROT_SOUTH
-                                else confCss.IDX_SLCT_ROT_NORTH,
-                            src=conf.DIRCTN_IMG)
+        with(confCss){
+            table{
+                tr{td{
+                    table{tr{td{
+                        span(PUZZLE_CELL_IDX_NUM){
+                            wordAtY?.ornt.let{yOrnt->
+                                if((yOrnt==KeyDirct.NORMAL && pRowIdx==0)
+                                    || (yOrnt==KeyDirct.REVERSED
+                                        && pRowIdx==pDimen-1))
+                                    span{
+                                        +pColIdx.inc().toString()
+                                        img(classes=
+                                            if(yOrnt==KeyDirct.NORMAL)
+                                                IDX_SLCT_ROT_SOUTH
+                                            else IDX_SLCT_ROT_NORTH,
+                                                src=conf.DIRCTN_IMG)
+                                    }
+                                    else {+Entities.nbsp}
+                            }
+                        }
+                    }}}
+                }}
+                tr{
+                    td{
+                        //colSpan="2"
+                        //rowSpan="2"
+                        span(confCss.PUZZLE_CELL_CHAR){+char.toString()}
                     }
-                    else{span(); span()}
                 }
-            }
-            span(confCss.PUZZLE_CELL_CHAR){+char.toString()}
-        }
+                tr{
+                    td{}
+                    td{}
+                }
+        }}
     }
 }
+        /*
+            if(showRowIdx) {
+                img(src = rowImg) {
+                    classes = setOf(confCss.GRID_TABLE_CELL_TOP)
+                }
+                span {
 
-
-
+                }
+            }
+                        .let{showCol->
+                        wordAtX?.ornt.let{ornt-> Pair(showCol,
+                            when(pColIdx){
+                                0->         Pair(
+                                                if(ornt==KeyDirct.NORMAL)
+                                                    pRowIdx else null,
+                                                IDX_SLCT_ROT_EAST)
+                                pDimen-1->  Pair(
+                                                if(ornt==KeyDirct.REVERSED)
+                                                    null else pRowIdx,
+                                                IDX_SLCT_ROT_WEST)
+                                else->      Pair(null, "")
+                            })
+                        }}
+                    span()
+                        span(PUZZLE_CELL_IDX_NUM){+col.first}
+                        span(){+col.second}
+                        //img(classes="."+col.first, src=conf.DIRCTN_IMG)
+                        span(PUZZLE_CELL_CHAR){+char.toString()}
+                    span(PUZZLE_CELL_IDX_NUM){+row.first}
+                        span(){+row.second}
+                        //img(classes="."+row.second, src=conf.DIRCTN_IMG)
+                }}
+                   when{
+                        col.first->when{
+                            col.second == IDX_SLCT_ROT_SOUTH->{
+                                span()
+                                span(PUZZLE_CELL_IDX_NUM){
+                                    +pColIdx.inc().toString()}
+                                img(classes=col.second, src=conf.DIRCTN_IMG)
+                                span()
+                                    span(PUZZLE_CELL_CHAR){+char.toString()}
+                                span()
+                                span();span();span()
+                            }
+                            else->(1..9).forEach{span()}
+                        }
+                        else->(1..9).forEach{span()}
+                    }
+                    if(col.first && col.second == IDX_SLCT_ROT_SOUTH){ // show
+                        span()
+                        span(PUZZLE_CELL_IDX_NUM){
+                            +pColIdx.inc().toString()}
+                        img(classes=col.second, src=conf.DIRCTN_IMG)
+                        span(PUZZLE_CELL_CHAR){+char.toString()}
+                        span()
+                    }
+                    else{span(); span()}
+        */

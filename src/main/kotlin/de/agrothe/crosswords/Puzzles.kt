@@ -115,7 +115,7 @@ fun generate(pDimen: Int): Puzzle? =
 
 fun main(){
     val numPuzzls = 10
-    val dimen = 5
+    val dimen = 4
 
     (1..numPuzzls).forEach{
         generate(dimen)?.run{

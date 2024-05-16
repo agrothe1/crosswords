@@ -18,21 +18,18 @@ val CSS = fun CSSBuilder.(){
     rule(".${confCss.GRID_TABLE}"){
         border="0.5vh solid blue"
     }
-    rule(".${confCss.GRID_TABLE} td"){
+    rule(".${confCss.GRID_TABLE}"){
         fontFamily="Monospace"
         borderCollapse=BorderCollapse.collapse
     }
-    rule(".${confCss.GRID_TABLE_CELL}"){
+    rule(".${confCss.PUZZLE_CELL_IDX_NUM}"){
         fontSize=3.0.vh
+        //lineHeight=LineHeight("3vh")
         textAlign=TextAlign.end
-        display=Display.grid
-        gridTemplateColumns=GridTemplateColumns(1.fr, 1.fr)
-        gridTemplateRows=GridTemplateRows(3.0.vh, 10.vh)
     }
     rule(".${confCss.PUZZLE_CELL_CHAR}"){
         fontSize=10.vh
-        gridColumnStart=GridColumnStart("1")
-        gridColumnEnd=GridColumnEnd("3")
+        //lineHeight=LineHeight("6vh")
     }
     rule(".${confCss.IDX_SLCT_ROT_SOUTH}"){
         height=2.5.vh
