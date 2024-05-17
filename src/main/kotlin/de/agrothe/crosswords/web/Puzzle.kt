@@ -39,9 +39,9 @@ class PuzzleTplt: Template<FlowContent>{
                 puzzle.forEachIndexed{rowIdx, row->
                     val dictEntryRow= entries.get(
                         puzzle.getStringAt(Axis.X, rowIdx))
-                    tr{
+                    tr(confCss.GRID_TABLE_ROW){
                         row.forEachIndexed{colIdx, char->
-                            td{
+                            td(confCss.GRID_TABLE_COL){
                                 insert(CellTmplt(rowIdx, colIdx,
                                     char, puzzle, dictEntryRow,
                                     entries.get(
@@ -69,7 +69,7 @@ class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val char: Char,
                         span(PUZZLE_CELL_IDX_NUM){
                             wordAtY?.ornt.let{yOrnt->
                                 if((yOrnt==KeyDirct.NORMAL && pRowIdx==0)
-                                    || (yOrnt==KeyDirct.REVERSED
+                                    ||(yOrnt==KeyDirct.REVERSED
                                         && pRowIdx==pDimen-1))
                                     span{
                                         +pColIdx.inc().toString()
@@ -79,80 +79,34 @@ class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val char: Char,
                                             else IDX_SLCT_ROT_NORTH,
                                                 src=conf.DIRCTN_IMG)
                                     }
-                                    else {+Entities.nbsp}
+                                else {+Entities.nbsp}
                             }
                         }
                     }}}
                 }}
-                tr{
-                    td{
-                        //colSpan="2"
-                        //rowSpan="2"
-                        span(confCss.PUZZLE_CELL_CHAR){+char.toString()}
-                    }
-                }
-                tr{
-                    td{}
-                    td{}
-                }
+                tr{td{
+                    span(confCss.PUZZLE_CELL_CHAR){+char.toString()}
+                }}
+                tr{td{
+                    table{tr{td{
+                        span(PUZZLE_CELL_IDX_NUM){
+                            wordAtX?.ornt.let{xOrnt->
+                                if((xOrnt==KeyDirct.NORMAL && pColIdx==0)
+                                    ||(xOrnt==KeyDirct.REVERSED
+                                        && pColIdx==pDimen-1))
+                                    span{
+                                        +pRowIdx.inc().toString()
+                                        img(classes=
+                                            if(xOrnt==KeyDirct.NORMAL)
+                                                IDX_SLCT_ROT_WEST
+                                            else IDX_SLCT_ROT_EAST,
+                                                src=conf.DIRCTN_IMG)
+                                    }
+                                else {+Entities.nbsp}
+                            }
+                        }
+                    }}}
+                }}
         }}
     }
 }
-        /*
-            if(showRowIdx) {
-                img(src = rowImg) {
-                    classes = setOf(confCss.GRID_TABLE_CELL_TOP)
-                }
-                span {
-
-                }
-            }
-                        .let{showCol->
-                        wordAtX?.ornt.let{ornt-> Pair(showCol,
-                            when(pColIdx){
-                                0->         Pair(
-                                                if(ornt==KeyDirct.NORMAL)
-                                                    pRowIdx else null,
-                                                IDX_SLCT_ROT_EAST)
-                                pDimen-1->  Pair(
-                                                if(ornt==KeyDirct.REVERSED)
-                                                    null else pRowIdx,
-                                                IDX_SLCT_ROT_WEST)
-                                else->      Pair(null, "")
-                            })
-                        }}
-                    span()
-                        span(PUZZLE_CELL_IDX_NUM){+col.first}
-                        span(){+col.second}
-                        //img(classes="."+col.first, src=conf.DIRCTN_IMG)
-                        span(PUZZLE_CELL_CHAR){+char.toString()}
-                    span(PUZZLE_CELL_IDX_NUM){+row.first}
-                        span(){+row.second}
-                        //img(classes="."+row.second, src=conf.DIRCTN_IMG)
-                }}
-                   when{
-                        col.first->when{
-                            col.second == IDX_SLCT_ROT_SOUTH->{
-                                span()
-                                span(PUZZLE_CELL_IDX_NUM){
-                                    +pColIdx.inc().toString()}
-                                img(classes=col.second, src=conf.DIRCTN_IMG)
-                                span()
-                                    span(PUZZLE_CELL_CHAR){+char.toString()}
-                                span()
-                                span();span();span()
-                            }
-                            else->(1..9).forEach{span()}
-                        }
-                        else->(1..9).forEach{span()}
-                    }
-                    if(col.first && col.second == IDX_SLCT_ROT_SOUTH){ // show
-                        span()
-                        span(PUZZLE_CELL_IDX_NUM){
-                            +pColIdx.inc().toString()}
-                        img(classes=col.second, src=conf.DIRCTN_IMG)
-                        span(PUZZLE_CELL_CHAR){+char.toString()}
-                        span()
-                    }
-                    else{span(); span()}
-        */

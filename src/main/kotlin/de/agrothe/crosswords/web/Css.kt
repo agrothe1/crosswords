@@ -16,20 +16,27 @@ val CSS = fun CSSBuilder.(){
         fontSize=5.vh
     }
     rule(".${confCss.GRID_TABLE}"){
-        border="0.5vh solid blue"
-    }
-    rule(".${confCss.GRID_TABLE}"){
         fontFamily="Monospace"
+        border="0.6vh solid blue"
+        borderRadius=1.5.vh
         borderCollapse=BorderCollapse.collapse
+        // todo ? border-image: url()
+    }
+    /*
+    rule(".${confCss.GRID_TABLE_ROW}"){
+        border="0.4vh solid red"
+    }
+    */
+    rule(".${confCss.GRID_TABLE_COL}"){
+        border="0.4vh solid green"
     }
     rule(".${confCss.PUZZLE_CELL_IDX_NUM}"){
         fontSize=3.0.vh
-        //lineHeight=LineHeight("3vh")
-        textAlign=TextAlign.end
+        lineHeight=LineHeight("3vh")
     }
     rule(".${confCss.PUZZLE_CELL_CHAR}"){
         fontSize=10.vh
-        //lineHeight=LineHeight("6vh")
+        lineHeight=LineHeight("4vh")
     }
     rule(".${confCss.IDX_SLCT_ROT_SOUTH}"){
         height=2.5.vh
