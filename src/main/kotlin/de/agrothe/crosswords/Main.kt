@@ -1,6 +1,5 @@
 package de.agrothe.crosswords
 
-import de.agrothe.crosswords.Dict.Companion.getPattern
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlin.time.measureTime
 
