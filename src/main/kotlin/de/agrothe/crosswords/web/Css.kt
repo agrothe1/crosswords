@@ -7,6 +7,8 @@ import kotlinx.css.properties.*
 private val confCss=config.webApp.CSS
 
 val CSS = fun CSSBuilder.(){
+    val colors = confCss.COLOR_PALETTES.random()
+
     rule("body"){
         backgroundColor=Color.white
         margin(5.vh)
@@ -17,26 +19,24 @@ val CSS = fun CSSBuilder.(){
     }
     rule(".${confCss.GRID_TABLE}"){
         fontFamily="Monospace"
-        border="0.6vh solid blue"
-        borderRadius=1.5.vh
+        border="0.6vh solid ${colors.GRID_BORDER_COLR}"
+        borderRadius=2.vh
         borderCollapse=BorderCollapse.collapse
         // todo ? border-image: url()
     }
-    /*
-    rule(".${confCss.GRID_TABLE_ROW}"){
-        border="0.4vh solid red"
-    }
-    */
     rule(".${confCss.GRID_TABLE_COL}"){
-        border="0.4vh solid green"
+        border="0.4vh solid ${colors.GRID_LINES_COLR}"
     }
     rule(".${confCss.PUZZLE_CELL_IDX_NUM}"){
         fontSize=3.0.vh
-        lineHeight=LineHeight("3vh")
+        fontWeight=FontWeight.bolder
+        lineHeight=LineHeight("0.5vh")
+        color=colors.IDX_NUM_COLR
     }
     rule(".${confCss.PUZZLE_CELL_CHAR}"){
         fontSize=10.vh
         lineHeight=LineHeight("4vh")
+        color=colors.CELL_CHAR_COLR
     }
     rule(".${confCss.IDX_SLCT_ROT_SOUTH}"){
         height=2.5.vh

@@ -3,6 +3,7 @@ package de.agrothe.crosswords
 import io.github.oshai.kotlinlogging.KotlinLogging
 import com.typesafe.config.ConfigFactory
 import io.github.config4k.extract
+import kotlinx.css.Color
 
 private val logger by lazy{KotlinLogging.logger{}}
 
@@ -64,7 +65,26 @@ class Css(
     val IDX_SLCT_ROT_WEST: String,
     val IDX_SLCT_ROT_SOUTH: String,
     val IDX_SLCT_ROT_NORTH: String,
+
+    val COLOR_PALETTES: List<ColorPalletteConfig>,
 )
+
+open class ColorPalletteConfig(
+    GRID_BORDER: String,
+    GRID_LINES: String,
+    IDX_NUM: String,
+    CELL_CHAR: String,
+
+    val GRID_BORDER_COLR: Color = GRID_BORDER.toColor(),
+    val GRID_LINES_COLR: Color = GRID_LINES.toColor(),
+    val IDX_NUM_COLR: Color = IDX_NUM.toColor().darken(60),
+    val CELL_CHAR_COLR: Color = CELL_CHAR.toColor().darken(20),
+)
+    {
+        companion object{
+            private fun String.toColor() = Color('#'+this)
+        }
+    }
 
 data class AppConfig(
     val dict: ReadDictConfig,
