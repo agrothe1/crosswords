@@ -65,6 +65,7 @@ class Css(
     val IDX_SLCT_ROT_WEST: String,
     val IDX_SLCT_ROT_SOUTH: String,
     val IDX_SLCT_ROT_NORTH: String,
+    val TABLE_CELL_BACKGROUND: String,
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,
 )

@@ -2,6 +2,7 @@ package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.*
 import io.ktor.server.html.*
+import kotlinx.css.tr
 import kotlinx.html.*
 
 private val conf by lazy{config.webApp}
@@ -63,7 +64,8 @@ class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val char: Char,
 {
     override fun FlowContent.apply(){
         with(confCss){
-            table{
+            table(TABLE_CELL_BACKGROUND +
+                    (1..2).random().toString()){
                 tr{td{
                     table{tr{td{
                         span(PUZZLE_CELL_IDX_NUM){
@@ -85,7 +87,7 @@ class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val char: Char,
                     }}}
                 }}
                 tr{td{
-                    span(confCss.PUZZLE_CELL_CHAR){+char.toString()}
+                    span(PUZZLE_CELL_CHAR){+char.toString()}
                 }}
                 tr{td{
                     table{tr{td{
