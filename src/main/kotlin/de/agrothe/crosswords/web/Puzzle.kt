@@ -68,19 +68,19 @@ class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val char: Char,
                     table{tr{td{
                         span(PUZZLE_CELL_IDX_NUM){
                             wordAtY?.ornt.let{yOrnt->
-                                if((yOrnt==KeyDirct.NORMAL && pRowIdx==0)
-                                    ||(yOrnt==KeyDirct.REVERSED
-                                        && pRowIdx==pDimen-1))
-                                    span{
-                                        +pColIdx.inc().toString()
-                                        img(classes=
-                                            if(yOrnt==KeyDirct.NORMAL)
-                                                IDX_SLCT_ROT_SOUTH
-                                            else IDX_SLCT_ROT_NORTH,
-                                                src=conf.DIRCTN_IMG)
-                                    }
-                                else {+Entities.nbsp}
-                            }
+                                Pair(yOrnt, pRowIdx).also{
+                                    if(it==Pair(KeyDirct.NORMAL, 0)
+                                        ||it==Pair(KeyDirct.REVERSED, pDimen-1))
+                                        span{
+                                            +pColIdx.inc().toString()
+                                            img(classes=
+                                                if(yOrnt==KeyDirct.NORMAL)
+                                                    IDX_SLCT_ROT_SOUTH
+                                                else IDX_SLCT_ROT_NORTH,
+                                                    src=conf.DIRCTN_IMG)
+                                        }
+                                    else {+Entities.nbsp}
+                                }}
                         }
                     }}}
                 }}
@@ -91,19 +91,19 @@ class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val char: Char,
                     table{tr{td{
                         span(PUZZLE_CELL_IDX_NUM){
                             wordAtX?.ornt.let{xOrnt->
-                                if((xOrnt==KeyDirct.NORMAL && pColIdx==0)
-                                    ||(xOrnt==KeyDirct.REVERSED
-                                        && pColIdx==pDimen-1))
-                                    span{
-                                        +pRowIdx.inc().toString()
-                                        img(classes=
-                                            if(xOrnt==KeyDirct.NORMAL)
-                                                IDX_SLCT_ROT_WEST
-                                            else IDX_SLCT_ROT_EAST,
-                                                src=conf.DIRCTN_IMG)
-                                    }
-                                else {+Entities.nbsp}
-                            }
+                                Pair(xOrnt, pColIdx).also{
+                                    if(it==Pair(KeyDirct.NORMAL, 0)
+                                        ||it==Pair(KeyDirct.REVERSED, pDimen-1))
+                                        span{
+                                            +pRowIdx.inc().toString()
+                                            img(classes=
+                                                if(xOrnt==KeyDirct.NORMAL)
+                                                    IDX_SLCT_ROT_WEST
+                                                else IDX_SLCT_ROT_EAST,
+                                                    src=conf.DIRCTN_IMG)
+                                        }
+                                    else {+Entities.nbsp}
+                                }}
                         }
                     }}}
                 }}
