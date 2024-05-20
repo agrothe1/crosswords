@@ -2,7 +2,6 @@ package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.*
 import io.ktor.server.html.*
-import kotlinx.css.tr
 import kotlinx.html.*
 
 private val conf by lazy{config.webApp}
@@ -13,6 +12,8 @@ class BodyTplt: Template<HTML>{
     val puzzle = TemplatePlaceholder<PuzzleTplt>()
     override fun HTML.apply(){
         head{
+            meta("viewport",
+            "width=device-width, initial-scale=1.0")
             link(rel = "stylesheet", href="/styles.css", type = "text/css")
         }
         body{
@@ -35,19 +36,23 @@ class PuzzleTplt: Template<FlowContent>{
 
     override fun FlowContent.apply(){
         val cellTmplt = TemplatePlaceholder<CellTmplt>()
-        table(confCss.GRID_TABLE){
-            tbody{
-                puzzle.forEachIndexed{rowIdx, row->
-                    val dictEntryRow= entries.get(
-                        puzzle.getStringAt(Axis.X, rowIdx))
-                    tr(confCss.GRID_TABLE_ROW){
-                        row.forEachIndexed{colIdx, char->
-                            td(confCss.GRID_TABLE_COL){
-                                insert(CellTmplt(rowIdx, colIdx,
-                                    char, puzzle, dictEntryRow,
-                                    entries.get(
-                                        puzzle.getStringAt(Axis.Y, colIdx)),
-                                    dimen), cellTmplt)
+        with(confCss){
+            table(GRID_TABLE){
+                tbody{
+                    puzzle.forEachIndexed{rowIdx, row->
+                        tr(GRID_TABLE_ROW){
+                            row.forEachIndexed{colIdx, char->
+                                td(GRID_TABLE_COL +' '+
+                                        TABLE_CELL_BACKGROUND
+                                            +setOf(1,2).random()){
+                                    insert(CellTmplt(rowIdx, colIdx,
+                                        char, puzzle,
+                                        entries.get(
+                                            puzzle.getStringAt(Axis.X, rowIdx)),
+                                        entries.get(
+                                            puzzle.getStringAt(Axis.Y, colIdx)),
+                                        dimen), cellTmplt)
+                                }
                             }
                         }
                     }
@@ -57,58 +62,43 @@ class PuzzleTplt: Template<FlowContent>{
     }
 }
 
-class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val char: Char,
+class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val pChar: Char,
         val pPuzzle: Puzzle,
-        val wordAtX: DictSynmsOrnt?, val wordAtY: DictSynmsOrnt?,
+        val pWordAtX: DictSynmsOrnt?, val pWordAtY: DictSynmsOrnt?,
         val pDimen: Int): Template<FlowContent>
 {
     override fun FlowContent.apply(){
         with(confCss){
-            table(TABLE_CELL_BACKGROUND +
-                    (1..2).random().toString()){
-                tr{td{
-                    table{tr{td{
-                        span(PUZZLE_CELL_IDX_NUM){
-                            wordAtY?.ornt.let{yOrnt->
-                                Pair(yOrnt, pRowIdx).also{
+            table{
+                fun idx(pDirct: KeyDirct?, pIdx: Int,
+                        pRot: Pair<String, String>){
+                    tr{td{
+                        table{tr{td{
+                            span(PUZZLE_CELL_IDX_NUM){
+                                Pair(pDirct, pIdx).also{
                                     if(it==Pair(KeyDirct.NORMAL, 0)
                                         ||it==Pair(KeyDirct.REVERSED, pDimen-1))
-                                        span{
+                                    span{
+                                        if(pRot.first==IDX_SLCT_ROT_SOUTH)
                                             +pColIdx.inc().toString()
-                                            img(classes=
-                                                if(yOrnt==KeyDirct.NORMAL)
-                                                    IDX_SLCT_ROT_SOUTH
-                                                else IDX_SLCT_ROT_NORTH,
-                                                    src=conf.DIRCTN_IMG)
-                                        }
+                                        else +pRowIdx.inc().toString()
+                                        img(classes=
+                                            if(pDirct==KeyDirct.NORMAL)
+                                                pRot.first else pRot.second,
+                                            src=conf.DIRCTN_IMG)
+                                    }
                                     else {+Entities.nbsp}
-                                }}
-                        }
-                    }}}
-                }}
+                            }}
+                    }}}}}
+                }
+                idx(pWordAtY?.ornt, pRowIdx,
+                    Pair(IDX_SLCT_ROT_SOUTH, IDX_SLCT_ROT_NORTH))
                 tr{td{
-                    span(PUZZLE_CELL_CHAR){+char.toString()}
+                    span(PUZZLE_CELL_CHAR){+pChar.toString()}
                 }}
-                tr{td{
-                    table{tr{td{
-                        span(PUZZLE_CELL_IDX_NUM){
-                            wordAtX?.ornt.let{xOrnt->
-                                Pair(xOrnt, pColIdx).also{
-                                    if(it==Pair(KeyDirct.NORMAL, 0)
-                                        ||it==Pair(KeyDirct.REVERSED, pDimen-1))
-                                        span{
-                                            +pRowIdx.inc().toString()
-                                            img(classes=
-                                                if(xOrnt==KeyDirct.NORMAL)
-                                                    IDX_SLCT_ROT_WEST
-                                                else IDX_SLCT_ROT_EAST,
-                                                    src=conf.DIRCTN_IMG)
-                                        }
-                                    else {+Entities.nbsp}
-                                }}
-                        }
-                    }}}
-                }}
-        }}
+                idx(pWordAtX?.ornt, pColIdx,
+                    Pair(IDX_SLCT_ROT_WEST, IDX_SLCT_ROT_EAST))
+            }
+        }
     }
 }

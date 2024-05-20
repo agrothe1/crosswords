@@ -48,8 +48,8 @@ fun Puzzle.getStringAt(pAxis: Axis, pPos: Pos): String =
 
 fun Keys.getMatchingKeys(pPattern: String): Collection<DictWord> =
     Regex(pPattern, RegexOption.IGNORE_CASE).let{regex->
-        mapNotNull{entry->
-            if(entry.matches(regex)) entry else null
+        mapNotNull{key->
+            if(key.matches(regex)) key else null
         }
     }
 
