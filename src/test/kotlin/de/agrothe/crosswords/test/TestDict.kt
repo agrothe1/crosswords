@@ -55,14 +55,11 @@ class TestDict{
     @Test
     fun noNegatives(){
         val negatives = config.dict.NEGATIVES_REGEXPR
-        entries.forEach{entry->assertFalse(
-            entry.key.let{
-                val isNegative = negatives.matches(it)
-                if(isNegative)logger.error{"should be excluded: $entry"}
-                isNegative
-             })
-        }
-    }
+        entries.forEach{entry->assertFalse{
+            val isNegative = negatives.matches(entry.key)
+            if(isNegative)logger.error{"should be excluded: $entry"}
+            isNegative
+        }}}
 
     @Test
     fun noDuplicateValues() =
@@ -79,8 +76,7 @@ class TestDict{
                         assertTrue(rowOut contentEquals rowIn)
             }
             file.delete()
-        }
-    }
+        }}
 
     @Test
     fun permutations(){

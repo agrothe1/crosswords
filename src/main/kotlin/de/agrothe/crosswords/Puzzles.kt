@@ -94,7 +94,6 @@ fun Puzzle.save(): Puzzle =
                 +config.GENERATED_PUZZLE_SUFFX))
         ).toAbsolutePath().createParentDirectories().toString()))
 
-
 fun File.read(): Puzzle =
     readLines().map{it.toCharArray()}.toTypedArray()
 
@@ -103,10 +102,24 @@ fun getRandom(pDimen: Int): Puzzle =
         .listDirectoryEntries().random().toString()).run{
             logger.info{"reading puzzle: ${this.name}"}
             read()
-        }
+        }.randomMirror()
 
-fun emptyPuzzle(pDimen: Int) =
+fun emptyPuzzle(pDimen: Int): Puzzle =
     Array(pDimen){_->CharArray(pDimen){_-> '.'}}
+
+fun Puzzle.randomMirror(): Puzzle{
+    fun revrt() = setOf(true, false).random()
+    fun String.revert(pRvrt: Boolean) = if(pRvrt) reversed() else this
+    val newPuzz = emptyPuzzle(size)
+    Pair(revrt(), revrt()).let{
+        forEachIndexed{idx, _->
+            newPuzz.put(X, idx, getStringAt(X, idx).run{revert(it.first)})}
+        forEachIndexed{idx, _->
+            newPuzz.put(Y, idx, newPuzz.getStringAt(Y, idx)
+                .run{revert(it.second)})}
+    }
+    return newPuzz
+}
 
 fun generate(pDimen: Int): Puzzle? =
     emptyPuzzle(pDimen)
@@ -114,8 +127,8 @@ fun generate(pDimen: Int): Puzzle? =
             dict.words.filter{it.length == pDimen})
 
 fun main(){
-    val numPuzzls = 5
-    val dimen = 3
+    val numPuzzls = 1
+    val dimen = 6
 
     (1..numPuzzls).forEach{
         generate(dimen)?.run{

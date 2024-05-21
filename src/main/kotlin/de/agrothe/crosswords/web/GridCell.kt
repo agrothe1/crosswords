@@ -17,11 +17,11 @@ override fun FlowContent.apply(){
                         span(PUZZLE_CELL_IDX_NUM){
                             Pair(pDirct, pIdx).also{
                                 if(it==Pair(KeyDirct.NORMAL, 0)
-                                    ||it==Pair(KeyDirct.REVERSED, pDimen-1))
+                                    || it==Pair(KeyDirct.REVERSED, pDimen-1))
                                 span{
-                                    if(pRot.first==IDX_SLCT_ROT_SOUTH)
-                                        +pColIdx.inc().toString()
-                                    else +pRowIdx.inc().toString()
+                                    +(if(pRot.first==IDX_SLCT_ROT_SOUTH)
+                                        pColIdx else pRowIdx
+                                    ).inc().toString()
                                     img(classes=
                                         if(pDirct==KeyDirct.NORMAL)
                                             pRot.first else pRot.second,
