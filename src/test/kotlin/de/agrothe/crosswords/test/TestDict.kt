@@ -17,13 +17,13 @@ class TestDict{
 
     @Test
     fun numKeysUniDir(){
-        assertTrue(Dict(config.dict.apply{BIDECTIONAL=false})
+        assertTrue(Dict(config.dict.apply{BIDIRECTIONAL=false})
             .entries.count() in numEntries)
     }
 
     @Test
     fun numKeysBiDir(){
-        assertTrue(Dict(config.dict.apply{BIDECTIONAL=true})
+        assertTrue(Dict(config.dict.apply{BIDIRECTIONAL=true})
             .entries.count() in numEntries.map{it.times(2)})
     }
 
@@ -101,7 +101,7 @@ class TestDict{
            " w/ Space;KEY;;B C;D#"
         ).asSequence()
         val dict =
-            testDict.parseDict(config.dict.apply{BIDECTIONAL=false})
+            testDict.parseDict(config.dict.apply{BIDIRECTIONAL=false})
                 .map{Pair(it.key, it.value.synms)}.toMap().toString()
         assertTrue(dict ==
 """{a=[b, c, ô], b=[a, c, ä, ô, 1, 2], c=[a, b, ä], ae=[b, c, ô], Aeae=[öxÖ, üyÜ, ßzß], oexOe=[Ää, üyÜ, ßzß], ueyUe=[Ää, öxÖ, ßzß], sszss=[Ää, öxÖ, üyÜ], Aesen=[Über, Öffi, mästen, grübeln, lösen, daß], Ueber=[Äsen, Öffi, mästen, grübeln, lösen, daß], Oeffi=[Äsen, Über, mästen, grübeln, lösen, daß], maesten=[Äsen, Über, Öffi, grübeln, lösen, daß], gruebeln=[Äsen, Über, Öffi, mästen, lösen, daß], loesen=[Äsen, Über, Öffi, mästen, grübeln, daß], dass=[Äsen, Über, Öffi, mästen, grübeln, lösen], KEY=[w/ Space, B C, D], D=[w/ Space, KEY, B C]}"""

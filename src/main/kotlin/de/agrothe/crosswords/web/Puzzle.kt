@@ -35,7 +35,7 @@ class PuzzleTplt: Template<FlowContent>{
             .toTypedArray()
 
     override fun FlowContent.apply(){
-        val cellTmplt = TemplatePlaceholder<CellTmplt>()
+        val cellTmplt = TemplatePlaceholder<GridCell>()
         with(confCss){
             table(GRID_TABLE){
                 tbody{
@@ -45,59 +45,17 @@ class PuzzleTplt: Template<FlowContent>{
                                 td(GRID_TABLE_COL +' '+
                                         TABLE_CELL_BACKGROUND
                                             +setOf(1,2).random()){
-                                    insert(CellTmplt(rowIdx, colIdx,
-                                        char, puzzle,
+                                    insert(GridCell(rowIdx, colIdx, char,
                                         entries.get(
                                             puzzle.getStringAt(Axis.X, rowIdx)),
                                         entries.get(
                                             puzzle.getStringAt(Axis.Y, colIdx)),
-                                        dimen), cellTmplt)
+                                        dimen, conf), cellTmplt)
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-    }
-}
-
-class CellTmplt(val pRowIdx: Int, val pColIdx: Int, val pChar: Char,
-        val pPuzzle: Puzzle,
-        val pWordAtX: DictSynmsOrnt?, val pWordAtY: DictSynmsOrnt?,
-        val pDimen: Int): Template<FlowContent>
-{
-    override fun FlowContent.apply(){
-        with(confCss){
-            table{
-                fun idx(pDirct: KeyDirct?, pIdx: Int,
-                        pRot: Pair<String, String>){
-                    tr{td{
-                        table{tr{td{
-                            span(PUZZLE_CELL_IDX_NUM){
-                                Pair(pDirct, pIdx).also{
-                                    if(it==Pair(KeyDirct.NORMAL, 0)
-                                        ||it==Pair(KeyDirct.REVERSED, pDimen-1))
-                                    span{
-                                        if(pRot.first==IDX_SLCT_ROT_SOUTH)
-                                            +pColIdx.inc().toString()
-                                        else +pRowIdx.inc().toString()
-                                        img(classes=
-                                            if(pDirct==KeyDirct.NORMAL)
-                                                pRot.first else pRot.second,
-                                            src=conf.DIRCTN_IMG)
-                                    }
-                                    else {+Entities.nbsp}
-                            }}
-                    }}}}}
-                }
-                idx(pWordAtY?.ornt, pRowIdx,
-                    Pair(IDX_SLCT_ROT_SOUTH, IDX_SLCT_ROT_NORTH))
-                tr{td{
-                    span(PUZZLE_CELL_CHAR){+pChar.toString()}
-                }}
-                idx(pWordAtX?.ornt, pColIdx,
-                    Pair(IDX_SLCT_ROT_WEST, IDX_SLCT_ROT_EAST))
             }
         }
     }

@@ -1,11 +1,8 @@
 package de.agrothe.crosswords
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import com.typesafe.config.ConfigFactory
 import io.github.config4k.extract
 import kotlinx.css.Color
-
-private val logger by lazy{KotlinLogging.logger{}}
 
 class PuzzleConfig(
     val ALLOW_DUPLICATES: Boolean,
@@ -24,7 +21,7 @@ class ReadDictConfig(
     val SKIP_TEST_LINES: Boolean,
     val TO_UPPER_CASE: Boolean,
     private val SUBST_CHARS: Boolean,
-    var BIDECTIONAL: Boolean,
+    var BIDIRECTIONAL: Boolean,
 
     NEGATIVES_LIST: Set<String>,
     ENTRY_DELIMITER_CHAR: String,
@@ -66,8 +63,6 @@ class Css(
     val IDX_SLCT_ROT_SOUTH: String,
     val IDX_SLCT_ROT_NORTH: String,
     val TABLE_CELL_BACKGROUND: String,
-    val TABLE_CELL_BACKGROUND1: String,
-    val TABLE_CELL_BACKGROUND2: String,
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,
 )

@@ -2,13 +2,12 @@ package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.config
 import kotlinx.css.*
-import kotlinx.css.Float
 import kotlinx.css.properties.*
 
 private val confCss=config.webApp.CSS
 
 val CSS = fun CSSBuilder.(){
-    fun String.cls() = "." + this
+    fun String.cls() = ".$this"
 
     with(confCss){
         val colors = COLOR_PALETTES.random()

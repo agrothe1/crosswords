@@ -73,7 +73,7 @@ fun ReadDictConfig.parseDict(pDict: Sequence<String>): DictEntry =
             Pair(entry, DictSynmsOrnt(synms.flatMap{synm->synm.second}.toSet(),
                 KeyDirct.NORMAL))}
         .flatMap{entry->
-            if(BIDECTIONAL)
+            if(BIDIRECTIONAL)
                 setOf(entry,
                     Pair(entry.first.reversed(), entry.second.reversed()))
             else setOf(entry)
