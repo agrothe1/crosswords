@@ -2,6 +2,7 @@ package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.*
 import io.ktor.server.html.*
+import kotlinx.css.table
 import kotlinx.html.*
 
 class GridCell(val pRowIdx: Int, val pColIdx: Int, val pChar: Char,

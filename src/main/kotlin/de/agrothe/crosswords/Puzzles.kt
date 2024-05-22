@@ -86,7 +86,6 @@ fun Puzzle.save(pFile: File): Puzzle =
         acc.append(row.joinToString("", postfix="\n"))}
             .toString().removeSuffix("\n"))}
 
-
 fun Puzzle.save(): Puzzle =
     save(File(Path("",
         *config.GENERATED_PUZZLES_DIR.plus(

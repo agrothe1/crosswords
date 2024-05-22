@@ -13,7 +13,7 @@ class BodyTplt: Template<HTML>{
     override fun HTML.apply(){
         head{
             meta("viewport",
-            "width=device-width, initial-scale=1.0")
+            "width=device-width, height=device-height, initial-scale=1.0")
             link(rel = "stylesheet", href="/styles.css", type = "text/css")
         }
         body{
@@ -35,8 +35,67 @@ class PuzzleTplt: Template<FlowContent>{
             .toTypedArray()
 
     override fun FlowContent.apply(){
-        val cellTmplt = TemplatePlaceholder<GridCell>()
+        val gridTmplt = TemplatePlaceholder<PuzzleGrid>()
         with(confCss){
+            table{
+                tr{
+                    td{
+                        table(classes=LEGEND_TABLE){
+                            tr{
+                                th(classes=LEGEND_TABLE_HEADER)
+                                    {colSpan="2"; +"Waagerecht"}//todo
+                            }
+                            puzzle.forEachIndexed{rowIdx, row->
+                                tr{
+                                    td(classes=PUZZLE_CELL_IDX_NUM)
+                                        {+rowIdx.inc().toString()}
+                                    td{table{
+                                        entries.get(
+                                            puzzle.getStringAt(Axis.X, rowIdx))
+                                                ?.synms?.shuffled()?.take(2)
+                                        ?.forEach{synm->
+                                            tr{
+                                                td{+synm}
+                                            }}
+                                    }}
+                                }}
+                            tr{
+                                th(classes=LEGEND_TABLE_HEADER)
+                                    {colSpan="2"; +"Senkrecht"}//todo
+                            }
+                            puzzle.forEachIndexed{colIdx, row->
+                                tr{
+                                    td(classes=PUZZLE_CELL_IDX_NUM)
+                                        {+colIdx.inc().toString()}
+                                    td{table{
+                                        entries.get(
+                                            puzzle.getStringAt(Axis.Y, colIdx))
+                                                ?.synms?.shuffled()?.take(2)
+                                        ?.forEach{synm->
+                                            tr{
+                                                td{+synm}
+                                            }}
+                                    }}
+                                }}
+                        }
+                    }
+                    td{
+                        insert(PuzzleGrid(entries, puzzle, dimen, conf),
+                            gridTmplt)
+                    }
+                }
+            }
+        }
+    }
+}
+
+// todo separate
+class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
+    val pConf: WebAppConfig)
+        : Template<FlowContent> {
+    override fun FlowContent.apply(){
+        val cellTmplt = TemplatePlaceholder<GridCell>()
+        with(pConf.CSS){
             table(GRID_TABLE){
                 tbody{
                     puzzle.forEachIndexed{rowIdx, row->
@@ -46,11 +105,11 @@ class PuzzleTplt: Template<FlowContent>{
                                         TABLE_CELL_BACKGROUND
                                             +setOf(1,2).random()){
                                     insert(GridCell(rowIdx, colIdx, char,
-                                        entries.get(
+                                        pEntries.get(
                                             puzzle.getStringAt(Axis.X, rowIdx)),
-                                        entries.get(
+                                        pEntries.get(
                                             puzzle.getStringAt(Axis.Y, colIdx)),
-                                        dimen, conf), cellTmplt)
+                                        pDimen, pConf), cellTmplt)
                                 }
                             }
                         }

@@ -63,6 +63,8 @@ class Css(
     val IDX_SLCT_ROT_SOUTH: String,
     val IDX_SLCT_ROT_NORTH: String,
     val TABLE_CELL_BACKGROUND: String,
+    val LEGEND_TABLE: String,
+    val LEGEND_TABLE_HEADER: String,
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,
 )

@@ -20,8 +20,18 @@ val CSS = fun CSSBuilder.(){
             color=Color.blue
             fontSize=5.vh
         }
+        rule(LEGEND_TABLE.cls()){
+            fontFamily="sans-serif"
+            fontSize=3.3.vh
+            fontWeight=FontWeight.normal
+//            lineHeight=LineHeight("2.9vh")
+        }
+        rule(LEGEND_TABLE_HEADER.cls()){
+            textAlign = TextAlign.left
+            textDecoration=TextDecoration(setOf(TextDecorationLine.underline))
+        }
         rule(GRID_TABLE.cls()){
-            fontFamily="Monospace"
+            fontFamily="monospace"
             borderWidth=0.6.vh
             borderStyle=BorderStyle.solid
             borderColor=colors.GRID_BORDER_COLR
