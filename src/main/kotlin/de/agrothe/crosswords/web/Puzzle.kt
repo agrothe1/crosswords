@@ -47,12 +47,20 @@ class PuzzleTplt: Template<FlowContent>{
                             }
                             puzzle.forEachIndexed{rowIdx, row->
                                 tr{
-                                    td(classes=PUZZLE_CELL_IDX_NUM)
-                                        {+rowIdx.inc().toString()}
+                                    val synms= entries.get(
+                                        puzzle.getStringAt(Axis.X, rowIdx))
+                                    td(classes=PUZZLE_CELL_IDX_NUM){
+                                        synms?.ornt.let{ornt->
+                                            dirImg(ornt,
+                                                if(ornt == KeyDirct.NORMAL) 0
+                                                    else dimen-1,
+                                                rowIdx, 0,
+                                                Pair(IDX_SLCT_ROT_WEST,
+                                                    IDX_SLCT_ROT_EAST),
+                                                dimen, conf, this)
+                                        }}
                                     td{table{
-                                        entries.get(
-                                            puzzle.getStringAt(Axis.X, rowIdx))
-                                                ?.synms?.shuffled()?.take(2)
+                                        synms?.synms?.shuffled()?.take(2)
                                         ?.forEach{synm->
                                             tr{
                                                 td{+synm}
@@ -65,16 +73,24 @@ class PuzzleTplt: Template<FlowContent>{
                             }
                             puzzle.forEachIndexed{colIdx, row->
                                 tr{
-                                    td(classes=PUZZLE_CELL_IDX_NUM)
-                                        {+colIdx.inc().toString()}
+                                    val synms= entries.get(
+                                        puzzle.getStringAt(Axis.Y, colIdx))
+                                    td(classes=PUZZLE_CELL_IDX_NUM){
+                                        synms?.ornt.let{ornt->
+                                            dirImg(ornt,
+                                                if(ornt == KeyDirct.NORMAL) 0
+                                                    else dimen-1,
+                                        0, colIdx,
+                                                Pair(IDX_SLCT_ROT_SOUTH,
+                                                    IDX_SLCT_ROT_NORTH),
+                                                dimen, conf,this)
+                                    }}
                                     td{table{
-                                        entries.get(
-                                            puzzle.getStringAt(Axis.Y, colIdx))
-                                                ?.synms?.shuffled()?.take(2)
-                                        ?.forEach{synm->
-                                            tr{
-                                                td{+synm}
-                                            }}
+                                        synms?.synms?.shuffled()?.take(2)
+                                            ?.forEach{synm->
+                                                tr{
+                                                    td{+synm}
+                                                }}
                                     }}
                                 }}
                         }
