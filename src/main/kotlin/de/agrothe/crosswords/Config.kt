@@ -53,6 +53,7 @@ class WebAppConfig(
 )
 
 class Css(
+    val PUZZLE_TABLE: String,
     val GRID_TABLE: String,
     val GRID_TABLE_ROW: String,
     val GRID_TABLE_COL: String,

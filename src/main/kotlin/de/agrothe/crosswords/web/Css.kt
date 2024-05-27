@@ -20,11 +20,15 @@ val CSS = fun CSSBuilder.(){
             color=Color.blue
             fontSize=5.vh
         }
+        rule(PUZZLE_TABLE.cls()){
+            verticalAlign=VerticalAlign.top
+        }
         rule(LEGEND_TABLE.cls()){
             fontFamily="sans-serif"
             fontSize=3.3.vh
             fontWeight=FontWeight.normal
-//            lineHeight=LineHeight("2.9vh")
+            //whiteSpace=WhiteSpace.nowrap
+            wordWrap=WordWrap.breakWord
         }
         rule(LEGEND_TABLE_HEADER.cls()){
             textAlign = TextAlign.left
@@ -58,10 +62,16 @@ val CSS = fun CSSBuilder.(){
         }
         rule(PUZZLE_CELL_CHAR.cls()){
             fontSize=10.vh
-            lineHeight=LineHeight("4vh")
             color=colors.CELL_CHAR_COLR
+            backgroundColor=Color.transparent
+            borderStyle=BorderStyle.none
+            lineHeight=LineHeight("4vh")
+            padding="0"
+            maxWidth=1.em
+            textAlign=TextAlign.center
+            maxHeight=1.em
         }
-        rule(".${IDX_SLCT_ROT_SOUTH}"){
+        rule(IDX_SLCT_ROT_SOUTH.cls()){
             height=2.5.vh
             transform.rotate(0.grad)
         }

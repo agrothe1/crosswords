@@ -2,6 +2,7 @@ package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.*
 import io.ktor.server.html.*
+import kotlinx.css.td
 import kotlinx.html.*
 
 private val conf by lazy{config.webApp}
@@ -38,17 +39,23 @@ class PuzzleTplt: Template<FlowContent>{
         val gridTmplt = TemplatePlaceholder<PuzzleGrid>()
         with(confCss){
             table{
+                fun legendEntry(pSynm: String){
+                    tr{
+                        td{b{+Entities.middot}}
+                        td{+pSynm}
+                    }}
+                tbody(classes=PUZZLE_TABLE){
                 tr{
-                    td{
+                    td(){
                         table(classes=LEGEND_TABLE){
                             tr{
                                 th(classes=LEGEND_TABLE_HEADER)
                                     {colSpan="2"; +"Waagerecht"}//todo
                             }
-                            puzzle.forEachIndexed{rowIdx, row->
+                            puzzle.forEachIndexed{rowIdx, _->
                                 tr{
-                                    val synms= entries.get(
-                                        puzzle.getStringAt(Axis.X, rowIdx))
+                                    val synms= entries[
+                                        puzzle.getStringAt(Axis.X, rowIdx)]
                                     td(classes=PUZZLE_CELL_IDX_NUM){
                                         synms?.ornt.let{ornt->
                                             dirImg(ornt,
@@ -61,20 +68,18 @@ class PuzzleTplt: Template<FlowContent>{
                                         }}
                                     td{table{
                                         synms?.synms?.shuffled()?.take(2)
-                                        ?.forEach{synm->
-                                            tr{
-                                                td{+synm}
-                                            }}
+                                        ?.forEach{legendEntry(it)}
+
                                     }}
                                 }}
                             tr{
                                 th(classes=LEGEND_TABLE_HEADER)
                                     {colSpan="2"; +"Senkrecht"}//todo
                             }
-                            puzzle.forEachIndexed{colIdx, row->
+                            puzzle.forEachIndexed{colIdx, _->
                                 tr{
-                                    val synms= entries.get(
-                                        puzzle.getStringAt(Axis.Y, colIdx))
+                                    val synms= entries[
+                                        puzzle.getStringAt(Axis.Y, colIdx)]
                                     td(classes=PUZZLE_CELL_IDX_NUM){
                                         synms?.ornt.let{ornt->
                                             dirImg(ornt,
@@ -87,10 +92,7 @@ class PuzzleTplt: Template<FlowContent>{
                                     }}
                                     td{table{
                                         synms?.synms?.shuffled()?.take(2)
-                                            ?.forEach{synm->
-                                                tr{
-                                                    td{+synm}
-                                                }}
+                                            ?.forEach{legendEntry(it)}
                                     }}
                                 }}
                         }
@@ -99,7 +101,7 @@ class PuzzleTplt: Template<FlowContent>{
                         insert(PuzzleGrid(entries, puzzle, dimen, conf),
                             gridTmplt)
                     }
-                }
+                }}
             }
         }
     }
@@ -121,10 +123,10 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
                                         TABLE_CELL_BACKGROUND
                                             +setOf(1,2).random()){
                                     insert(GridCell(rowIdx, colIdx, char,
-                                        pEntries.get(
-                                            puzzle.getStringAt(Axis.X, rowIdx)),
-                                        pEntries.get(
-                                            puzzle.getStringAt(Axis.Y, colIdx)),
+                                        pEntries[
+                                            puzzle.getStringAt(Axis.X, rowIdx)],
+                                        pEntries[
+                                            puzzle.getStringAt(Axis.Y, colIdx)],
                                         pDimen, pConf), cellTmplt)
                                 }
                             }
