@@ -14,18 +14,22 @@ fun Css.dirImg(
         pParentCnt.apply {
             span(PUZZLE_CELL_IDX_NUM){
                 Pair(pDirct, pIdx).also{
-                    if(it==Pair(KeyDirct.NORMAL, 0)
-                        || it==Pair(KeyDirct.REVERSED, pDimen-1))
-                        table{tr{td{
+                    table{tr{
+                        if(it==Pair(KeyDirct.NORMAL, 0)
+                            ||it==Pair(KeyDirct.REVERSED, pDimen-1)){
+                            td{
                                 +(if(pRot.first==IDX_SLCT_ROT_SOUTH)
                                     pColIdx else pRowIdx).inc().toString()
-                            };td{
+                            }
+                            td{
                                 img(classes=
                                     if(pDirct==KeyDirct.NORMAL)
                                         pRot.first else pRot.second,
                                     src=pConf.DIRCTN_IMG)
-                        }}}
-                    else +Entities.nbsp
+                            }
+                        }else
+                            td(classes=pRot.first){colSpan="2"; +Entities.nbsp}
+                    }}
             }}
     }}
 

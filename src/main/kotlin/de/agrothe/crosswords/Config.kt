@@ -68,6 +68,7 @@ class Css(
     val TABLE_CELL_BACKGROUND: String,
     val LEGEND_TABLE: String,
     val LEGEND_TABLE_HEADER: String,
+    val LEGEND_ENTRIES: String,
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,
 )

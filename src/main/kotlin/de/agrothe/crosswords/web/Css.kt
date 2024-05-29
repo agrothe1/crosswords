@@ -28,11 +28,19 @@ val CSS = fun CSSBuilder.(){
             fontSize=3.3.vh
             fontWeight=FontWeight.normal
             //whiteSpace=WhiteSpace.nowrap
+            color=colors.CELL_CHAR_COLR
             wordWrap=WordWrap.breakWord
+            paddingRight=1.vh
         }
         rule(LEGEND_TABLE_HEADER.cls()){
             textAlign = TextAlign.left
             textDecoration=TextDecoration(setOf(TextDecorationLine.underline))
+        }
+        rule(LEGEND_ENTRIES.cls()){
+            borderWidth=0.4.vh
+            borderColor=colors.GRID_BORDER_COLR.darken(30)
+            borderStyle=BorderStyle.none
+            borderBottomStyle=BorderStyle.dashed
         }
         rule(GRID_TABLE.cls()){
             fontFamily="monospace"

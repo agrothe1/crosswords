@@ -2,6 +2,8 @@ package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.*
 import io.ktor.server.html.*
+import kotlinx.css.tbody
+import kotlinx.css.td
 import kotlinx.html.*
 
 private val conf by lazy{config.webApp}
@@ -42,14 +44,19 @@ class PuzzleTplt: Template<FlowContent>{
         val gridTmplt = TemplatePlaceholder<PuzzleGrid>()
         with(confCss){
             table{
-                fun legendEntry(pSynm: String){
+                fun legendEntry(pSynm: String) =
                     tr{
                         td{b{+Entities.middot}}
                         td{+pSynm}
-                    }}
+                    }
+                fun TD.legendEntries(pSynms: DictSynms?) =
+                    table(classes=LEGEND_ENTRIES){
+                        pSynms?.shuffled()?.take(2)?.forEach{legendEntry(it)}
+                    }
+
                 tbody(classes=PUZZLE_TABLE){
                 tr{
-                    td(){
+                    td{
                         table(classes=LEGEND_TABLE){
                             tr{
                                 th(classes=LEGEND_TABLE_HEADER)
@@ -69,11 +76,9 @@ class PuzzleTplt: Template<FlowContent>{
                                                     IDX_SLCT_ROT_EAST),
                                                 dimen, conf, this)
                                         }}
-                                    td{table{
-                                        synms?.synms?.shuffled()?.take(2)
-                                        ?.forEach{legendEntry(it)}
-
-                                    }}
+                                    td{
+                                        legendEntries(synms?.synms)
+                                    }
                                 }}
                             tr{
                                 th(classes=LEGEND_TABLE_HEADER)
@@ -93,10 +98,9 @@ class PuzzleTplt: Template<FlowContent>{
                                                     IDX_SLCT_ROT_NORTH),
                                                 dimen, conf,this)
                                     }}
-                                    td{table{
-                                        synms?.synms?.shuffled()?.take(2)
-                                            ?.forEach{legendEntry(it)}
-                                    }}
+                                    td{
+                                        legendEntries(synms?.synms)
+                                    }
                                 }}
                         }
                     }
@@ -131,7 +135,7 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
                                         pEntries[
                                             puzzle.getStringAt(Axis.Y, colIdx)],
                                         pDimen, pConf, puzzle.hashCode()),
-                                        cellTmplt)
+                                            cellTmplt)
                                 }
                             }
                         }
