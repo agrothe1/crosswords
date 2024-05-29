@@ -2,7 +2,6 @@ package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.*
 import io.ktor.server.html.*
-import kotlinx.css.td
 import kotlinx.html.*
 
 private val conf by lazy{config.webApp}
@@ -34,6 +33,10 @@ class PuzzleTplt: Template<FlowContent>{
     private val puzzle: Puzzle =
         getRandom(dimen).map{row->row.map{it.uppercaseChar()}.toCharArray()}
             .toTypedArray()
+
+    init{
+        puzzleCache.put(puzzle.hashCode(), puzzle)
+    }
 
     override fun FlowContent.apply(){
         val gridTmplt = TemplatePlaceholder<PuzzleGrid>()
@@ -127,7 +130,8 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
                                             puzzle.getStringAt(Axis.X, rowIdx)],
                                         pEntries[
                                             puzzle.getStringAt(Axis.Y, colIdx)],
-                                        pDimen, pConf), cellTmplt)
+                                        pDimen, pConf, puzzle.hashCode()),
+                                        cellTmplt)
                                 }
                             }
                         }

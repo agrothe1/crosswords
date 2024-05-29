@@ -60,9 +60,9 @@ val CSS = fun CSSBuilder.(){
             lineHeight=LineHeight("0.5vh")
             color=colors.IDX_NUM_COLR
         }
-        rule(PUZZLE_CELL_CHAR.cls()){
+        fun cellChar(pSel: String, pColr: Color) = rule(pSel.cls()){
             fontSize=10.vh
-            color=colors.CELL_CHAR_COLR
+            color=pColr
             backgroundColor=Color.transparent
             borderStyle=BorderStyle.none
             lineHeight=LineHeight("4vh")
@@ -71,6 +71,8 @@ val CSS = fun CSSBuilder.(){
             textAlign=TextAlign.center
             maxHeight=1.em
         }
+        cellChar(PUZZLE_CELL_CHAR, colors.CELL_CHAR_COLR)
+        cellChar(PUZZLE_CELL_CHAR_SOLVED, colors.SOLVED_CELL_CHAR_COLR)
         rule(IDX_SLCT_ROT_SOUTH.cls()){
             height=2.5.vh
             transform.rotate(0.grad)

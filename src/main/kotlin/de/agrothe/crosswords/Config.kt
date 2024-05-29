@@ -48,6 +48,7 @@ class ReadDictConfig(
     }
 
 class WebAppConfig(
+    val WEB_SOCK_ENDPOINT: String,
     val DIRCTN_IMG: String,
     val CSS: Css,
 )
@@ -58,6 +59,7 @@ class Css(
     val GRID_TABLE_ROW: String,
     val GRID_TABLE_COL: String,
     val PUZZLE_CELL_CHAR: String,
+    val PUZZLE_CELL_CHAR_SOLVED: String,
     val PUZZLE_CELL_IDX_NUM: String,
     val IDX_SLCT_ROT_EAST: String,
     val IDX_SLCT_ROT_WEST: String,
@@ -75,11 +77,13 @@ open class ColorPalletteConfig(
     GRID_LINES: String,
     IDX_NUM: String,
     CELL_CHAR: String,
+    SOLVED_CELL_CHAR: String,
 
     val GRID_BORDER_COLR: Color = GRID_BORDER.toColor(),
     val GRID_LINES_COLR: Color = GRID_LINES.toColor(),
     val IDX_NUM_COLR: Color = IDX_NUM.toColor().darken(60),
     val CELL_CHAR_COLR: Color = CELL_CHAR.toColor().darken(20),
+    val SOLVED_CELL_CHAR_COLR: Color = SOLVED_CELL_CHAR.toColor(),
 )
     {
         companion object{

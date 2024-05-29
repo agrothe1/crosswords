@@ -1,25 +1,24 @@
 package de.agrothe.crosswords.web
 
+import de.agrothe.crosswords.Puzzle
+import de.agrothe.crosswords.print
 import io.ktor.http.*
-import io.ktor.network.sockets.*
+import io.ktor.serialization.kotlinx.*
 import io.ktor.server.application.*
+import io.ktor.server.engine.*
 import io.ktor.server.html.*
 import io.ktor.server.http.content.*
+import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.css.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import kotlinx.css.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import net.jodah.expiringmap.ExpiringMap
 import java.time.Duration
-import java.util.concurrent.atomic.AtomicInteger
-import io.ktor.serialization.kotlinx.*
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.*
+import java.util.concurrent.TimeUnit
 
 fun main(args: Array<String>){
     //io.ktor.server.netty.EngineMain.main(args)
@@ -35,7 +34,7 @@ fun Application.configureTemplating(){
             call.respondCss(CSS)
         }
         get("/puzzler"){
-             call.respondHtmlTemplate(BodyTplt()) {
+             call.respondHtmlTemplate(BodyTplt()){
                  header{
                      +"Puzzler"
                  }
@@ -46,15 +45,21 @@ fun Application.configureTemplating(){
     }
 }
 
+typealias HashCode = Int
+
 @Serializable
 data class WSData(
-    val cellChar: Char, val inpChar: Char,
-    val xPos: Int, val yPos: Int)
+    val inpChar: Char, val xPos: Int, val yPos: Int, val hashCode: HashCode)
+
+val puzzleCache: MutableMap<HashCode, Puzzle> = ExpiringMap.builder()
+    .maxSize(10_000)
+    .expiration(1, TimeUnit.HOURS)
+    .build()
 
 fun Application.configureSockets(){
     install(WebSockets){
-        pingPeriod=Duration.ofSeconds(15)
-        timeout=Duration.ofSeconds(15)
+        pingPeriod=Duration.ofSeconds(60) // todo config
+        //timeout=Duration.ofSeconds(15)
         maxFrameSize=Long.MAX_VALUE
         contentConverter=KotlinxWebsocketSerializationConverter(Json)
     }
@@ -63,14 +68,17 @@ fun Application.configureSockets(){
             try{
                 for(frame in incoming){
                     val f = frame as? Frame.Text ?: continue
-                    val wsData=
+                    val wsd=
                         Json.decodeFromString<WSData>(f.readText())
-                    println(wsData)
+                    //println(wsd)
+                    puzzleCache.get(wsd.hashCode)?.let{
+                        send(Frame.Text(
+                            (it.get(wsd.yPos).get(wsd.xPos)==wsd.inpChar)
+                                .toString()))
+                    }
                 }
-            }catch(e: Exception){
-                println(e.localizedMessage)
-            }finally{
             }
+            catch(e: Exception){println(e.localizedMessage)}
         }
     }
 }

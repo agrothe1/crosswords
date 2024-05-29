@@ -3,10 +3,8 @@ package de.agrothe.crosswords.web
 import de.agrothe.crosswords.*
 import io.ktor.server.html.*
 import kotlinx.html.*
-import kotlinx.serialization.StringFormat
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.util.Formatter
 
 fun Css.dirImg(
         pDirct: KeyDirct?,
@@ -33,7 +31,8 @@ fun Css.dirImg(
 
 class GridCell(val pRowIdx: Int, val pColIdx: Int, val pChar: Char,
     val pWordAtX: DictSynmsOrnt?, val pWordAtY: DictSynmsOrnt?,
-    val pDimen: Int, val pConf: WebAppConfig): Template<FlowContent>
+    val pDimen: Int, val pConf: WebAppConfig, val pHashCode: HashCode)
+        : Template<FlowContent>
 {
 override fun FlowContent.apply(){
     with(pConf.CSS){
@@ -48,19 +47,25 @@ override fun FlowContent.apply(){
             idx(pWordAtY?.ornt, pRowIdx,
                 Pair(IDX_SLCT_ROT_SOUTH, IDX_SLCT_ROT_NORTH))
             tr{td{
+                val iD="${pRowIdx}_${pColIdx}"
                 val wsdata = Json.encodeToString(
-                    WSData(pChar, '%', pColIdx, pRowIdx))
+                    WSData('%', pColIdx, pRowIdx, pHashCode))
                 input(classes=PUZZLE_CELL_CHAR, type=InputType.text){
+                    id=iD
                     maxLength="1"
                     placeholder=pChar.toString() // todo configurable
-                    // localhost:8080/verify: todo refactor to gloabal setting
+                    // todo does "new WS" reuse existing WS?
                     onKeyUp="""
-                        let s=new WebSocket("ws://localhost:8080/verify")
-                        value=value.toUpperCase()
-                        s.onopen=(event)=>{s.send(
-                            '${wsdata}'.replace("%", value||" ") 
-                        )}
-                    """.trimIndent()
+                let ws=new WebSocket('${pConf.WEB_SOCK_ENDPOINT}') 
+                ws.addEventListener("message", (ev)=>{
+                    let elm=document.getElementById('$iD')
+                    if(ev.data=='true'){elm.className="$PUZZLE_CELL_CHAR_SOLVED"}
+                    else{elm.className="$PUZZLE_CELL_CHAR"}
+                });
+                value=value.toUpperCase()
+                ws.onopen=(event)=>{ws.send('${wsdata}'.replace("%", value||" ") 
+                )}
+            """.trimIndent()
                 }
                 //span(PUZZLE_CELL_CHAR){+pChar.toString()}
             }}
