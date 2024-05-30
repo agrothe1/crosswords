@@ -2,7 +2,6 @@ package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.*
 import io.ktor.server.html.*
-import kotlinx.css.tbody
 import kotlinx.css.td
 import kotlinx.html.*
 
@@ -13,6 +12,7 @@ class BodyTplt: Template<HTML>{
     val header = Placeholder<FlowContent>()
     val puzzle = TemplatePlaceholder<PuzzleTplt>()
     override fun HTML.apply(){
+        lang="de"
         head{
             meta("viewport",
             "width=device-width, height=device-height, initial-scale=1.0")
@@ -47,11 +47,13 @@ class PuzzleTplt: Template<FlowContent>{
                 fun legendEntry(pSynm: String) =
                     tr{
                         td{b{+Entities.middot}}
-                        td{+pSynm}
+                            conf.LEGND_ENTR_SUBST_REGEX.replace(pSynm, "").also{
+                        td{+it}
+                        }
                     }
                 fun TD.legendEntries(pSynms: DictSynms?) =
                     table(classes=LEGEND_ENTRIES){
-                        pSynms?.shuffled()?.take(2)?.forEach{legendEntry(it)}
+                        pSynms?.shuffled()?.take(2)?.forEach{legendEntry(it)} // todo max synms -> config
                     }
 
                 tbody(classes=PUZZLE_TABLE){
@@ -60,7 +62,7 @@ class PuzzleTplt: Template<FlowContent>{
                         table(classes=LEGEND_TABLE){
                             tr{
                                 th(classes=LEGEND_TABLE_HEADER)
-                                    {colSpan="2"; +"Waagerecht"}//todo
+                                    {colSpan="2"; +conf.I18n.HORIZONTAL}
                             }
                             puzzle.forEachIndexed{rowIdx, _->
                                 tr{
@@ -81,8 +83,8 @@ class PuzzleTplt: Template<FlowContent>{
                                     }
                                 }}
                             tr{
-                                th(classes=LEGEND_TABLE_HEADER)
-                                    {colSpan="2"; +"Senkrecht"}//todo
+                                th(classes=LEGEND_TABLE_HEADER_NTH)
+                                    {colSpan="2"; +conf.I18n.VERTICAL}
                             }
                             puzzle.forEachIndexed{colIdx, _->
                                 tr{

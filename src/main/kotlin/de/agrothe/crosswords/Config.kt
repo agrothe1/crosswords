@@ -50,7 +50,15 @@ class ReadDictConfig(
 class WebAppConfig(
     val WEB_SOCK_ENDPOINT: String,
     val DIRCTN_IMG: String,
+    val I18n: I18n,
     val CSS: Css,
+    LEGND_ENTR_SUBST: String,
+    val LEGND_ENTR_SUBST_REGEX: Regex = Regex(LEGND_ENTR_SUBST),
+)
+
+class I18n(
+    val HORIZONTAL: String,
+    val VERTICAL: String,
 )
 
 class Css(
@@ -68,6 +76,7 @@ class Css(
     val TABLE_CELL_BACKGROUND: String,
     val LEGEND_TABLE: String,
     val LEGEND_TABLE_HEADER: String,
+    val LEGEND_TABLE_HEADER_NTH: String,
     val LEGEND_ENTRIES: String,
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,

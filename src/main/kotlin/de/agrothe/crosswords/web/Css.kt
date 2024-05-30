@@ -12,9 +12,12 @@ val CSS = fun CSSBuilder.(){
     with(confCss){
         val colors = COLOR_PALETTES.random()
 
-        rule("body"){
+        rule("html, body"){
             backgroundColor=Color.white
-            margin(5.vh)
+            //height=100.pct
+            //width=100.pct
+            //padding="5.vh"
+            //boxSizing=BoxSizing.borderBox
         }
         rule("h1"){
             color=Color.blue
@@ -26,21 +29,25 @@ val CSS = fun CSSBuilder.(){
         rule(LEGEND_TABLE.cls()){
             fontFamily="sans-serif"
             fontSize=3.3.vh
+            paddingRight=1.vh
             fontWeight=FontWeight.normal
-            //whiteSpace=WhiteSpace.nowrap
             color=colors.CELL_CHAR_COLR
             wordWrap=WordWrap.breakWord
-            paddingRight=1.vh
         }
-        rule(LEGEND_TABLE_HEADER.cls()){
+        fun lgndTableHdr(pSel: String, pTop: LinearDimension)
+                = rule(pSel.cls()){
             textAlign = TextAlign.left
             textDecoration=TextDecoration(setOf(TextDecorationLine.underline))
+            paddingTop=pTop
         }
+        lgndTableHdr(LEGEND_TABLE_HEADER, 0.vh)
+        lgndTableHdr(LEGEND_TABLE_HEADER_NTH, 2.vh)
         rule(LEGEND_ENTRIES.cls()){
             borderWidth=0.4.vh
             borderColor=colors.GRID_BORDER_COLR.darken(30)
             borderStyle=BorderStyle.none
             borderBottomStyle=BorderStyle.dashed
+            hyphens=Hyphens.auto
         }
         rule(GRID_TABLE.cls()){
             fontFamily="monospace"
