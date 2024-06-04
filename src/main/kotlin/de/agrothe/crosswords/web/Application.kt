@@ -1,7 +1,7 @@
 package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.Puzzle
-import de.agrothe.crosswords.print
+import de.agrothe.crosswords.config
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.server.application.*
@@ -19,6 +19,7 @@ import kotlinx.serialization.json.Json
 import net.jodah.expiringmap.ExpiringMap
 import java.time.Duration
 import java.util.concurrent.TimeUnit
+import kotlinx.serialization.encodeToString
 
 fun main(args: Array<String>){
     //io.ktor.server.netty.EngineMain.main(args)
@@ -51,6 +52,8 @@ typealias HashCode = Int
 data class WSData(
     val inpChar: Char, val xPos: Int, val yPos: Int, val hashCode: HashCode)
 
+private val conf by lazy{config.webApp}
+
 val puzzleCache: MutableMap<HashCode, Puzzle> = ExpiringMap.builder()
     .maxSize(10_000)
     .expiration(1, TimeUnit.HOURS)
@@ -70,11 +73,11 @@ fun Application.configureSockets(){
                     val f = frame as? Frame.Text ?: continue
                     val wsd=
                         Json.decodeFromString<WSData>(f.readText())
-                    //println(wsd)
+                    println(wsd)
                     puzzleCache.get(wsd.hashCode)?.let{
                         send(Frame.Text(
-                            (it.get(wsd.yPos).get(wsd.xPos)==wsd.inpChar)
-                                .toString()))
+                            (it.get(wsd.yPos).get(wsd.xPos).equals(
+                                wsd.inpChar, true)).toString()))
                     }
                 }
             }

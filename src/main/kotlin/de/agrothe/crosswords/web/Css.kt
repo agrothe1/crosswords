@@ -85,9 +85,11 @@ val CSS = fun CSSBuilder.(){
             maxWidth=1.em
             textAlign=TextAlign.center
             maxHeight=1.em
+            transition("all", 1.s,
+                Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
         }
         cellChar(PUZZLE_CELL_CHAR, colors.CELL_CHAR_COLR)
-        cellChar(PUZZLE_CELL_CHAR_SOLVED, colors.SOLVED_CELL_CHAR_COLR)
+        cellChar(PUZZLE_CELL_CHAR_SOLVED, colors.PUZZLE_CELL_CHAR_SOLVED)
         rule(IDX_SLCT_ROT_SOUTH.cls()){
             height=2.5.vh
             transform.rotate(0.grad)

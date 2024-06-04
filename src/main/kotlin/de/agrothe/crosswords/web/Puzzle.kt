@@ -47,7 +47,8 @@ class PuzzleTplt: Template<FlowContent>{
                 fun legendEntry(pSynm: String) =
                     tr{
                         td{b{+Entities.middot}}
-                            conf.LEGND_ENTR_SUBST_REGEX.replace(pSynm, "").also{
+                            conf.LEGND_ENTR_SUBST_REGEX
+                                .replace(pSynm, "").also{
                         td{+it}
                         }
                     }
@@ -118,8 +119,7 @@ class PuzzleTplt: Template<FlowContent>{
 
 // todo separate
 class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
-    val pConf: WebAppConfig)
-        : Template<FlowContent> {
+        val pConf: WebAppConfig): Template<FlowContent>{
     override fun FlowContent.apply(){
         val cellTmplt = TemplatePlaceholder<GridCell>()
         with(pConf.CSS){

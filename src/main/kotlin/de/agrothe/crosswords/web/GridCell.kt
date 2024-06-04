@@ -60,19 +60,19 @@ override fun FlowContent.apply(){
                     placeholder=pChar.toString() // todo configurable
                     // todo does "new WS" reuse existing WS?
                     onKeyUp="""
-                let ws=new WebSocket('${pConf.WEB_SOCK_ENDPOINT}') 
-                ws.addEventListener("message", (ev)=>{
+                let ws=new WebSocket('${pConf.WEB_SOCK_ENDPOINT}')
+                ws.addEventListener("message",(ev)=>{
                     let elm=document.getElementById('$iD')
                     if(ev.data=='true'){
                         elm.disabled=true
                         elm.className="$PUZZLE_CELL_CHAR_SOLVED"
                     }
                     else{elm.className="$PUZZLE_CELL_CHAR"}
-                });
+                })
                 value=value.toUpperCase()
-                ws.onopen=(event)=>{ws.send('${wsdata}'.replace("%", value||" ") 
-                )}
-                """.trimIndent()
+                ws.onopen=(event)=>{
+                    ws.send('${wsdata}'.replace("%",value||" "))}
+            """.trimIndent()
                 }
                 //span(PUZZLE_CELL_CHAR){+pChar.toString()}
             }}

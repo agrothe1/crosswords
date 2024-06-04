@@ -87,13 +87,13 @@ open class ColorPalletteConfig(
     GRID_LINES: String,
     IDX_NUM: String,
     CELL_CHAR: String,
-    SOLVED_CELL_CHAR: String,
+    CELL_CHAR_SOLVED: String,
 
     val GRID_BORDER_COLR: Color = GRID_BORDER.toColor(),
     val GRID_LINES_COLR: Color = GRID_LINES.toColor(),
     val IDX_NUM_COLR: Color = IDX_NUM.toColor().darken(60),
     val CELL_CHAR_COLR: Color = CELL_CHAR.toColor().darken(20),
-    val SOLVED_CELL_CHAR_COLR: Color = SOLVED_CELL_CHAR.toColor(),
+    val PUZZLE_CELL_CHAR_SOLVED: Color = CELL_CHAR_SOLVED.toColor(),
 )
     {
         companion object{
