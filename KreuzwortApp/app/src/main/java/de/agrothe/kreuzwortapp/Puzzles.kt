@@ -2,7 +2,6 @@ package de.agrothe.crosswords
 
 import de.agrothe.crosswords.Axis.X
 import de.agrothe.crosswords.Axis.Y
-import de.agrothe.kreuzwortapp.MainActivity
 import de.agrothe.kreuzwortapp.MainActivity.Companion.appAssets
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.File
@@ -99,18 +98,19 @@ fun Puzzle.save(): Puzzle =
 fun InputStream.readPuzzle(): Puzzle =
     reader().readLines().map{it.toCharArray()}.toTypedArray()
 
-fun getRandom(pDimen: Int)=//: Puzzle? = // todo
+fun getRandom(pDimen: Int): Puzzle? = // todo
 //  File(Path("", *config.GENERATED_PUZZLES_DIR.plus(pDimen.toString()))
 //        .listDirectoryEntries().random().toString()).run{
     Path("",
-            *config.GENERATED_PUZZLES_DIR.plus(pDimen.toString())).let{path->
-        appAssets.list(path.toString())?.random()?.let{fname->
-            appAssets.open(Path(path.toString(), fname).toString()).let{
-                logger.info{"reading puzzle: $fname"}
-                it.readPuzzle()
+            *config.GENERATED_PUZZLES_DIR.plus(pDimen.toString())).toString()
+        .let{path->
+            appAssets.list(path)?.random()?.let{fname->
+                appAssets.open(Path(path, fname).toString()).let{
+                    logger.info{"reading puzzle: $fname"}
+                    it.readPuzzle()
+                }
             }
-        }
-    }
+        }?.randomMirror()
 
 fun emptyPuzzle(pDimen: Int): Puzzle =
     Array(pDimen){_->CharArray(pDimen){_-> '.'}}

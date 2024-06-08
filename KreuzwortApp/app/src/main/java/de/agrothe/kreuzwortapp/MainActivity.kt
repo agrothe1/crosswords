@@ -1,38 +1,22 @@
 package de.agrothe.kreuzwortapp
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.res.AssetManager
-import android.net.Uri
 import android.os.Bundle
-import android.view.ViewGroup
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import de.agrothe.crosswords.web.BodyTplt
 import de.agrothe.crosswords.web.CSS
 import de.agrothe.crosswords.web.configureSockets
-import de.agrothe.kreuzwortapp.ui.theme.KreuzwortAppTheme
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.html.*
-import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.netty.bootstrap.ServerBootstrap
-import io.netty.channel.ChannelFuture
-import io.netty.channel.ChannelHandler
-import io.netty.channel.ChannelInitializer
-import io.netty.channel.nio.NioEventLoopGroup
-import io.netty.channel.socket.SocketChannel
-import io.netty.channel.socket.nio.NioServerSocketChannel
-import kotlinx.coroutines.*
 import kotlinx.css.CSSBuilder
-import java.lang.Thread.sleep
-import java.time.Duration
-import java.util.concurrent.TimeUnit
 
 private val logger by lazy{KotlinLogging.logger{}}
 
