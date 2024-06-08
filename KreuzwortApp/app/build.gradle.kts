@@ -48,21 +48,6 @@ android{
             excludes += "/META-INF/INDEX.LIST"
             excludes += "/META-INF/io.netty.versions.properties"
             //pickFirsts += "/resources/**"
-            pickFirsts += "/data/**"
-            pickFirsts += "/imgs/**"
-            //pickFirsts += "/puzzles/**"
-            pickFirsts += "/puzzles/generated/**"
-        }
-    }
-
-    sourceSets{
-        getByName("main"){
-            assets{
-                //srcDirs("src\\main\\resources")
-                srcDirs("src\\main\\assets\\data")
-                srcDirs("src\\main\\assets\\imgs")
-                srcDirs("src\\main\\assets\\puzzles\\generated")
-            }
         }
     }
 }

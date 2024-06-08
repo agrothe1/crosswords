@@ -1,6 +1,8 @@
 package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.config
+import io.ktor.http.*
+import io.ktor.server.util.*
 import kotlinx.css.*
 import kotlinx.css.properties.*
 
