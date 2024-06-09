@@ -1,6 +1,8 @@
 package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.*
+import de.agrothe.kreuzwortapp.web.GridCell
+import de.agrothe.kreuzwortapp.web.dirImg
 import io.ktor.server.html.*
 import kotlinx.css.td
 import kotlinx.html.*
@@ -14,14 +16,15 @@ class BodyTplt: Template<HTML>{
     override fun HTML.apply(){
         lang="de"
         head{
-            meta("viewport",
-            "height=device-height")
+            meta("viewport", "width=device-width")
             link(rel="stylesheet", href="/styles.css", type="text/css")
         }
         body{
+            /*
             h1{
                 insert(header)
             }
+             */
             insert(PuzzleTplt(), puzzle)
         }
     }
@@ -55,57 +58,51 @@ class PuzzleTplt: Template<FlowContent>{
                     }
                 fun TD.legendEntries(pSynms: DictSynms?) =
                     table(classes=LEGEND_ENTRIES){
-                        pSynms?.shuffled()?.take(2)?.forEach{legendEntry(it)} // todo max synms -> config
+                        // todo max synms -> config
+                        pSynms?.shuffled()?.take(2)?.forEach{legendEntry(it)}
                     }
-
-                tbody(classes=PUZZLE_TABLE){
-                tr{
+                tbody(classes=PUZZLE_TABLE){tr{
                     td{
                         table(classes=LEGEND_TABLE){
+                            fun TR.legendIdx(pRowIdx: Int, pColIdx: Int,
+                                     pSynms: DictSynmsOrnt?,
+                                     pIdxSelct: Pair<String, String>) =
+                                td(classes=PUZZLE_CELL_IDX_NUM){
+                                    pSynms?.ornt.let{ornt->
+                                        dirImg(ornt,
+                                            if(ornt == KeyDirct.NORMAL) 0
+                                                else dimen-1,
+                                            pRowIdx, pColIdx, pIdxSelct,
+                                            dimen, conf, false,
+                                            this)
+                                    }}
+
                             tr{
                                 th(classes=LEGEND_TABLE_HEADER)
                                     {colSpan="2"; +conf.I18n.HORIZONTAL}
                             }
                             puzzle.forEachIndexed{rowIdx, _->
                                 tr{
-                                    val synms= entries[
-                                        puzzle.getStringAt(Axis.X, rowIdx)]
-                                    td(classes=PUZZLE_CELL_IDX_NUM){
-                                        synms?.ornt.let{ornt->
-                                            dirImg(ornt,
-                                                if(ornt == KeyDirct.NORMAL) 0
-                                                    else dimen-1,
-                                                rowIdx, 0,
+                                    entries[puzzle.getStringAt(Axis.X, rowIdx)]
+                                        ?.let{
+                                            legendIdx(rowIdx, 0, it,
                                                 Pair(IDX_SLCT_ROT_WEST,
-                                                    IDX_SLCT_ROT_EAST),
-                                                dimen, conf, this)
-                                        }}
-                                    td{
-                                        legendEntries(synms?.synms)
-                                    }
-                                }}
+                                                    IDX_SLCT_ROT_EAST))
+                                            td{legendEntries(it.synms)}
+                            }}}
                             tr{
                                 th(classes=LEGEND_TABLE_HEADER_NTH)
                                     {colSpan="2"; +conf.I18n.VERTICAL}
                             }
                             puzzle.forEachIndexed{colIdx, _->
                                 tr{
-                                    val synms= entries[
-                                        puzzle.getStringAt(Axis.Y, colIdx)]
-                                    td(classes=PUZZLE_CELL_IDX_NUM){
-                                        synms?.ornt.let{ornt->
-                                            dirImg(ornt,
-                                                if(ornt == KeyDirct.NORMAL) 0
-                                                    else dimen-1,
-                                        0, colIdx,
+                                    entries[puzzle.getStringAt(Axis.Y, colIdx)]
+                                        ?.let{
+                                            legendIdx(0, colIdx, it,
                                                 Pair(IDX_SLCT_ROT_SOUTH,
-                                                    IDX_SLCT_ROT_NORTH),
-                                                dimen, conf,this)
-                                    }}
-                                    td{
-                                        legendEntries(synms?.synms)
-                                    }
-                                }}
+                                                    IDX_SLCT_ROT_NORTH))
+                                            td{legendEntries(it.synms)}
+                                }}}
                         }
                     }
                     td{

@@ -3,10 +3,11 @@ package de.agrothe.kreuzwortapp
 import android.annotation.SuppressLint
 import android.content.res.AssetManager
 import android.os.Bundle
+import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import de.agrothe.crosswords.web.BodyTplt
-import de.agrothe.crosswords.web.CSS
+import de.agrothe.kreuzwortapp.web.CSS
 import de.agrothe.crosswords.web.configureSockets
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
@@ -36,11 +37,16 @@ override fun onCreate(savedInstanceState: Bundle?){
         }.start(wait=false)
         logger.info{"...web server started"}
 
-        WebView(this).let{
-            setContentView(it)
-            @SuppressLint("SetJavaScriptEnabled")
-            it.settings.javaScriptEnabled=true
-            it.loadUrl("http://localhost:8080/puzzler")
+        WebView(this).run{
+            setContentView(this)
+            with(settings){
+                @SuppressLint("SetJavaScriptEnabled")
+                javaScriptEnabled=true
+                loadWithOverviewMode=true
+                useWideViewPort=true
+                layoutAlgorithm=WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
+            }
+            loadUrl("http://localhost:8080/puzzler")
         }
     }
 

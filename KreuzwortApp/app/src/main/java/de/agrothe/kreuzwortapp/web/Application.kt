@@ -2,6 +2,7 @@ package de.agrothe.crosswords.web
 
 import de.agrothe.crosswords.Puzzle
 import de.agrothe.crosswords.config
+import de.agrothe.kreuzwortapp.web.CSS
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.server.application.*

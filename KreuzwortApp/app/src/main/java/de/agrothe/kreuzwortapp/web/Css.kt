@@ -1,8 +1,6 @@
-package de.agrothe.crosswords.web
+package de.agrothe.kreuzwortapp.web
 
 import de.agrothe.crosswords.config
-import io.ktor.http.*
-import io.ktor.server.util.*
 import kotlinx.css.*
 import kotlinx.css.properties.*
 
@@ -30,7 +28,7 @@ val CSS = fun CSSBuilder.(){
         }
         rule(LEGEND_TABLE.cls()){
             fontFamily="sans-serif"
-            fontSize=3.3.vh
+            fontSize=3.0.vh
             paddingRight=1.vh
             fontWeight=FontWeight.normal
             color=colors.CELL_CHAR_COLR
@@ -38,7 +36,7 @@ val CSS = fun CSSBuilder.(){
         }
         fun lgndTableHdr(pSel: String, pTop: LinearDimension)
                 = rule(pSel.cls()){
-            textAlign = TextAlign.left
+            textAlign=TextAlign.left
             textDecoration=TextDecoration(setOf(TextDecorationLine.underline))
             paddingTop=pTop
         }
@@ -70,15 +68,18 @@ val CSS = fun CSSBuilder.(){
         rule((TABLE_CELL_BACKGROUND+"2").cls()){
             backgroundColor=Color.antiqueWhite.lighten((5..7).random())
         }
-        rule(PUZZLE_CELL_IDX_NUM.cls()){
-            height=3.0.vh
-            fontSize=3.0.vh
+        fun cellIdxNum(pSel: String, pLineHeight: LineHeight)
+                = rule(pSel.cls()){
+            height=2.9.vh
+            fontSize=2.9.vh
             fontWeight=FontWeight.bolder
-            lineHeight=LineHeight("0.5vh")
+            lineHeight=pLineHeight
             color=colors.IDX_NUM_COLR
         }
-        fun cellChar(pSel: String, pColr: Color) = rule(pSel.cls()){
-            fontSize=10.vh
+        cellIdxNum(PUZZLE_CELL_IDX_NUM, LineHeight("0.5vh"))
+        cellIdxNum(PUZZLE_LGND_IDX_NUM, LineHeight("2.1vh"))
+        fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()){
+            fontSize=8.5.vh
             color=pColr
             backgroundColor=Color.transparent
             borderStyle=BorderStyle.none

@@ -47,7 +47,6 @@ android{
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "/META-INF/INDEX.LIST"
             excludes += "/META-INF/io.netty.versions.properties"
-            //pickFirsts += "/resources/**"
         }
     }
 }
@@ -67,10 +66,8 @@ dependencies{
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    //androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    //implementation("androidx.webkit:webkit:1.11.0")
 
     implementation("org.slf4j:slf4j-simple:2.0.12")
     implementation("io.ktor:ktor-server-html-builder-jvm:2.3.11")
@@ -78,7 +75,7 @@ dependencies{
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty-jvm:2.3.11")
     implementation("io.github.config4k:config4k:0.6.0")
-    implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.129-kotlin-1.4.20")
+    implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.156-kotlin-1.5.0")
     implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.10")
     implementation("io.ktor:ktor-server-websockets:2.3.10")

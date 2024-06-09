@@ -1,7 +1,10 @@
-package de.agrothe.crosswords.web
+package de.agrothe.kreuzwortapp.web
 
 import de.agrothe.crosswords.*
+import de.agrothe.crosswords.web.HashCode
+import de.agrothe.crosswords.web.WSData
 import io.ktor.server.html.*
+import kotlinx.css.*
 import kotlinx.html.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -9,23 +12,33 @@ import kotlinx.serialization.json.Json
 fun Css.dirImg(
         pDirct: KeyDirct?,
         pIdx: Int, pRowIdx: Int, pColIdx: Int, pRot: Pair<String, String>,
-        pDimen: Int, pConf: WebAppConfig, pParentCnt: FlowContent)
+        pDimen: Int, pConf: WebAppConfig, pHorizntl: Boolean,
+        pParentCnt: FlowContent)
     {
-        pParentCnt.apply {
-            span(PUZZLE_CELL_IDX_NUM){
+        fun TR.idx() = td{
+            +(if(pRot.first==IDX_SLCT_ROT_SOUTH)
+                pColIdx else pRowIdx).inc().toString()}
+
+        fun TD.idxImg() = img(
+            classes=if(pDirct==KeyDirct.NORMAL) pRot.first else pRot.second,
+            src=pConf.DIRCTN_IMG)
+
+        pParentCnt.apply{
+            span(if(pHorizntl) PUZZLE_CELL_IDX_NUM else PUZZLE_LGND_IDX_NUM){
                 Pair(pDirct, pIdx).also{
                     table{tr{
                         if(it==Pair(KeyDirct.NORMAL, 0)
-                            ||it==Pair(KeyDirct.REVERSED, pDimen-1)){
-                            td{
-                                +(if(pRot.first==IDX_SLCT_ROT_SOUTH)
-                                    pColIdx else pRowIdx).inc().toString()
+                                ||it==Pair(KeyDirct.REVERSED, pDimen-1)){
+                            if(pHorizntl){
+                                idx()
+                                td{idxImg()}
                             }
-                            td{
-                                img(classes=
-                                    if(pDirct==KeyDirct.NORMAL)
-                                        pRot.first else pRot.second,
-                                    src=pConf.DIRCTN_IMG)
+                            else{
+                                td{colSpan="2"
+                                    table{
+                                        tr{idx()}
+                                        tr{td{idxImg()}}}
+                                }
                             }
                         }else
                             td(classes=pRot.first){colSpan="2"; +Entities.nbsp}
@@ -45,7 +58,7 @@ override fun FlowContent.apply(){
                 tr{td{
                     table{tr{td{
                         dirImg(pDirct, pIdx, pRowIdx, pColIdx, pRot, pDimen,
-                            pConf, this)
+                            pConf, true, this)
                 }}}}}
             }
             idx(pWordAtY?.ornt, pRowIdx,
@@ -59,21 +72,27 @@ override fun FlowContent.apply(){
                     maxLength="1"
                     placeholder=pChar.toString() // todo configurable
                     // todo does "new WS" reuse existing WS?
-                    onKeyUp=
-"""
-    let ws=new WebSocket('${pConf.WEB_SOCK_ENDPOINT}')
-    ws.addEventListener("message",(ev)=>{
-        let elm=document.getElementById('$iD')
-        if(ev.data=='true'){
-            elm.disabled=true
-            elm.className="$PUZZLE_CELL_CHAR_SOLVED"
-        }
-        else{elm.className="$PUZZLE_CELL_CHAR"}
-    })
-    value=value.toUpperCase()
-    ws.onopen=(event)=>{
-        ws.send('${wsdata}'.replace("%",value||" "))}
-""".trimIndent()
+                    onClick="""
+                        value=''
+                        """.trimIndent()
+                    onInput=""" 
+                        if(value.length>1){value=value.charAt(0)}           
+                        """.trimIndent()
+                        // todo move to global function
+                    onKeyUp="""
+                        let ws=new WebSocket('${pConf.WEB_SOCK_ENDPOINT}')
+                        ws.addEventListener("message",(ev)=>{
+                            let e=document.getElementById('$iD')
+                            if(ev.data=='true'){
+                                e.disabled=true
+                                e.className="$PUZZLE_CELL_CHAR_SOLVED"
+                            }
+                            else{e.className="$PUZZLE_CELL_CHAR"}
+                        })
+                        value=value.toUpperCase()
+                        ws.onopen=(ev)=>{
+                            ws.send('${wsdata}'.replace("%",value||" "))}
+                        """.trimIndent()
                 }
                 //span(PUZZLE_CELL_CHAR){+pChar.toString()}
             }}

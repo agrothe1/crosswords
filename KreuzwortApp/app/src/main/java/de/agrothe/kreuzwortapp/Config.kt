@@ -69,6 +69,7 @@ class Css(
     val PUZZLE_CELL_CHAR: String,
     val PUZZLE_CELL_CHAR_SOLVED: String,
     val PUZZLE_CELL_IDX_NUM: String,
+    val PUZZLE_LGND_IDX_NUM: String,
     val IDX_SLCT_ROT_EAST: String,
     val IDX_SLCT_ROT_WEST: String,
     val IDX_SLCT_ROT_SOUTH: String,
