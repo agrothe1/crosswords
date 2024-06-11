@@ -35,16 +35,16 @@ fun Puzzle.put(pAxis: Axis, pPos: Pos, pStr: String): Puzzle =
         .also{newPuzzle->
             for((idx, c) in pStr.withIndex()){
                 when(pAxis){
-                    X->newPuzzle[pPos][idx] = c
-                    Y->newPuzzle[idx][pPos] = c
+                    X-> newPuzzle[pPos][idx] = c
+                    Y-> newPuzzle[idx][pPos] = c
                 }
             }
         }
 
 fun Puzzle.getStringAt(pAxis: Axis, pPos: Pos): String =
     when(pAxis){
-        X -> String(this[pPos])
-        Y -> this.fold(StringBuilder())
+        X-> String(this[pPos])
+        Y-> this.fold(StringBuilder())
             {sb, row->sb.append(row[pPos])}.toString()
     }
 

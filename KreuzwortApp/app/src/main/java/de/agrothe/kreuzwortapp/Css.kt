@@ -14,6 +14,7 @@ val CSS = fun CSSBuilder.(){
 
         rule("html, body"){
             backgroundColor=Color.white
+            //backgroundImage=
             //height=100.pct
             //width=100.pct
             //padding="5.vh"
@@ -23,12 +24,38 @@ val CSS = fun CSSBuilder.(){
             color=Color.blue
             fontSize=5.vh
         }
-        rule(PUZZLE_TABLE.cls()){
-            verticalAlign=VerticalAlign.top
+        rule(PUZZLE_GRID.cls()){
+            display=Display.grid
+            gridTemplateColumns=GridTemplateColumns(
+                LinearDimension("1fr"), LinearDimension("1fr"))
+            gridTemplateRows=GridTemplateRows(
+                LinearDimension("1fr"), LinearDimension("1fr"))
+        }
+        rule(LEGEND_GRID_HORIZ.cls()){
+            gridColumnStart=GridColumnStart("1")
+            gridColumnEnd=GridColumnEnd("2")
+            gridRowStart=GridRowStart("2")
+            gridRowEnd=GridRowEnd("3")
+        }
+        rule(LEGEND_GRID_VERT.cls()){
+            gridColumnStart=GridColumnStart("2")
+            gridColumnEnd=GridColumnEnd("3")
+            gridRowStart=GridRowStart("2")
+            gridRowEnd=GridRowEnd("3")
+            marginLeft=LinearDimension.auto
+            marginRight=LinearDimension("0")
+        }
+        rule(FIELD_GRID.cls()){
+            gridColumnStart=GridColumnStart("1")
+            gridColumnEnd=GridColumnEnd("3")
+            gridRowStart=GridRowStart("1")
+            gridRowEnd=GridRowEnd("2")
         }
         rule(LEGEND_TABLE.cls()){
             fontFamily="sans-serif"
-            fontSize=3.0.vh
+            fontSize=2.6.vh
+            margin="auto"
+            paddingTop=1.vh
             paddingRight=1.vh
             fontWeight=FontWeight.normal
             color=colors.CELL_CHAR_COLR
@@ -56,6 +83,7 @@ val CSS = fun CSSBuilder.(){
             borderColor=colors.GRID_BORDER_COLR
             borderRadius=2.vh
             borderCollapse=BorderCollapse.collapse
+            margin="auto"
         }
         rule(GRID_TABLE_COL.cls()){
             borderWidth=0.4.vh
@@ -79,7 +107,7 @@ val CSS = fun CSSBuilder.(){
         cellIdxNum(PUZZLE_CELL_IDX_NUM, LineHeight("0.5vh"))
         cellIdxNum(PUZZLE_LGND_IDX_NUM, LineHeight("2.1vh"))
         fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()){
-            fontSize=8.5.vh
+            fontSize=8.0.vh
             color=pColr
             backgroundColor=Color.transparent
             borderStyle=BorderStyle.none

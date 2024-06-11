@@ -5,6 +5,7 @@ import android.content.res.AssetManager
 import android.os.Bundle
 import android.webkit.WebSettings
 import android.webkit.WebView
+import android.webkit.WebView.setWebContentsDebuggingEnabled
 import androidx.activity.ComponentActivity
 import de.agrothe.crosswords.web.BodyTplt
 import de.agrothe.kreuzwortapp.web.CSS
@@ -39,6 +40,7 @@ override fun onCreate(savedInstanceState: Bundle?){
 
         WebView(this).run{
             setContentView(this)
+            setWebContentsDebuggingEnabled(true)
             with(settings){
                 @SuppressLint("SetJavaScriptEnabled")
                 javaScriptEnabled=true

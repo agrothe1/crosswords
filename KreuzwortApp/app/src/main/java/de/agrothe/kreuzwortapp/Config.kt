@@ -63,6 +63,10 @@ class I18n(
 
 class Css(
     val PUZZLE_TABLE: String,
+    val PUZZLE_GRID: String,
+    val LEGEND_GRID_HORIZ: String,
+    var FIELD_GRID: String,
+    var LEGEND_GRID_VERT: String,
     val GRID_TABLE: String,
     val GRID_TABLE_ROW: String,
     val GRID_TABLE_COL: String,
