@@ -9,6 +9,14 @@ import kotlinx.html.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+// todo config ?
+val lgndIdSuffxRow= "lgndRow"
+val lgndIdSuffxCol= "lgndCol"
+
+fun getRowColIdx(pRowIdx: Int, pColIdx: Int) = "${pRowIdx}_${pColIdx}"
+fun Int.lgndIdSuffxRow() = "$lgndIdSuffxRow$this"
+fun Int.lgndIdSuffxCol() = "$lgndIdSuffxCol$this"
+
 fun Css.dirImg(
         pDirct: KeyDirct?,
         pIdx: Int, pRowIdx: Int, pColIdx: Int, pRot: Pair<String, String>,
@@ -28,7 +36,7 @@ fun Css.dirImg(
                 Pair(pDirct, pIdx).also{
                     table{tr{
                         if(it==Pair(KeyDirct.NORMAL, 0)
-                                ||it==Pair(KeyDirct.REVERSED, pDimen-1)){
+                                || it==Pair(KeyDirct.REVERSED, pDimen-1)){
                             if(pHorizntl){
                                 idx()
                                 td{idxImg()}
@@ -64,9 +72,9 @@ override fun FlowContent.apply(){
             idx(pWordAtY?.ornt, pRowIdx,
                 Pair(IDX_SLCT_ROT_SOUTH, IDX_SLCT_ROT_NORTH))
             tr{td{
-                val iD="${pRowIdx}_${pColIdx}"
+                val iD = getRowColIdx(pRowIdx, pColIdx)
                 val wsdata = Json.encodeToString(
-                    WSData('%', pColIdx, pRowIdx, pHashCode))
+                    WSDataToSrvr('%', pRowIdx, pColIdx, pHashCode))
                 input(classes=PUZZLE_CELL_CHAR, type=InputType.text){
                     id=iD
                     maxLength="1"
@@ -82,12 +90,19 @@ override fun FlowContent.apply(){
                     onKeyUp="""
                         let ws=new WebSocket('${pConf.WEB_SOCK_ENDPOINT}')
                         ws.addEventListener("message",(ev)=>{
-                            let e=document.getElementById('$iD')
-                            if(ev.data=='true'){
-                                e.disabled=true
-                                e.className="$PUZZLE_CELL_CHAR_SOLVED"
+                            let doc=document
+                            let elm=doc.getElementById('$iD')
+                            let rpl=JSON.parse(ev.data)
+                            if(rpl.charSolved==true){
+                                elm.disabled=true
+                                elm.className="$PUZZLE_CELL_CHAR_SOLVED"
                             }
-                            else{e.className="$PUZZLE_CELL_CHAR"}
+                            if(rpl.rowSolved==true)
+                                doc.getElementById('${pRowIdx.lgndIdSuffxRow()}')
+                                    .className="$LGND_ENTRIES_SOLVED"
+                            if(rpl.colSolved==true)
+                                doc.getElementById('${pColIdx.lgndIdSuffxCol()}')
+                                    .className="$LGND_ENTRIES_SOLVED"
                         })
                         value=value.toUpperCase()
                         ws.onopen=(ev)=>{

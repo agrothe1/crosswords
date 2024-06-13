@@ -31,13 +31,13 @@ val CSS = fun CSSBuilder.(){
             gridTemplateRows=GridTemplateRows(
                 LinearDimension("1fr"), LinearDimension("1fr"))
         }
-        rule(LEGEND_GRID_HORIZ.cls()){
+        rule(LGND_GRID_HORIZ.cls()){
             gridColumnStart=GridColumnStart("1")
             gridColumnEnd=GridColumnEnd("2")
             gridRowStart=GridRowStart("2")
             gridRowEnd=GridRowEnd("3")
         }
-        rule(LEGEND_GRID_VERT.cls()){
+        rule(LGND_GRID_VERT.cls()){
             gridColumnStart=GridColumnStart("2")
             gridColumnEnd=GridColumnEnd("3")
             gridRowStart=GridRowStart("2")
@@ -51,7 +51,7 @@ val CSS = fun CSSBuilder.(){
             gridRowStart=GridRowStart("1")
             gridRowEnd=GridRowEnd("2")
         }
-        rule(LEGEND_TABLE.cls()){
+        rule(LGND_TABLE.cls()){
             fontFamily="sans-serif"
             fontSize=2.6.vh
             margin="auto"
@@ -67,15 +67,19 @@ val CSS = fun CSSBuilder.(){
             textDecoration=TextDecoration(setOf(TextDecorationLine.underline))
             paddingTop=pTop
         }
-        lgndTableHdr(LEGEND_TABLE_HEADER, 0.vh)
-        lgndTableHdr(LEGEND_TABLE_HEADER_NTH, 2.vh)
-        rule(LEGEND_ENTRIES.cls()){
+        lgndTableHdr(LGND_TABLE_HEADER, 0.vh)
+        lgndTableHdr(LGND_TABLE_HEADER_NTH, 2.vh)
+        fun lgndEntries(pSel: String, pTextDecoLine: TextDecorationLine)
+                = rule(pSel.cls()){
             borderWidth=0.4.vh
             borderColor=colors.GRID_BORDER_COLR.darken(30)
             borderStyle=BorderStyle.none
             borderBottomStyle=BorderStyle.dashed
             hyphens=Hyphens.auto
+            textDecoration=TextDecoration(setOf(pTextDecoLine))
         }
+        lgndEntries(LGND_ENTRIES, TextDecorationLine.unset)
+        lgndEntries(LGND_ENTRIES_SOLVED, TextDecorationLine.lineThrough)
         rule(GRID_TABLE.cls()){
             fontFamily="monospace"
             borderWidth=0.6.vh

@@ -62,11 +62,10 @@ class I18n(
 )
 
 class Css(
-    val PUZZLE_TABLE: String,
     val PUZZLE_GRID: String,
-    val LEGEND_GRID_HORIZ: String,
+    val LGND_GRID_HORIZ: String,
     var FIELD_GRID: String,
-    var LEGEND_GRID_VERT: String,
+    var LGND_GRID_VERT: String,
     val GRID_TABLE: String,
     val GRID_TABLE_ROW: String,
     val GRID_TABLE_COL: String,
@@ -79,10 +78,11 @@ class Css(
     val IDX_SLCT_ROT_SOUTH: String,
     val IDX_SLCT_ROT_NORTH: String,
     val TABLE_CELL_BACKGROUND: String,
-    val LEGEND_TABLE: String,
-    val LEGEND_TABLE_HEADER: String,
-    val LEGEND_TABLE_HEADER_NTH: String,
-    val LEGEND_ENTRIES: String,
+    val LGND_TABLE: String,
+    val LGND_TABLE_HEADER: String,
+    val LGND_TABLE_HEADER_NTH: String,
+    val LGND_ENTRIES: String,
+    val LGND_ENTRIES_SOLVED: String,
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,
 )
@@ -116,4 +116,3 @@ data class AppConfig(
 
 fun readConfig(): AppConfig =
     ConfigFactory.load().extract<AppConfig>()
-

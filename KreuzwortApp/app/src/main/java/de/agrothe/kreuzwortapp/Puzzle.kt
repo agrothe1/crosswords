@@ -49,7 +49,8 @@ class PuzzleTplt: Template<FlowContent>{
             .toTypedArray()
 
     init{
-        puzzleCache.put(puzzle.hashCode(), puzzle)
+        puzzleCache.put(puzzle.hashCode(),
+            PuzzleCacheEntry(puzzle, emptyPuzzle(dimen)))
     }
 
     override fun FlowContent.apply(){
@@ -72,18 +73,19 @@ class PuzzleTplt: Template<FlowContent>{
                             td{+it}
                     }
                 }
-            fun TD.legendEntries(pSynms: DictSynms?) =
-                table(classes=LEGEND_ENTRIES){
+            fun TD.legendEntries(pSynms: DictSynms?, pId: String) =
+                table(classes=LGND_ENTRIES){
+                    id=pId
                     // todo max synms -> config
                     pSynms?.shuffled()?.take(2)?.forEach{legendEntry(it)}
             }
 
             div{
                 div(classes=PUZZLE_GRID){
-                    div(classes=LEGEND_GRID_HORIZ){
-                        table(classes=LEGEND_TABLE){
+                    div(classes=LGND_GRID_HORIZ){
+                        table(classes=LGND_TABLE){
                             tr{
-                                th(classes=LEGEND_TABLE_HEADER)
+                                th(classes=LGND_TABLE_HEADER)
                                     {colSpan="2"; +conf.I18n.HORIZONTAL}
                             }
                             puzzle.forEachIndexed{rowIdx, _->
@@ -93,7 +95,8 @@ class PuzzleTplt: Template<FlowContent>{
                                             legendIdx(rowIdx, 0, it,
                                                 Pair(IDX_SLCT_ROT_WEST,
                                                     IDX_SLCT_ROT_EAST))
-                                            td{legendEntries(it.synms)}
+                                            td{legendEntries(it.synms,
+                                                rowIdx.lgndIdSuffxRow())}
                             }}}
                         }
                     }
@@ -101,10 +104,10 @@ class PuzzleTplt: Template<FlowContent>{
                         insert(PuzzleGrid(entries, puzzle, dimen, conf),
                             gridTmplt)
                     }
-                    div(classes=LEGEND_GRID_VERT){
-                        table(classes=LEGEND_TABLE){
+                    div(classes=LGND_GRID_VERT){
+                        table(classes=LGND_TABLE){
                             tr{
-                                th(classes=LEGEND_TABLE_HEADER)
+                                th(classes=LGND_TABLE_HEADER)
                                     {colSpan="2"; +conf.I18n.VERTICAL}
                             }
                             puzzle.forEachIndexed{colIdx, _->
@@ -114,7 +117,8 @@ class PuzzleTplt: Template<FlowContent>{
                                             legendIdx(0, colIdx, it,
                                                 Pair(IDX_SLCT_ROT_SOUTH,
                                                     IDX_SLCT_ROT_NORTH))
-                                            td{legendEntries(it.synms)}
+                                            td{legendEntries(it.synms,
+                                                colIdx.lgndIdSuffxCol())}
                             }}}
                         }
                     }
