@@ -1,6 +1,7 @@
 package de.agrothe.kreuzwortapp
 
 import io.ktor.server.html.*
+import kotlinx.css.*
 import kotlinx.html.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -17,34 +18,17 @@ fun Css.dirImg(
         pIdx: Int, pRowIdx: Int, pColIdx: Int, pRot: Pair<String, String>,
         pDimen: Int, pHorizntl: Boolean, pParentCnt: FlowContent)
     {
-        fun TR.idx() = td{
-            +(if(pRot.first==IDX_SLCT_ROT_SOUTH)
-                pColIdx else pRowIdx).inc().toString()}
-
-        fun TD.idxImg() = img(
-            classes=if(pDirct==KeyDirct.NORMAL) pRot.first else pRot.second,
-            src=webAppConf.DIRCTN_IMG)
-
         pParentCnt.apply{
             span(if(pHorizntl) PUZZLE_CELL_IDX_NUM else PUZZLE_LGND_IDX_NUM){
                 Pair(pDirct, pIdx).also{
-                    table{tr{
-                        if(it==Pair(KeyDirct.NORMAL, 0)
-                                || it==Pair(KeyDirct.REVERSED, pDimen-1)){
-                            if(pHorizntl){
-                                idx()
-                                td{idxImg()}
-                            }
-                            else{
-                                td{colSpan="2"
-                                    table{
-                                        tr{idx()}
-                                        tr{td{idxImg()}}}
-                                }
-                            }
-                        }else
-                            td(classes=pRot.first){colSpan="2"; +Entities.nbsp}
-                    }}
+                    if(it==Pair(KeyDirct.NORMAL, 0)
+                            || it==Pair(KeyDirct.REVERSED, pDimen-1)){
+                        +(if(pRot.first==IDX_SLCT_ROT_SOUTH)
+                            pColIdx else pRowIdx).inc().toString()
+                        img(classes=if(pDirct==KeyDirct.NORMAL)
+                                pRot.first else pRot.second,
+                            src=webAppConf.DIRCTN_IMG)
+                    } else span(classes=pRot.first){+Entities.nbsp}
             }}
     }}
 
@@ -55,17 +39,16 @@ class GridCell(val pRowIdx: Int, val pColIdx: Int, val pChar: Char,
 {
 override fun FlowContent.apply(){
     with(cssConf){
-        table{
+        div(classes=CELL_GRID){
             fun idx(pDirct: KeyDirct?, pIdx: Int, pRot: Pair<String, String>){
-                tr{td{
-                    table{tr{td{
+                div{
                         dirImg(pDirct, pIdx, pRowIdx, pColIdx, pRot, pDimen,
                     true, this)
-                }}}}}
+                }
             }
             idx(pWordAtY?.ornt, pRowIdx,
                 Pair(IDX_SLCT_ROT_SOUTH, IDX_SLCT_ROT_NORTH))
-            tr{td{
+            div{
                 val iD = getRowColIdx(pRowIdx, pColIdx)
                 val wsdata = Json.encodeToString(
                     WSDataToSrvr('%', pRowIdx, pColIdx, pHashCode))
@@ -104,8 +87,7 @@ override fun FlowContent.apply(){
                             ws.send('${wsdata}'.replace("%",value||" "))}
                         """.trimIndent()
                 }
-                //span(PUZZLE_CELL_CHAR){+pChar.toString()}
-            }}
+            }
             idx(pWordAtX?.ornt, pColIdx,
                 Pair(IDX_SLCT_ROT_WEST, IDX_SLCT_ROT_EAST))
         }

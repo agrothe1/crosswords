@@ -33,14 +33,10 @@ val CSS = fun CSSBuilder.(){
         rule(LGND_GRID_HORIZ.cls()){
             gridColumnStart=GridColumnStart("1")
             gridColumnEnd=GridColumnEnd("2")
-            gridRowStart=GridRowStart("1")
-            gridRowEnd=GridRowEnd("2")
         }
         rule(LGND_GRID_VERT.cls()){
             gridColumnStart=GridColumnStart("2")
             gridColumnEnd=GridColumnEnd("3")
-            gridRowStart=GridRowStart("1")
-            gridRowEnd=GridRowEnd("2")
             marginLeft=LinearDimension.auto
             marginRight=LinearDimension("0")
         }
@@ -50,6 +46,14 @@ val CSS = fun CSSBuilder.(){
             gridRowStart=GridRowStart("2")
             gridRowEnd=GridRowEnd("3")
             paddingTop=0.7.vh
+        }
+        rule(CELL_GRID.cls()){
+            display=Display.grid
+            gridTemplateColumns=GridTemplateColumns(
+                LinearDimension("3fr"))
+            gridTemplateRows=GridTemplateRows(
+                LinearDimension("1fr"), LinearDimension("2fr"),
+                LinearDimension("1fr"))
         }
         rule(LGND_TABLE.cls()){
             fontFamily="sans-serif"
@@ -77,6 +81,7 @@ val CSS = fun CSSBuilder.(){
             borderStyle=BorderStyle.none
             borderBottomStyle=pBorderBottomStyle
             textDecoration=TextDecoration(setOf(pTextDecoLine))
+            lineHeight=LineHeight("2.7vh")
             hyphens=Hyphens.auto
         }
         lgndEntries(LGND_ENTRIES,
@@ -113,12 +118,13 @@ val CSS = fun CSSBuilder.(){
             fontSize=2.9.vh
             fontWeight=FontWeight.bolder
             lineHeight=pLineHeight
+            textAlign=TextAlign.center
             color=colors.IDX_NUM_COLR
         }
-        cellIdxNum(PUZZLE_CELL_IDX_NUM, LineHeight("0.5vh"))
+        cellIdxNum(PUZZLE_CELL_IDX_NUM, LineHeight("3vh"))
         cellIdxNum(PUZZLE_LGND_IDX_NUM, LineHeight("2.1vh"))
         fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()){
-            fontSize=8.0.vh
+            fontSize=7.5.vh
             color=pColr
             backgroundColor=Color.transparent
             borderStyle=BorderStyle.none

@@ -70,6 +70,7 @@ class I18n(
 
 class Css(
     val PUZZLE_GRID: String,
+    val CELL_GRID: String,
     val LGND_GRID_HORIZ: String,
     var FIELD_GRID: String,
     var LGND_GRID_VERT: String,
