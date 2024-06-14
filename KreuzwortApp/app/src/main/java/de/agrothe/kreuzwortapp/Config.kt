@@ -48,7 +48,12 @@ class ReadDictConfig(
     }
 
 class WebAppConfig(
+    val PORT: Int,
+    val APP_URL: String,
     val WEB_SOCK_ENDPOINT: String,
+    val WS_PING_PERIODS_SECS: Long,
+    val PUZZLE_CACHE_MAX_SIZE: Int,
+    val PUZZLE_CACHE_EXPIRATION_MINS: Long,
     val DIRCTN_IMG: String,
     val I18n: I18n,
     val CSS: Css,

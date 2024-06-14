@@ -3,7 +3,6 @@ package de.agrothe.kreuzwortapp
 import io.ktor.server.html.*
 import kotlinx.html.*
 
-private val conf by lazy{config.webApp}
 private val confCss=conf.CSS
 
 class BodyTplt: Template<HTML>{
