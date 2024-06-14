@@ -1,4 +1,4 @@
-package de.agrothe.crosswords
+package de.agrothe.kreuzwortapp
 
 import com.typesafe.config.ConfigFactory
 import io.github.config4k.extract
@@ -54,6 +54,8 @@ class WebAppConfig(
     val CSS: Css,
     LEGND_ENTR_SUBST: String,
     val LEGND_ENTR_SUBST_REGEX: Regex = Regex(LEGND_ENTR_SUBST),
+    val SHOW_INPUT_HINT: Boolean,
+    val MAX_SYNMS: Int,
 )
 
 class I18n(
@@ -82,7 +84,10 @@ class Css(
     val LGND_TABLE_HEADER: String,
     val LGND_TABLE_HEADER_NTH: String,
     val LGND_ENTRIES: String,
-    val LGND_ENTRIES_SOLVED: String,
+    val LGND_ENTRIES_LAST: String,
+    val LGND_ENTRIES_SOLVED_SUFFX: String,
+    val LGND_ID_SUFFX_ROW: String,
+    val LGND_ID_SUFFX_COL: String,
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,
 )

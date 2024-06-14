@@ -1,10 +1,6 @@
-package de.agrothe.crosswords.web
+package de.agrothe.kreuzwortapp
 
-import de.agrothe.crosswords.*
-import de.agrothe.kreuzwortapp.web.GridCell
-import de.agrothe.kreuzwortapp.web.dirImg
 import io.ktor.server.html.*
-import kotlinx.css.td
 import kotlinx.html.*
 
 private val conf by lazy{config.webApp}
@@ -62,7 +58,7 @@ class PuzzleTplt: Template<FlowContent>{
                     pSynms?.ornt.let{ornt->
                         dirImg(ornt,
                             if(ornt == KeyDirct.NORMAL) 0 else dimen-1,
-                            pRowIdx, pColIdx, pIdxSelct, dimen, conf,
+                            pRowIdx, pColIdx, pIdxSelct, dimen,
                             false, this)
                 }}
             fun TABLE.legendEntry(pSynm: String) =
@@ -73,11 +69,13 @@ class PuzzleTplt: Template<FlowContent>{
                             td{+it}
                     }
                 }
-            fun TD.legendEntries(pSynms: DictSynms?, pId: String) =
-                table(classes=LGND_ENTRIES){
+            fun TD.legendEntries(pSynms: DictSynms?, pId: String,
+                    pLast: Boolean) =
+                table(classes=LGND_ENTRIES+if(pLast)
+                        " $LGND_ENTRIES_LAST" else ""){
                     id=pId
-                    // todo max synms -> config
-                    pSynms?.shuffled()?.take(2)?.forEach{legendEntry(it)}
+                    pSynms?.shuffled()?.take(conf.MAX_SYNMS)
+                        ?.forEach{legendEntry(it)}
             }
 
             div{
@@ -96,7 +94,8 @@ class PuzzleTplt: Template<FlowContent>{
                                                 Pair(IDX_SLCT_ROT_WEST,
                                                     IDX_SLCT_ROT_EAST))
                                             td{legendEntries(it.synms,
-                                                rowIdx.lgndIdSuffxRow())}
+                                                rowIdx.lgndIdSuffxRow(),
+                                                rowIdx==dimen-1)}
                             }}}
                         }
                     }
@@ -118,7 +117,8 @@ class PuzzleTplt: Template<FlowContent>{
                                                 Pair(IDX_SLCT_ROT_SOUTH,
                                                     IDX_SLCT_ROT_NORTH))
                                             td{legendEntries(it.synms,
-                                                colIdx.lgndIdSuffxCol())}
+                                                colIdx.lgndIdSuffxCol(),
+                                                colIdx==dimen-1)}
                             }}}
                         }
                     }
@@ -147,7 +147,7 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
                                             puzzle.getStringAt(Axis.X, rowIdx)],
                                         pEntries[
                                             puzzle.getStringAt(Axis.Y, colIdx)],
-                                        pDimen, pConf, puzzle.hashCode()),
+                                        pDimen, puzzle.hashCode()),
                                             cellTmplt)
                                 }
                             }

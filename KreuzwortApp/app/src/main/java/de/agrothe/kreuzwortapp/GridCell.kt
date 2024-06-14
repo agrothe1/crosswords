@@ -1,27 +1,21 @@
-package de.agrothe.kreuzwortapp.web
+package de.agrothe.kreuzwortapp
 
-import de.agrothe.crosswords.*
-import de.agrothe.crosswords.web.HashCode
-import de.agrothe.crosswords.web.WSData
 import io.ktor.server.html.*
-import kotlinx.css.*
 import kotlinx.html.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-// todo config ?
-val lgndIdSuffxRow= "lgndRow"
-val lgndIdSuffxCol= "lgndCol"
+private val webAppConf = config.webApp
+private val cssConf = webAppConf.CSS
 
 fun getRowColIdx(pRowIdx: Int, pColIdx: Int) = "${pRowIdx}_${pColIdx}"
-fun Int.lgndIdSuffxRow() = "$lgndIdSuffxRow$this"
-fun Int.lgndIdSuffxCol() = "$lgndIdSuffxCol$this"
+fun Int.lgndIdSuffxRow() = "${cssConf.LGND_ID_SUFFX_ROW}$this"
+fun Int.lgndIdSuffxCol() = "${cssConf.LGND_ID_SUFFX_COL}$this"
 
 fun Css.dirImg(
         pDirct: KeyDirct?,
         pIdx: Int, pRowIdx: Int, pColIdx: Int, pRot: Pair<String, String>,
-        pDimen: Int, pConf: WebAppConfig, pHorizntl: Boolean,
-        pParentCnt: FlowContent)
+        pDimen: Int, pHorizntl: Boolean, pParentCnt: FlowContent)
     {
         fun TR.idx() = td{
             +(if(pRot.first==IDX_SLCT_ROT_SOUTH)
@@ -29,7 +23,7 @@ fun Css.dirImg(
 
         fun TD.idxImg() = img(
             classes=if(pDirct==KeyDirct.NORMAL) pRot.first else pRot.second,
-            src=pConf.DIRCTN_IMG)
+            src=webAppConf.DIRCTN_IMG)
 
         pParentCnt.apply{
             span(if(pHorizntl) PUZZLE_CELL_IDX_NUM else PUZZLE_LGND_IDX_NUM){
@@ -56,17 +50,17 @@ fun Css.dirImg(
 
 class GridCell(val pRowIdx: Int, val pColIdx: Int, val pChar: Char,
     val pWordAtX: DictSynmsOrnt?, val pWordAtY: DictSynmsOrnt?,
-    val pDimen: Int, val pConf: WebAppConfig, val pHashCode: HashCode)
+    val pDimen: Int, val pHashCode: HashCode)
         : Template<FlowContent>
 {
 override fun FlowContent.apply(){
-    with(pConf.CSS){
+    with(cssConf){
         table{
             fun idx(pDirct: KeyDirct?, pIdx: Int, pRot: Pair<String, String>){
                 tr{td{
                     table{tr{td{
                         dirImg(pDirct, pIdx, pRowIdx, pColIdx, pRot, pDimen,
-                            pConf, true, this)
+                    true, this)
                 }}}}}
             }
             idx(pWordAtY?.ornt, pRowIdx,
@@ -78,7 +72,9 @@ override fun FlowContent.apply(){
                 input(classes=PUZZLE_CELL_CHAR, type=InputType.text){
                     id=iD
                     maxLength="1"
-                    placeholder=pChar.toString() // todo configurable
+                    // todo make interactive
+                    placeholder=if(webAppConf.SHOW_INPUT_HINT)
+                        pChar.toString() else ""
                     // todo does "new WS" reuse existing WS?
                     onClick="""
                         value=''
@@ -88,21 +84,20 @@ override fun FlowContent.apply(){
                         """.trimIndent()
                         // todo move to global function
                     onKeyUp="""
-                        let ws=new WebSocket('${pConf.WEB_SOCK_ENDPOINT}')
+                        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
                         ws.addEventListener("message",(ev)=>{
-                            let doc=document
-                            let elm=doc.getElementById('$iD')
+                            let d=document
+                            let elm=d.getElementById('$iD')
                             let rpl=JSON.parse(ev.data)
                             if(rpl.charSolved==true){
                                 elm.disabled=true
-                                elm.className="$PUZZLE_CELL_CHAR_SOLVED"
-                            }
-                            if(rpl.rowSolved==true)
-                                doc.getElementById('${pRowIdx.lgndIdSuffxRow()}')
-                                    .className="$LGND_ENTRIES_SOLVED"
-                            if(rpl.colSolved==true)
-                                doc.getElementById('${pColIdx.lgndIdSuffxCol()}')
-                                    .className="$LGND_ENTRIES_SOLVED"
+                                elm.className="$PUZZLE_CELL_CHAR_SOLVED"}
+                            if(rpl.rowSolved==true){
+                                let e=d.getElementById('${pRowIdx.lgndIdSuffxRow()}')
+                                e.className=e.className+'$LGND_ENTRIES_SOLVED_SUFFX'}
+                            if(rpl.colSolved==true){
+                                let e=d.getElementById('${pColIdx.lgndIdSuffxCol()}')
+                                e.className=e.className+'$LGND_ENTRIES_SOLVED_SUFFX'}
                         })
                         value=value.toUpperCase()
                         ws.onopen=(ev)=>{

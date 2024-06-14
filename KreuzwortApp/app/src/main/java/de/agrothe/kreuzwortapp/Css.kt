@@ -1,6 +1,5 @@
-package de.agrothe.kreuzwortapp.web
+package de.agrothe.kreuzwortapp
 
-import de.agrothe.crosswords.config
 import kotlinx.css.*
 import kotlinx.css.properties.*
 
@@ -29,27 +28,28 @@ val CSS = fun CSSBuilder.(){
             gridTemplateColumns=GridTemplateColumns(
                 LinearDimension("1fr"), LinearDimension("1fr"))
             gridTemplateRows=GridTemplateRows(
-                LinearDimension("1fr"), LinearDimension("1fr"))
+                LinearDimension("1fr"), LinearDimension("5fr"))
         }
         rule(LGND_GRID_HORIZ.cls()){
             gridColumnStart=GridColumnStart("1")
             gridColumnEnd=GridColumnEnd("2")
-            gridRowStart=GridRowStart("2")
-            gridRowEnd=GridRowEnd("3")
+            gridRowStart=GridRowStart("1")
+            gridRowEnd=GridRowEnd("2")
         }
         rule(LGND_GRID_VERT.cls()){
             gridColumnStart=GridColumnStart("2")
             gridColumnEnd=GridColumnEnd("3")
-            gridRowStart=GridRowStart("2")
-            gridRowEnd=GridRowEnd("3")
+            gridRowStart=GridRowStart("1")
+            gridRowEnd=GridRowEnd("2")
             marginLeft=LinearDimension.auto
             marginRight=LinearDimension("0")
         }
         rule(FIELD_GRID.cls()){
             gridColumnStart=GridColumnStart("1")
             gridColumnEnd=GridColumnEnd("3")
-            gridRowStart=GridRowStart("1")
-            gridRowEnd=GridRowEnd("2")
+            gridRowStart=GridRowStart("2")
+            gridRowEnd=GridRowEnd("3")
+            paddingTop=0.7.vh
         }
         rule(LGND_TABLE.cls()){
             fontFamily="sans-serif"
@@ -69,17 +69,24 @@ val CSS = fun CSSBuilder.(){
         }
         lgndTableHdr(LGND_TABLE_HEADER, 0.vh)
         lgndTableHdr(LGND_TABLE_HEADER_NTH, 2.vh)
-        fun lgndEntries(pSel: String, pTextDecoLine: TextDecorationLine)
+        fun lgndEntries(pSel: String,
+            pTextDecoLine: TextDecorationLine, pBorderBottomStyle: BorderStyle)
                 = rule(pSel.cls()){
             borderWidth=0.4.vh
             borderColor=colors.GRID_BORDER_COLR.darken(30)
             borderStyle=BorderStyle.none
-            borderBottomStyle=BorderStyle.dashed
-            hyphens=Hyphens.auto
+            borderBottomStyle=pBorderBottomStyle
             textDecoration=TextDecoration(setOf(pTextDecoLine))
+            hyphens=Hyphens.auto
         }
-        lgndEntries(LGND_ENTRIES, TextDecorationLine.unset)
-        lgndEntries(LGND_ENTRIES_SOLVED, TextDecorationLine.lineThrough)
+        lgndEntries(LGND_ENTRIES,
+            TextDecorationLine.unset, BorderStyle.dashed)
+        lgndEntries(LGND_ENTRIES+LGND_ENTRIES_SOLVED_SUFFX,
+            TextDecorationLine.lineThrough, BorderStyle.dashed)
+        lgndEntries(LGND_ENTRIES_LAST,
+            TextDecorationLine.unset, BorderStyle.none)
+        lgndEntries(LGND_ENTRIES_LAST+LGND_ENTRIES_SOLVED_SUFFX,
+            TextDecorationLine.lineThrough, BorderStyle.none)
         rule(GRID_TABLE.cls()){
             fontFamily="monospace"
             borderWidth=0.6.vh
