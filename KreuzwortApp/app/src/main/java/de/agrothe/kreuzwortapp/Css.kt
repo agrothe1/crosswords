@@ -14,38 +14,68 @@ val CSS = fun CSSBuilder.(){
         rule("html, body"){
             backgroundColor=Color.white
             //backgroundImage=
-            //height=100.pct
-            //width=100.pct
-            //padding="5.vh"
-            //boxSizing=BoxSizing.borderBox
+            height=100.vh
+            width=100.vw
+            padding="2.vh"
         }
         rule("h1"){
             color=Color.blue
             fontSize=5.vh
         }
-        rule(PUZZLE_GRID.cls()){
-            display=Display.grid
-            gridTemplateColumns=GridTemplateColumns(
-                LinearDimension("1fr"), LinearDimension("1fr"))
-            gridTemplateRows=GridTemplateRows(
-                LinearDimension("1fr"), LinearDimension("5fr"))
+        media("only screen and (orientation: portrait)"){
+            rule(PUZZLE_GRID.cls()){
+                display=Display.grid
+                gridTemplateColumns=GridTemplateColumns(
+                    LinearDimension("1fr"), LinearDimension("1fr"))
+                gridTemplateRows=GridTemplateRows(
+                    LinearDimension("1fr"), LinearDimension("5fr"))
+            }
+            rule(LGND_GRID_HORIZ.cls()){
+                gridColumnStart=GridColumnStart("1")
+                gridColumnEnd=GridColumnEnd("2")
+            }
+            rule(LGND_GRID_VERT.cls()){
+                gridColumnStart=GridColumnStart("2")
+                gridColumnEnd=GridColumnEnd("3")
+                marginLeft=LinearDimension.auto
+                marginRight=LinearDimension("0")
+            }
+            rule(FIELD_GRID.cls()){
+                gridColumnStart=GridColumnStart("1")
+                gridColumnEnd=GridColumnEnd("3")
+                gridRowStart=GridRowStart("2")
+                gridRowEnd=GridRowEnd("3")
+                paddingTop=0.7.vh
+            }
         }
-        rule(LGND_GRID_HORIZ.cls()){
-            gridColumnStart=GridColumnStart("1")
-            gridColumnEnd=GridColumnEnd("2")
-        }
-        rule(LGND_GRID_VERT.cls()){
-            gridColumnStart=GridColumnStart("2")
-            gridColumnEnd=GridColumnEnd("3")
-            marginLeft=LinearDimension.auto
-            marginRight=LinearDimension("0")
-        }
-        rule(FIELD_GRID.cls()){
-            gridColumnStart=GridColumnStart("1")
-            gridColumnEnd=GridColumnEnd("3")
-            gridRowStart=GridRowStart("2")
-            gridRowEnd=GridRowEnd("3")
-            paddingTop=0.7.vh
+        media("only screen and (orientation: landscape)"){
+            rule(PUZZLE_GRID.cls()){
+                display=Display.grid
+                gridTemplateColumns=GridTemplateColumns(
+                    LinearDimension("1fr"), LinearDimension("1fr"),
+                    LinearDimension("5fr"))
+                gridTemplateRows=GridTemplateRows(LinearDimension("1fr"))
+            }
+            rule(LGND_GRID_HORIZ.cls()){
+                gridColumnStart=GridColumnStart("1")
+                gridColumnEnd=GridColumnEnd("1")
+                gridRowStart=GridRowStart("1")
+                gridRowEnd=GridRowEnd("1")
+            }
+            rule(LGND_GRID_VERT.cls()){
+                gridColumnStart=GridColumnStart("2")
+                gridColumnEnd=GridColumnEnd("2")
+                gridRowStart=GridRowStart("1")
+                gridRowEnd=GridRowEnd("1")
+                marginRight=LinearDimension("0")
+            }
+            rule(FIELD_GRID.cls()){
+                gridColumnStart=GridColumnStart("3")
+                gridColumnEnd=GridColumnEnd("3")
+                gridRowStart=GridRowStart("1")
+                gridRowEnd=GridRowEnd("1")
+                paddingTop=0.7.vh
+            }
         }
         rule(CELL_GRID.cls()){
             display=Display.grid
@@ -60,7 +90,6 @@ val CSS = fun CSSBuilder.(){
             fontSize=2.6.vh
             margin="auto"
             paddingTop=1.vh
-            paddingRight=1.vh
             fontWeight=FontWeight.normal
             color=colors.CELL_CHAR_COLR
             wordWrap=WordWrap.breakWord
@@ -76,7 +105,7 @@ val CSS = fun CSSBuilder.(){
         fun lgndEntries(pSel: String,
             pTextDecoLine: TextDecorationLine, pBorderBottomStyle: BorderStyle)
                 = rule(pSel.cls()){
-            borderWidth=0.4.vh
+            borderWidth=0.3.vh
             borderColor=colors.GRID_BORDER_COLR.darken(30)
             borderStyle=BorderStyle.none
             borderBottomStyle=pBorderBottomStyle
@@ -99,7 +128,9 @@ val CSS = fun CSSBuilder.(){
             borderColor=colors.GRID_BORDER_COLR
             borderRadius=2.vh
             borderCollapse=BorderCollapse.collapse
-            margin="auto"
+            marginLeft=LinearDimension("auto")
+            marginRight=LinearDimension("auto")
+            width=98.pct
         }
         rule(GRID_TABLE_COL.cls()){
             borderWidth=0.4.vh
@@ -112,6 +143,10 @@ val CSS = fun CSSBuilder.(){
         rule((TABLE_CELL_BACKGROUND+"2").cls()){
             backgroundColor=Color.antiqueWhite.lighten((5..7).random())
         }
+        rule(PUZZLE_CELL_GRID_IDX.cls()){
+            paddingTop=0.4.vh
+            paddingLeft=0.4.vh
+        }
         fun cellIdxNum(pSel: String, pLineHeight: LineHeight)
                 = rule(pSel.cls()){
             height=2.9.vh
@@ -123,6 +158,9 @@ val CSS = fun CSSBuilder.(){
         }
         cellIdxNum(PUZZLE_CELL_IDX_NUM, LineHeight("3vh"))
         cellIdxNum(PUZZLE_LGND_IDX_NUM, LineHeight("2.1vh"))
+        rule(PUZZLE_CELL_CHAR_CONTAINER.cls()){
+            textAlign=TextAlign.center
+        }
         fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()){
             fontSize=7.5.vh
             color=pColr
@@ -131,8 +169,8 @@ val CSS = fun CSSBuilder.(){
             lineHeight=LineHeight("4vh")
             padding="0"
             maxWidth=1.em
-            textAlign=TextAlign.center
             maxHeight=1.em
+            textAlign=TextAlign.center
             transition("all", 1.s,
                 Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
         }

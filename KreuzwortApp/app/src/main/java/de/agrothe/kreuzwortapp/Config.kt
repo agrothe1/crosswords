@@ -77,6 +77,8 @@ class Css(
     val GRID_TABLE: String,
     val GRID_TABLE_ROW: String,
     val GRID_TABLE_COL: String,
+    val PUZZLE_CELL_GRID_IDX: String,
+    val PUZZLE_CELL_CHAR_CONTAINER: String,
     val PUZZLE_CELL_CHAR: String,
     val PUZZLE_CELL_CHAR_SOLVED: String,
     val PUZZLE_CELL_IDX_NUM: String,

@@ -41,14 +41,14 @@ override fun FlowContent.apply(){
     with(cssConf){
         div(classes=CELL_GRID){
             fun idx(pDirct: KeyDirct?, pIdx: Int, pRot: Pair<String, String>){
-                div{
+                div(classes=PUZZLE_CELL_GRID_IDX){
                         dirImg(pDirct, pIdx, pRowIdx, pColIdx, pRot, pDimen,
                     true, this)
                 }
             }
             idx(pWordAtY?.ornt, pRowIdx,
                 Pair(IDX_SLCT_ROT_SOUTH, IDX_SLCT_ROT_NORTH))
-            div{
+            div(classes=PUZZLE_CELL_CHAR_CONTAINER){
                 val iD = getRowColIdx(pRowIdx, pColIdx)
                 val wsdata = Json.encodeToString(
                     WSDataToSrvr('%', pRowIdx, pColIdx, pHashCode))
