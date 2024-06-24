@@ -6,7 +6,7 @@ import kotlinx.html.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-private val webAppConf = config.webApp
+val webAppConf = config.webApp
 private val cssConf = webAppConf.CSS
 
 fun getRowColIdx(pRowIdx: Int, pColIdx: Int) = "${pRowIdx}_${pColIdx}"
@@ -52,7 +52,13 @@ override fun FlowContent.apply(){
                 val iD = getRowColIdx(pRowIdx, pColIdx)
                 val wsdata = Json.encodeToString(
                     WSDataToSrvr('%', pRowIdx, pColIdx, pHashCode))
-                input(classes=PUZZLE_CELL_CHAR, type=InputType.text){
+                input(
+                    classes=
+                        if(puzzleCache.get(pHashCode)?.run{
+                            puzzleInPlay.get(pRowIdx).get(pColIdx) == pChar
+                        } == true)
+                            PUZZLE_CELL_CHAR_SOLVED else PUZZLE_CELL_CHAR,
+                    type=InputType.text){
                     id=iD
                     maxLength="1"
                     // todo make interactive

@@ -64,6 +64,7 @@ class WebAppConfig(
 )
 
 class I18n(
+    val NEW_GAME: String,
     val HORIZONTAL: String,
     val VERTICAL: String,
 )
@@ -71,9 +72,10 @@ class I18n(
 class Css(
     val PUZZLE_GRID: String,
     val CELL_GRID: String,
+    val PLAY_CNTRLS: String,
     val LGND_GRID_HORIZ: String,
-    var FIELD_GRID: String,
     var LGND_GRID_VERT: String,
+    var FIELD_GRID: String,
     val GRID_TABLE: String,
     val GRID_TABLE_ROW: String,
     val GRID_TABLE_COL: String,
@@ -125,6 +127,7 @@ data class AppConfig(
     val webApp: WebAppConfig,
     val GENERATED_PUZZLES_DIR: Array<String>,
     val GENERATED_PUZZLE_SUFFX: String,
+    val BUNDLE_KEY: String,
 )
 
 fun readConfig(): AppConfig =

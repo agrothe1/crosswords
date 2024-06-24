@@ -135,8 +135,8 @@ fun generate(pDimen: Int): Puzzle? =
             dict.words.filter{it.length == pDimen})
 
 fun main(){
-    val numPuzzls = 4
-    val dimen = 5
+    val numPuzzls = 5
+    val dimen = 4
 
     (1..numPuzzls).forEach{
         generate(dimen)?.run{

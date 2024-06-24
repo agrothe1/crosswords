@@ -6,44 +6,44 @@ plugins{
 }
 
 android{
-    namespace = "de.agrothe.kreuzwortapp"
-    compileSdk = 34
+    namespace="de.agrothe.kreuzwortapp"
+    compileSdk=34
 
-    defaultConfig {
+    defaultConfig{
         applicationId = "de.agrothe.kreuzwortapp"
-        minSdk = 26
-        targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        minSdk=26
+        targetSdk=34
+        versionCode=1
+        versionName="1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
+        testInstrumentationRunner="androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables{
+            useSupportLibrary=true
         }
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
+    buildTypes{
+        release{
+            isMinifyEnabled=false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro")
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+    compileOptions{
+        sourceCompatibility=JavaVersion.VERSION_1_8
+        targetCompatibility=JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlinOptions{
+        jvmTarget="1.8"
     }
-    buildFeatures {
-        compose = true
+    buildFeatures{
+        compose=true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+    composeOptions{
+        kotlinCompilerExtensionVersion="1.5.1"
     }
-    packaging {
-        resources {
+    packaging{
+        resources{
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             excludes += "/META-INF/INDEX.LIST"
             excludes += "/META-INF/io.netty.versions.properties"

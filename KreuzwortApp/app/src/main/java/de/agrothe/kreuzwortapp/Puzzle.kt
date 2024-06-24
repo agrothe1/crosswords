@@ -2,8 +2,10 @@ package de.agrothe.kreuzwortapp
 
 import io.ktor.server.html.*
 import kotlinx.html.*
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-private val confCss=conf.CSS
+private val confCss=confWeb.CSS
 
 class BodyTplt: Template<HTML>{
     val header = Placeholder<FlowContent>()
@@ -14,7 +16,7 @@ class BodyTplt: Template<HTML>{
             meta{
                 charset="utf-8"
                 name="viewport"
-                content="height=device-height"
+                content="height=device-height,width=device-width"
             }
             link{
                 rel="stylesheet"
@@ -40,12 +42,20 @@ class PuzzleTplt: Template<FlowContent>{
             ->Pair(key.uppercase(), values)}.toMap()
 
     private val puzzle: Puzzle =
-        getRandom(dimen)!!.map{row->row.map{it.uppercaseChar()}.toCharArray()}
-            .toTypedArray()
+        restoredGame?.puzzleInPlay
+            ?: getRandom(dimen)!!.map{row->row.map{it.uppercaseChar()}
+                .toCharArray()}.toTypedArray()
 
     init{
-        puzzleCache.put(puzzle.hashCode(),
-            PuzzleCacheEntry(puzzle, emptyPuzzle(dimen)))
+        if(restoredGame==null)
+            puzzleCache.put(puzzle.hashCode(),
+                PuzzleCacheEntry(puzzle, emptyPuzzle(dimen)))
+        else
+            restoredGame?.apply{
+                puzzleCache.put(puzzleGenerated.hashCode(),
+                    PuzzleCacheEntry(puzzleGenerated, puzzleInPlay))
+                    // todo mark solved
+            }
     }
 
     override fun FlowContent.apply(){
@@ -63,7 +73,7 @@ class PuzzleTplt: Template<FlowContent>{
             fun TABLE.legendEntry(pSynm: String) =
                 tr{
                     td{b{+Entities.middot}}
-                    conf.LEGND_ENTR_SUBST_REGEX
+                    confWeb.LEGND_ENTR_SUBST_REGEX
                         .replace(pSynm, "").also{
                             td{+it}
                     }
@@ -73,17 +83,28 @@ class PuzzleTplt: Template<FlowContent>{
                 table(classes=LGND_ENTRIES+if(pLast)
                         " $LGND_ENTRIES_LAST" else ""){
                     id=pId
-                    pSynms?.shuffled()?.take(conf.MAX_SYNMS)
+                    pSynms?.shuffled()?.take(confWeb.MAX_SYNMS)
                         ?.forEach{legendEntry(it)}
             }
 
             div{
                 div(classes=PUZZLE_GRID){
+                    val wsdata = Json.encodeToString(
+                        WSDataToSrvr(newGame=true))
+                    button(classes=PLAY_CNTRLS)
+                    {
+                        onClick=
+                """ 
+                    let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
+                    ws.onopen=(ev)=>{ws.send('${wsdata}')}
+                """.trimIndent()
+                        +confWeb.I18n.NEW_GAME
+                    }
                     div(classes=LGND_GRID_HORIZ){
                         table(classes=LGND_TABLE){
                             tr{
                                 th(classes=LGND_TABLE_HEADER)
-                                    {colSpan="2"; +conf.I18n.HORIZONTAL}
+                                    {colSpan="2"; +confWeb.I18n.HORIZONTAL}
                             }
                             puzzle.forEachIndexed{rowIdx, _->
                                 tr{
@@ -99,14 +120,14 @@ class PuzzleTplt: Template<FlowContent>{
                         }
                     }
                     div(classes=FIELD_GRID){
-                        insert(PuzzleGrid(entries, puzzle, dimen, conf),
+                        insert(PuzzleGrid(entries, puzzle, dimen, confWeb),
                             gridTmplt)
                     }
                     div(classes=LGND_GRID_VERT){
                         table(classes=LGND_TABLE){
                             tr{
                                 th(classes=LGND_TABLE_HEADER)
-                                    {colSpan="2"; +conf.I18n.VERTICAL}
+                                    {colSpan="2"; +confWeb.I18n.VERTICAL}
                             }
                             puzzle.forEachIndexed{colIdx, _->
                                 tr{
@@ -146,7 +167,7 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
                                             puzzle.getStringAt(Axis.X, rowIdx)],
                                         pEntries[
                                             puzzle.getStringAt(Axis.Y, colIdx)],
-                                        pDimen, puzzle.hashCode()),
+                                        pDimen, puzzle.hashCode(),),
                                             cellTmplt)
                                 }
                             }

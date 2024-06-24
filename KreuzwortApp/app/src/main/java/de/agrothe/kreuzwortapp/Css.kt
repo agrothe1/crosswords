@@ -2,6 +2,7 @@ package de.agrothe.kreuzwortapp
 
 import kotlinx.css.*
 import kotlinx.css.properties.*
+import kotlinx.html.A
 
 private val confCss=config.webApp.CSS
 
@@ -12,15 +13,21 @@ val CSS = fun CSSBuilder.(){
         val colors = COLOR_PALETTES.random()
 
         rule("html, body"){
-            backgroundColor=Color.white
-            //backgroundImage=
+            //backgroundColor=Color.transparent // todo
+            minHeight=100.vh
+            maxHeight=100.vw
             height=100.vh
             width=100.vw
-            padding="2.vh"
+            marginTop=0.vh
+            marginBottom=0.vh
+            marginLeft=0.vh
+            marginRight=0.vh
+            paddingLeft=LinearDimension("0.2vh")
+            paddingRight=LinearDimension("0.2vh")
         }
         rule("h1"){
             color=Color.blue
-            fontSize=5.vh
+            fontSize=0.5.vh
         }
         media("only screen and (orientation: portrait)"){
             rule(PUZZLE_GRID.cls()){
@@ -28,13 +35,34 @@ val CSS = fun CSSBuilder.(){
                 gridTemplateColumns=GridTemplateColumns(
                     LinearDimension("1fr"), LinearDimension("1fr"))
                 gridTemplateRows=GridTemplateRows(
-                    LinearDimension("1fr"), LinearDimension("5fr"))
+                    LinearDimension("1fr"),
+                    LinearDimension("8fr"), LinearDimension("14fr"))
+            }
+            rule(PLAY_CNTRLS.cls()){
+                gridColumnStart=GridColumnStart("2")
+                gridRowStart=GridRowStart("1")
+                paddingTop=1.vh
+                fontFamily="sans-serif"
+                fontSize=2.6.vh
+                margin="auto"
+                lineHeight=LineHeight("2.0vh")
+                fontWeight=FontWeight.bolder
+                color=colors.GRID_BORDER_COLR
+                verticalAlign=VerticalAlign.top
+                border="none"
+                outline=Outline.none
+                background="none"
+                cursor=Cursor.pointer
+                textDecoration=
+                    TextDecoration(setOf(TextDecorationLine.underline))
             }
             rule(LGND_GRID_HORIZ.cls()){
+                gridRowStart=GridRowStart("2")
                 gridColumnStart=GridColumnStart("1")
                 gridColumnEnd=GridColumnEnd("2")
             }
             rule(LGND_GRID_VERT.cls()){
+                gridRowStart=GridRowStart("2")
                 gridColumnStart=GridColumnStart("2")
                 gridColumnEnd=GridColumnEnd("3")
                 marginLeft=LinearDimension.auto
@@ -43,8 +71,8 @@ val CSS = fun CSSBuilder.(){
             rule(FIELD_GRID.cls()){
                 gridColumnStart=GridColumnStart("1")
                 gridColumnEnd=GridColumnEnd("3")
-                gridRowStart=GridRowStart("2")
-                gridRowEnd=GridRowEnd("3")
+                gridRowStart=GridRowStart("3")
+                gridRowEnd=GridRowEnd("4")
                 paddingTop=0.7.vh
             }
         }
@@ -131,6 +159,9 @@ val CSS = fun CSSBuilder.(){
             marginLeft=LinearDimension("auto")
             marginRight=LinearDimension("auto")
             width=98.pct
+            //backgroundImage=Image("url(imgs/AGRLogoGS.svg)") // todo
+            //backgroundPosition="center"
+            //filter="grayscale(80%)"
         }
         rule(GRID_TABLE_COL.cls()){
             borderWidth=0.4.vh
@@ -139,9 +170,18 @@ val CSS = fun CSSBuilder.(){
         }
         rule((TABLE_CELL_BACKGROUND+"1").cls()){
             backgroundColor=Color.floralWhite.lighten((1..3).random())
+                //.changeAlpha((84..90).random()*0.01)
         }
+        /*
+        rule((TABLE_CELL_BACKGROUND+"1").cls()
+                +" "+PUZZLE_CELL_CHAR_SOLVED.cls()){
+            backgroundColor=Color.floralWhite.lighten((1..3).random())
+                .changeAlpha((84..90).random()*0.01)
+        }
+         */
         rule((TABLE_CELL_BACKGROUND+"2").cls()){
             backgroundColor=Color.antiqueWhite.lighten((5..7).random())
+                //.changeAlpha((91..94).random()*0.01)
         }
         rule(PUZZLE_CELL_GRID_IDX.cls()){
             paddingTop=0.4.vh
