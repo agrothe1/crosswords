@@ -72,7 +72,7 @@ class I18n(
 class Css(
     val PUZZLE_GRID: String,
     val CELL_GRID: String,
-    val PLAY_CNTRLS: String,
+    val NEW_GAME: String,
     val LGND_GRID_HORIZ: String,
     var LGND_GRID_VERT: String,
     var FIELD_GRID: String,

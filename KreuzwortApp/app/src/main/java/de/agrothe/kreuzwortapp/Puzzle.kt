@@ -91,15 +91,18 @@ class PuzzleTplt: Template<FlowContent>{
                 div(classes=PUZZLE_GRID){
                     val wsdata = Json.encodeToString(
                         WSDataToSrvr(newGame=true))
-                    button(classes=PLAY_CNTRLS)
-                    {
-                        onClick=
-                """ 
-                    let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
-                    ws.onopen=(ev)=>{ws.send('${wsdata}')}
-                """.trimIndent()
-                        +confWeb.I18n.NEW_GAME
-                    }
+                    button(classes=NEW_GAME)
+                        {
+                            style=newGameButtonStyle
+                            onClick=
+                    """ 
+                        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
+                        ws.onopen=(ev)=>{ws.send('${wsdata}')}
+                    """.trimIndent()
+                            +confWeb.I18n.NEW_GAME
+                            img(classes=IDX_SLCT_ROT_WEST,
+                                src=webAppConf.DIRCTN_IMG)
+                        }
                     div(classes=LGND_GRID_HORIZ){
                         table(classes=LGND_TABLE){
                             tr{
@@ -167,7 +170,7 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
                                             puzzle.getStringAt(Axis.X, rowIdx)],
                                         pEntries[
                                             puzzle.getStringAt(Axis.Y, colIdx)],
-                                        pDimen, puzzle.hashCode(),),
+                                        pDimen, puzzle.hashCode()),
                                             cellTmplt)
                                 }
                             }

@@ -2,15 +2,18 @@ package de.agrothe.kreuzwortapp
 
 import kotlinx.css.*
 import kotlinx.css.properties.*
-import kotlinx.html.A
 
 private val confCss=config.webApp.CSS
+
+val newGameButtonStyle = // no support for these attributes in kotlin.css
+    "writing-mode:vertical-lr;text-orientation:upright"
 
 val CSS = fun CSSBuilder.(){
     fun String.cls() = ".$this"
 
     with(confCss){
         val colors = COLOR_PALETTES.random()
+        val gridBorderColor = colors.GRID_BORDER_COLR.darken(40)
 
         rule("html, body"){
             //backgroundColor=Color.transparent // todo
@@ -29,50 +32,51 @@ val CSS = fun CSSBuilder.(){
             color=Color.blue
             fontSize=0.5.vh
         }
+        fun StyledElement.nextButton(){apply{
+            fontFamily="sans-serif"
+            fontSize=2.6.vh
+            margin="auto"
+            padding(LinearDimension("0.2vh"))
+            lineHeight=LineHeight("2.0vh")
+            fontWeight=FontWeight.w700
+            color=gridBorderColor
+            border="0.3vh dotted $gridBorderColor"
+            borderRadius=0.8.vh
+            background="none"
+        }}
         media("only screen and (orientation: portrait)"){
             rule(PUZZLE_GRID.cls()){
                 display=Display.grid
                 gridTemplateColumns=GridTemplateColumns(
-                    LinearDimension("1fr"), LinearDimension("1fr"))
+                    LinearDimension("4fr"), LinearDimension("4fr"),
+                    LinearDimension("1fr"))
                 gridTemplateRows=GridTemplateRows(
-                    LinearDimension("1fr"),
                     LinearDimension("8fr"), LinearDimension("14fr"))
             }
-            rule(PLAY_CNTRLS.cls()){
-                gridColumnStart=GridColumnStart("2")
-                gridRowStart=GridRowStart("1")
-                paddingTop=1.vh
-                fontFamily="sans-serif"
-                fontSize=2.6.vh
-                margin="auto"
-                lineHeight=LineHeight("2.0vh")
-                fontWeight=FontWeight.bolder
-                color=colors.GRID_BORDER_COLR
-                verticalAlign=VerticalAlign.top
-                border="none"
-                outline=Outline.none
-                background="none"
-                cursor=Cursor.pointer
-                textDecoration=
-                    TextDecoration(setOf(TextDecorationLine.underline))
-            }
             rule(LGND_GRID_HORIZ.cls()){
-                gridRowStart=GridRowStart("2")
+                gridRowStart=GridRowStart("1")
                 gridColumnStart=GridColumnStart("1")
                 gridColumnEnd=GridColumnEnd("2")
             }
             rule(LGND_GRID_VERT.cls()){
-                gridRowStart=GridRowStart("2")
+                gridRowStart=GridRowStart("1")
                 gridColumnStart=GridColumnStart("2")
                 gridColumnEnd=GridColumnEnd("3")
                 marginLeft=LinearDimension.auto
                 marginRight=LinearDimension("0")
             }
+            rule(NEW_GAME.cls()){
+                gridRowStart=GridRowStart("1")
+                gridColumnStart=GridColumnStart("3")
+                nextButton()
+                marginLeft=0.5.vh
+                marginRight=1.0.vh
+            }
             rule(FIELD_GRID.cls()){
                 gridColumnStart=GridColumnStart("1")
-                gridColumnEnd=GridColumnEnd("3")
-                gridRowStart=GridRowStart("3")
-                gridRowEnd=GridRowEnd("4")
+                gridColumnEnd=GridColumnEnd("4")
+                gridRowStart=GridRowStart("2")
+                gridRowEnd=GridRowEnd("3")
                 paddingTop=0.7.vh
             }
         }
@@ -80,29 +84,37 @@ val CSS = fun CSSBuilder.(){
             rule(PUZZLE_GRID.cls()){
                 display=Display.grid
                 gridTemplateColumns=GridTemplateColumns(
-                    LinearDimension("1fr"), LinearDimension("1fr"),
-                    LinearDimension("5fr"))
+                    LinearDimension("20fr"), LinearDimension("20fr"),
+                    LinearDimension("88fr"), LinearDimension("1fr"))
                 gridTemplateRows=GridTemplateRows(LinearDimension("1fr"))
             }
             rule(LGND_GRID_HORIZ.cls()){
                 gridColumnStart=GridColumnStart("1")
-                gridColumnEnd=GridColumnEnd("1")
+                gridColumnEnd=GridColumnEnd("2")
                 gridRowStart=GridRowStart("1")
-                gridRowEnd=GridRowEnd("1")
+                gridRowEnd=GridRowEnd("2")
             }
             rule(LGND_GRID_VERT.cls()){
                 gridColumnStart=GridColumnStart("2")
-                gridColumnEnd=GridColumnEnd("2")
+                gridColumnEnd=GridColumnEnd("3")
                 gridRowStart=GridRowStart("1")
-                gridRowEnd=GridRowEnd("1")
+                gridRowEnd=GridRowEnd("2")
                 marginRight=LinearDimension("0")
             }
             rule(FIELD_GRID.cls()){
                 gridColumnStart=GridColumnStart("3")
-                gridColumnEnd=GridColumnEnd("3")
+                gridColumnEnd=GridColumnEnd("4")
                 gridRowStart=GridRowStart("1")
-                gridRowEnd=GridRowEnd("1")
+                gridRowEnd=GridRowEnd("2")
                 paddingTop=0.7.vh
+            }
+            rule(NEW_GAME.cls()){
+                gridColumnStart=GridColumnStart("4")
+                gridColumnStart=GridColumnStart("5")
+                gridRowStart=GridRowStart("1")
+                gridRowEnd=GridRowEnd("2")
+                nextButton()
+                //marginRight=3.0.vh
             }
         }
         rule(CELL_GRID.cls()){
