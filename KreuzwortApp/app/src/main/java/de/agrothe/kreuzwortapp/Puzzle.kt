@@ -63,13 +63,16 @@ class PuzzleTplt: Template<FlowContent>{
         with(confCss){
             fun TR.legendIdx(pRowIdx: Int, pColIdx: Int, pSynms: DictSynmsOrnt?,
                     pIdxSelct: Pair<String, String>) =
-                td(classes=PUZZLE_CELL_IDX_NUM){
-                    pSynms?.ornt.let{ornt->
-                        dirImg(ornt,
-                            if(ornt == KeyDirct.NORMAL) 0 else dimen-1,
-                            pRowIdx, pColIdx, pIdxSelct, dimen,
-                            false, this)
-                }}
+                pSynms?.ornt.let{ornt->
+                    td(classes=if(ornt == KeyDirct.NORMAL)
+                            PUZZLE_CELL_IDX_NUM_HOR
+                            else PUZZLE_CELL_IDX_NUM_VER)
+                        {
+                            dirImg(ornt,
+                                if(ornt == KeyDirct.NORMAL) 0 else dimen-1,
+                                pRowIdx, pColIdx, pIdxSelct, dimen,
+                                false, this)
+                        }}
             fun TABLE.legendEntry(pSynm: String) =
                 tr{
                     td{b{+Entities.middot}}
@@ -79,9 +82,19 @@ class PuzzleTplt: Template<FlowContent>{
                     }
                 }
             fun TD.legendEntries(pSynms: DictSynms?, pId: String,
-                    pLast: Boolean) =
+                    pLast: Boolean, pHoriz: Boolean) =
+                table(classes=
+                    (if(pHoriz)LGND_ENTRIES_HOR else LGND_ENTRIES_VER)
+                        +if(pLast) " ${
+                            if(pHoriz)LGND_ENTRIES_HOR_LAST 
+                            else LGND_ENTRIES_VER_LAST}"
+                        else "")
+                    {
+                /*
                 table(classes=LGND_ENTRIES+if(pLast)
                         " $LGND_ENTRIES_LAST" else ""){
+
+                 */
                     id=pId
                     pSynms?.shuffled()?.take(confWeb.MAX_SYNMS)
                         ?.forEach{legendEntry(it)}
@@ -91,22 +104,21 @@ class PuzzleTplt: Template<FlowContent>{
                 div(classes=PUZZLE_GRID){
                     val wsdata = Json.encodeToString(
                         WSDataToSrvr(newGame=true))
-                    button(classes=NEW_GAME)
-                        {
-                            style=newGameButtonStyle
-                            onClick=
-                    """ 
-                        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
-                        ws.onopen=(ev)=>{ws.send('${wsdata}')}
-                    """.trimIndent()
-                            +confWeb.I18n.NEW_GAME
-                            img(classes=IDX_SLCT_ROT_WEST,
-                                src=webAppConf.DIRCTN_IMG)
-                        }
+                    button(classes=NEW_GAME){
+                        style=NEW_GAME_BUTTON_STYLE
+                        onClick=
+                """ 
+                    let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
+                    ws.onopen=(ev)=>{ws.send('${wsdata}')}
+                """.trimIndent()
+                        +confWeb.I18n.NEW_GAME
+                        img(classes=IDX_SLCT_ROT_WEST,
+                            src=webAppConf.DIRCTN_IMG)
+                    }
                     div(classes=LGND_GRID_HORIZ){
                         table(classes=LGND_TABLE){
                             tr{
-                                th(classes=LGND_TABLE_HEADER)
+                                th(classes=LGND_TABLE_HEADER_HOR)
                                     {colSpan="2"; +confWeb.I18n.HORIZONTAL}
                             }
                             puzzle.forEachIndexed{rowIdx, _->
@@ -115,10 +127,12 @@ class PuzzleTplt: Template<FlowContent>{
                                         ?.let{
                                             legendIdx(rowIdx, 0, it,
                                                 Pair(IDX_SLCT_ROT_WEST,
-                                                    IDX_SLCT_ROT_EAST))
+                                                    IDX_SLCT_ROT_EAST)
+                                                )
                                             td{legendEntries(it.synms,
                                                 rowIdx.lgndIdSuffxRow(),
-                                                rowIdx==dimen-1)}
+                                                rowIdx==dimen-1,
+                                                false)}
                             }}}
                         }
                     }
@@ -129,7 +143,7 @@ class PuzzleTplt: Template<FlowContent>{
                     div(classes=LGND_GRID_VERT){
                         table(classes=LGND_TABLE){
                             tr{
-                                th(classes=LGND_TABLE_HEADER)
+                                th(classes=LGND_TABLE_HEADER_VER)
                                     {colSpan="2"; +confWeb.I18n.VERTICAL}
                             }
                             puzzle.forEachIndexed{colIdx, _->
@@ -141,7 +155,8 @@ class PuzzleTplt: Template<FlowContent>{
                                                     IDX_SLCT_ROT_NORTH))
                                             td{legendEntries(it.synms,
                                                 colIdx.lgndIdSuffxCol(),
-                                                colIdx==dimen-1)}
+                                                colIdx==dimen-1,
+                                                true)}
                             }}}
                         }
                     }

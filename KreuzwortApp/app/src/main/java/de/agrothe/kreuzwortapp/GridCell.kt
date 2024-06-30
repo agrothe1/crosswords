@@ -1,7 +1,6 @@
 package de.agrothe.kreuzwortapp
 
 import io.ktor.server.html.*
-import kotlinx.css.*
 import kotlinx.html.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -19,17 +18,23 @@ fun Css.dirImg(
         pDimen: Int, pHorizntl: Boolean, pParentCnt: FlowContent)
     {
         pParentCnt.apply{
-            span(if(pHorizntl) PUZZLE_CELL_IDX_NUM else PUZZLE_LGND_IDX_NUM){
-                Pair(pDirct, pIdx).also{
-                    if(it==Pair(KeyDirct.NORMAL, 0)
-                            || it==Pair(KeyDirct.REVERSED, pDimen-1)){
-                        +(if(pRot.first==IDX_SLCT_ROT_SOUTH)
-                            pColIdx else pRowIdx).inc().toString()
-                        img(classes=if(pDirct==KeyDirct.NORMAL)
-                                pRot.first else pRot.second,
-                            src=webAppConf.DIRCTN_IMG)
-                    } else span(classes=pRot.first){+Entities.nbsp}
-            }}
+            (pRot.first==IDX_SLCT_ROT_SOUTH).let{isVert->
+                span(if(pHorizntl){
+                        if(isVert) PUZZLE_CELL_IDX_NUM_HOR
+                        else PUZZLE_CELL_IDX_NUM_VER}
+                    else if(isVert) PUZZLE_LGND_IDX_NUM_HOR
+                         else PUZZLE_LGND_IDX_NUM_VER)
+                {
+                    Pair(pDirct, pIdx).also{
+                        if(it==Pair(KeyDirct.NORMAL, 0)
+                                || it==Pair(KeyDirct.REVERSED, pDimen-1)){
+                            +(if(isVert)
+                                pColIdx else pRowIdx).inc().toString()
+                            img(classes=if(pDirct==KeyDirct.NORMAL)
+                                    pRot.first else pRot.second,
+                                src=webAppConf.DIRCTN_IMG)
+                        } else span(classes=pRot.first){+Entities.nbsp}
+            }}}
     }}
 
 class GridCell(val pRowIdx: Int, val pColIdx: Int, val pChar: Char,
@@ -83,10 +88,10 @@ override fun FlowContent.apply(){
                                 elm.className="$PUZZLE_CELL_CHAR_SOLVED"}
                             if(rpl.rowSolved==true){
                                 let e=d.getElementById('${pRowIdx.lgndIdSuffxRow()}')
-                                e.className=e.className+'$LGND_ENTRIES_SOLVED_SUFFX'}
+                                e.className=e.className+'$LGND_ENTRIES_SOLVED_SFX'}
                             if(rpl.colSolved==true){
                                 let e=d.getElementById('${pColIdx.lgndIdSuffxCol()}')
-                                e.className=e.className+'$LGND_ENTRIES_SOLVED_SUFFX'}
+                                e.className=e.className+'$LGND_ENTRIES_SOLVED_SFX'}
                         })
                         value=value.toUpperCase()
                         ws.onopen=(ev)=>{

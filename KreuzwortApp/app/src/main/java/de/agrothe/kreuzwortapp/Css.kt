@@ -5,7 +5,7 @@ import kotlinx.css.properties.*
 
 private val confCss=config.webApp.CSS
 
-val newGameButtonStyle = // no support for these attributes in kotlin.css
+val NEW_GAME_BUTTON_STYLE = // no support for these attributes in kotlin.css
     "writing-mode:vertical-lr;text-orientation:upright"
 
 val CSS = fun CSSBuilder.(){
@@ -13,7 +13,8 @@ val CSS = fun CSSBuilder.(){
 
     with(confCss){
         val colors = COLOR_PALETTES.random()
-        val gridBorderColor = colors.GRID_BORDER_COLR.darken(40)
+        val gridBorderColor = colors.GRID_BORDER_COLR
+        val gridLineColor = colors.GRID_LINES_COLR
 
         rule("html, body"){
             //backgroundColor=Color.transparent // todo
@@ -39,8 +40,8 @@ val CSS = fun CSSBuilder.(){
             padding(LinearDimension("0.2vh"))
             lineHeight=LineHeight("2.0vh")
             fontWeight=FontWeight.w700
-            color=gridBorderColor
-            border="0.3vh dotted $gridBorderColor"
+            color=gridBorderColor.darken(40)
+            border="0.2vh groove ${gridLineColor.darken(50)}"
             borderRadius=0.8.vh
             background="none"
         }}
@@ -127,45 +128,53 @@ val CSS = fun CSSBuilder.(){
         }
         rule(LGND_TABLE.cls()){
             fontFamily="sans-serif"
-            fontSize=2.6.vh
+            fontSize=2.3.vh
             margin="auto"
             paddingTop=1.vh
             fontWeight=FontWeight.normal
             color=colors.CELL_CHAR_COLR
             wordWrap=WordWrap.breakWord
         }
-        fun lgndTableHdr(pSel: String, pTop: LinearDimension)
+        fun lgndTableHdr(pSel: String, pTop: LinearDimension, pColor: Color)
                 = rule(pSel.cls()){
+            paddingTop=pTop
             textAlign=TextAlign.left
             textDecoration=TextDecoration(setOf(TextDecorationLine.underline))
-            paddingTop=pTop
+            color=pColor.darken(70)
         }
-        lgndTableHdr(LGND_TABLE_HEADER, 0.vh)
-        lgndTableHdr(LGND_TABLE_HEADER_NTH, 2.vh)
-        fun lgndEntries(pSel: String,
-            pTextDecoLine: TextDecorationLine, pBorderBottomStyle: BorderStyle)
-                = rule(pSel.cls()){
+        lgndTableHdr(LGND_TABLE_HEADER_HOR, 0.vh, gridBorderColor)
+        lgndTableHdr(LGND_TABLE_HEADER_HOR_NTH, 2.vh, gridBorderColor)
+        lgndTableHdr(LGND_TABLE_HEADER_VER, 0.vh, gridLineColor)
+        lgndTableHdr(LGND_TABLE_HEADER_VER_NTH, 2.vh, gridLineColor)
+        fun lgndEntries(pSel: String, pTextDecoLine: TextDecorationLine,
+                pBorderBottomStyle: BorderStyle, pColor: Color)
+                    = rule(pSel.cls()){
             borderWidth=0.3.vh
-            borderColor=colors.GRID_BORDER_COLR.darken(30)
+            borderColor=pColor
             borderStyle=BorderStyle.none
             borderBottomStyle=pBorderBottomStyle
             textDecoration=TextDecoration(setOf(pTextDecoLine))
-            lineHeight=LineHeight("2.7vh")
+            lineHeight=LineHeight("2.5vh")
             hyphens=Hyphens.auto
         }
-        lgndEntries(LGND_ENTRIES,
-            TextDecorationLine.unset, BorderStyle.dashed)
-        lgndEntries(LGND_ENTRIES+LGND_ENTRIES_SOLVED_SUFFX,
-            TextDecorationLine.lineThrough, BorderStyle.dashed)
-        lgndEntries(LGND_ENTRIES_LAST,
-            TextDecorationLine.unset, BorderStyle.none)
-        lgndEntries(LGND_ENTRIES_LAST+LGND_ENTRIES_SOLVED_SUFFX,
-            TextDecorationLine.lineThrough, BorderStyle.none)
+        fun lgndEntriesDir(pClass: String, pColor: Color){
+            lgndEntries(pClass,
+                TextDecorationLine.unset, BorderStyle.dashed, pColor)
+            lgndEntries("${pClass}${LGND_ENTRIES_SOLVED_SFX}",
+                TextDecorationLine.lineThrough, BorderStyle.dashed, pColor)
+            lgndEntries("${pClass}${LGND_LAST_SFX}",
+                TextDecorationLine.unset, BorderStyle.none, pColor)
+            lgndEntries(
+                "${pClass}${LGND_LAST_SFX}${LGND_ENTRIES_SOLVED_SFX}",
+                TextDecorationLine.lineThrough, BorderStyle.none, pColor)
+        }
+        lgndEntriesDir(LGND_ENTRIES_HOR, gridLineColor.darken(70))
+        lgndEntriesDir(LGND_ENTRIES_VER, gridBorderColor.darken(70))
         rule(GRID_TABLE.cls()){
             fontFamily="monospace"
             borderWidth=0.6.vh
             borderStyle=BorderStyle.solid
-            borderColor=colors.GRID_BORDER_COLR
+            borderColor=gridBorderColor
             borderRadius=2.vh
             borderCollapse=BorderCollapse.collapse
             marginLeft=LinearDimension("auto")
@@ -178,7 +187,7 @@ val CSS = fun CSSBuilder.(){
         rule(GRID_TABLE_COL.cls()){
             borderWidth=0.4.vh
             borderStyle=BorderStyle.solid
-            borderColor=colors.GRID_LINES_COLR
+            borderColor=gridLineColor
         }
         rule((TABLE_CELL_BACKGROUND+"1").cls()){
             backgroundColor=Color.floralWhite.lighten((1..3).random())
@@ -186,7 +195,7 @@ val CSS = fun CSSBuilder.(){
         }
         /*
         rule((TABLE_CELL_BACKGROUND+"1").cls()
-                +" "+PUZZLE_CELL_CHAR_SOLVED.cls()){
+                +" "+ PUZZLE_CELL_CHAR_SOLVED.cls()){
             backgroundColor=Color.floralWhite.lighten((1..3).random())
                 .changeAlpha((84..90).random()*0.01)
         }
@@ -199,22 +208,28 @@ val CSS = fun CSSBuilder.(){
             paddingTop=0.4.vh
             paddingLeft=0.4.vh
         }
-        fun cellIdxNum(pSel: String, pLineHeight: LineHeight)
-                = rule(pSel.cls()){
+        fun cellIdxNum(pSel: String, pLineHeight: LineHeight,
+                pColor: Color) = rule(pSel.cls()){
             height=2.9.vh
             fontSize=2.9.vh
             fontWeight=FontWeight.bolder
             lineHeight=pLineHeight
             textAlign=TextAlign.center
-            color=colors.IDX_NUM_COLR
+            color=pColor.darken(40)
         }
-        cellIdxNum(PUZZLE_CELL_IDX_NUM, LineHeight("3vh"))
-        cellIdxNum(PUZZLE_LGND_IDX_NUM, LineHeight("2.1vh"))
+        cellIdxNum(PUZZLE_CELL_IDX_NUM_HOR, LineHeight("3vh"),
+            gridLineColor)
+        cellIdxNum(PUZZLE_CELL_IDX_NUM_VER, LineHeight("3vh"),
+            gridBorderColor)
+        cellIdxNum(PUZZLE_LGND_IDX_NUM_HOR, LineHeight("3vh"),
+            gridLineColor)
+        cellIdxNum(PUZZLE_LGND_IDX_NUM_VER, LineHeight("3vh"),
+            gridBorderColor)
         rule(PUZZLE_CELL_CHAR_CONTAINER.cls()){
             textAlign=TextAlign.center
         }
         fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()){
-            fontSize=7.5.vh
+            fontSize=7.0.vh
             color=pColr
             backgroundColor=Color.transparent
             borderStyle=BorderStyle.none
