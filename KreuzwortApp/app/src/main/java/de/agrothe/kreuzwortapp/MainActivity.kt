@@ -97,6 +97,14 @@ class MainActivity : ComponentActivity(){
                     useWideViewPort=true
                     layoutAlgorithm=WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING
                 }
+
+                val displayMetrics = resources.displayMetrics
+                val dpHeight = displayMetrics.heightPixels /
+                    displayMetrics.density
+                val dpWidth = displayMetrics.widthPixels /
+                    displayMetrics.density
+                logger.debug{"dpHeight: $dpHeight, dpWidth: $dpWidth"}
+
                 loadUrl(confWeb.APP_URL)
             })
     }
@@ -227,6 +235,8 @@ fun Application.configureTemplating(){
                  }
                   */
                  puzzle
+                 // dph 866.2857 x dpw 411.42856 = 2,10 dp
+                 // 1080x2400 2,22
              }
         }
         staticResources("/imgs", "/imgs")

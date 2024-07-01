@@ -84,7 +84,6 @@ class Css(
     val PUZZLE_CELL_CHAR_CONTAINER: String,
     val PUZZLE_CELL_CHAR: String,
     val PUZZLE_CELL_CHAR_SOLVED: String,
-//    val PUZZLE_CELL_IDX_NUM: String,
     val PUZZLE_CELL_IDX_NUM_HOR: String,
     val PUZZLE_CELL_IDX_NUM_VER: String,
     val PUZZLE_LGND_IDX_NUM_HOR: String,

@@ -80,6 +80,92 @@ val CSS = fun CSSBuilder.(){
                 gridRowEnd=GridRowEnd("3")
                 paddingTop=0.7.vh
             }
+            fun lgndEntries(pSel: String, pTextDecoLine: TextDecorationLine,
+                    pBorderBottomStyle: BorderStyle, pColor: Color)
+                        = rule(pSel.cls()){
+                borderWidth=0.3.vh
+                borderColor=pColor
+                borderStyle=BorderStyle.none
+                borderBottomStyle=pBorderBottomStyle
+                textDecoration=TextDecoration(setOf(pTextDecoLine))
+                lineHeight=LineHeight("2.5vh")
+                hyphens=Hyphens.auto
+            }
+            fun lgndEntriesDir(pClass: String, pColor: Color){
+                lgndEntries(pClass,
+                    TextDecorationLine.unset, BorderStyle.dashed, pColor)
+                lgndEntries("${pClass}${LGND_ENTRIES_SOLVED_SFX}",
+                    TextDecorationLine.lineThrough, BorderStyle.dashed, pColor)
+                lgndEntries("${pClass}${LGND_LAST_SFX}",
+                    TextDecorationLine.unset, BorderStyle.none, pColor)
+                lgndEntries(
+                    "${pClass}${LGND_LAST_SFX}${LGND_ENTRIES_SOLVED_SFX}",
+                    TextDecorationLine.lineThrough, BorderStyle.none, pColor)
+            }
+            lgndEntriesDir(LGND_ENTRIES_HOR, gridLineColor.darken(70))
+            lgndEntriesDir(LGND_ENTRIES_VER, gridBorderColor.darken(70))
+            rule(LGND_TABLE.cls()){
+                fontSize=2.3.vh
+                paddingTop=2.vh
+            }
+            fun lgndTableHdr(pSel: String, pTop: LinearDimension, pColor: Color)
+                    = rule(pSel.cls()){
+                paddingTop=pTop
+                textAlign=TextAlign.left
+                textDecoration=TextDecoration(setOf(TextDecorationLine.underline))
+                color=pColor.darken(65)
+            }
+            lgndTableHdr(LGND_TABLE_HEADER_HOR, 0.vh, gridBorderColor)
+            lgndTableHdr(LGND_TABLE_HEADER_HOR_NTH, 2.vh, gridBorderColor)
+            lgndTableHdr(LGND_TABLE_HEADER_VER, 0.vh, gridLineColor)
+            lgndTableHdr(LGND_TABLE_HEADER_VER_NTH, 2.vh, gridLineColor)
+            fun cellIdxNum(pSel: String, pLineHeight: String,
+                    pColor: Color) = rule(pSel.cls()){
+                lineHeight=LineHeight(pLineHeight)
+                height=LinearDimension(pLineHeight)
+                fontSize=LinearDimension(pLineHeight)
+                color=pColor.darken(40)
+            }
+            cellIdxNum(PUZZLE_CELL_IDX_NUM_HOR, "3vh",
+                gridLineColor)
+            cellIdxNum(PUZZLE_CELL_IDX_NUM_VER, "3vh",
+                gridBorderColor)
+            cellIdxNum(PUZZLE_LGND_IDX_NUM_HOR, "2.4vh",
+                gridLineColor)
+            cellIdxNum(PUZZLE_LGND_IDX_NUM_VER, "2.4vh",
+                gridBorderColor)
+            val IDX_SCT_ROT_HGHT = 1.9.vh
+            rule(IDX_SLCT_ROT_SOUTH.cls()){
+                height=IDX_SCT_ROT_HGHT
+                transform.rotate(0.grad)
+            }
+            rule(IDX_SLCT_ROT_EAST.cls()){
+                height=IDX_SCT_ROT_HGHT
+                transform.rotate(100.grad)
+            }
+            rule(IDX_SLCT_ROT_NORTH.cls()){
+                height=IDX_SCT_ROT_HGHT
+                transform.rotate(200.grad)
+            }
+            rule(IDX_SLCT_ROT_WEST.cls()){
+                height=IDX_SCT_ROT_HGHT
+                transform.rotate(300.grad)
+            }
+            fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()){
+                fontSize=7.0.vh
+                color=pColr
+                backgroundColor=Color.transparent
+                borderStyle=BorderStyle.none
+                lineHeight=LineHeight("3vh")
+                padding="0"
+                maxWidth=1.em
+                maxHeight=1.em
+                textAlign=TextAlign.center
+                transition("all", 1.s,
+                    Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
+            }
+            cellChar(PUZZLE_CELL_CHAR, colors.CELL_CHAR_COLR)
+            cellChar(PUZZLE_CELL_CHAR_SOLVED, colors.PUZZLE_CELL_CHAR_SOLVED)
         }
         media("only screen and (orientation: landscape)"){
             rule(PUZZLE_GRID.cls()){
@@ -115,8 +201,101 @@ val CSS = fun CSSBuilder.(){
                 gridRowStart=GridRowStart("1")
                 gridRowEnd=GridRowEnd("2")
                 nextButton()
-                //marginRight=3.0.vh
+                marginRight=4.0.vh
             }
+            fun lgndEntries(pSel: String, pTextDecoLine: TextDecorationLine,
+                    pBorderBottomStyle: BorderStyle, pColor: Color)
+                        = rule(pSel.cls()){
+                borderWidth=0.3.vh
+                borderColor=pColor
+                borderStyle=BorderStyle.none
+                borderBottomStyle=pBorderBottomStyle
+                textDecoration=TextDecoration(setOf(pTextDecoLine))
+                lineHeight=LineHeight("5.0vh")
+                hyphens=Hyphens.auto
+            }
+            fun lgndEntriesDir(pClass: String, pColor: Color){
+                lgndEntries(pClass,
+                    TextDecorationLine.unset, BorderStyle.dashed, pColor)
+                lgndEntries("${pClass}${LGND_ENTRIES_SOLVED_SFX}",
+                    TextDecorationLine.lineThrough, BorderStyle.dashed, pColor)
+                lgndEntries("${pClass}${LGND_LAST_SFX}",
+                    TextDecorationLine.unset, BorderStyle.none, pColor)
+                lgndEntries(
+                    "${pClass}${LGND_LAST_SFX}${LGND_ENTRIES_SOLVED_SFX}",
+                    TextDecorationLine.lineThrough, BorderStyle.none, pColor)
+            }
+            lgndEntriesDir(LGND_ENTRIES_HOR, gridLineColor.darken(70))
+            lgndEntriesDir(LGND_ENTRIES_VER, gridBorderColor.darken(70))
+            rule(LGND_TABLE.cls()){
+                fontSize=4.8.vh
+                paddingTop=2.vh
+            }
+            fun lgndTableHdr(pSel: String, pTop: LinearDimension, pColor: Color)
+                    = rule(pSel.cls()){
+                paddingTop=pTop
+                textAlign=TextAlign.left
+                textDecoration=TextDecoration(setOf(TextDecorationLine.underline))
+                color=pColor.darken(65)
+            }
+            lgndTableHdr(LGND_TABLE_HEADER_HOR, 0.vh, gridBorderColor)
+            lgndTableHdr(LGND_TABLE_HEADER_HOR_NTH, 2.vh, gridBorderColor)
+            lgndTableHdr(LGND_TABLE_HEADER_VER, 0.vh, gridLineColor)
+            lgndTableHdr(LGND_TABLE_HEADER_VER_NTH, 2.vh, gridLineColor)
+            fun cellIdxNum(pSel: String, pLineHeight: String, pHeight: String,
+                    pColor: Color) = rule(pSel.cls()){
+                lineHeight=LineHeight(pLineHeight)
+                height=LinearDimension(pHeight)
+                fontSize=LinearDimension(pLineHeight)
+                color=pColor.darken(40)
+            }
+            cellIdxNum(PUZZLE_CELL_IDX_NUM_HOR, "5vh", "5vh",
+                gridLineColor)
+            cellIdxNum(PUZZLE_CELL_IDX_NUM_VER, "5vh", "5vh",
+                gridBorderColor)
+            cellIdxNum(PUZZLE_LGND_IDX_NUM_HOR, "3.8vh","4.4vh",
+                gridLineColor)
+            cellIdxNum(PUZZLE_LGND_IDX_NUM_VER, "3.8vh","4.4vh",
+                gridBorderColor)
+            val IDX_SCT_ROT_HGHT = 3.4.vh
+            rule(IDX_SLCT_ROT_SOUTH.cls()){
+                height=IDX_SCT_ROT_HGHT
+                transform.rotate(0.grad)
+            }
+            rule(IDX_SLCT_ROT_EAST.cls()){
+                height=IDX_SCT_ROT_HGHT
+                transform.rotate(100.grad)
+            }
+            rule(IDX_SLCT_ROT_NORTH.cls()){
+                height=IDX_SCT_ROT_HGHT
+                transform.rotate(200.grad)
+            }
+            rule(IDX_SLCT_ROT_WEST.cls()){
+                height=IDX_SCT_ROT_HGHT
+                transform.rotate(300.grad)
+            }
+            fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()){
+                fontSize=10.0.vh
+                color=pColr
+                backgroundColor=Color.transparent
+                borderStyle=BorderStyle.none
+                lineHeight=LineHeight("4vh")
+                padding="0"
+                maxWidth=1.em
+                maxHeight=1.em
+                textAlign=TextAlign.center
+                transition("all", 1.s,
+                    Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
+            }
+            cellChar(PUZZLE_CELL_CHAR, colors.CELL_CHAR_COLR)
+            cellChar(PUZZLE_CELL_CHAR_SOLVED, colors.PUZZLE_CELL_CHAR_SOLVED)
+        }
+        rule(LGND_TABLE.cls()){
+            fontFamily="sans-serif"
+            margin="auto"
+            fontWeight=FontWeight.normal
+            color=colors.CELL_CHAR_COLR
+            wordWrap=WordWrap.breakWord
         }
         rule(CELL_GRID.cls()){
             display=Display.grid
@@ -126,50 +305,6 @@ val CSS = fun CSSBuilder.(){
                 LinearDimension("1fr"), LinearDimension("2fr"),
                 LinearDimension("1fr"))
         }
-        rule(LGND_TABLE.cls()){
-            fontFamily="sans-serif"
-            fontSize=2.3.vh
-            margin="auto"
-            paddingTop=1.vh
-            fontWeight=FontWeight.normal
-            color=colors.CELL_CHAR_COLR
-            wordWrap=WordWrap.breakWord
-        }
-        fun lgndTableHdr(pSel: String, pTop: LinearDimension, pColor: Color)
-                = rule(pSel.cls()){
-            paddingTop=pTop
-            textAlign=TextAlign.left
-            textDecoration=TextDecoration(setOf(TextDecorationLine.underline))
-            color=pColor.darken(70)
-        }
-        lgndTableHdr(LGND_TABLE_HEADER_HOR, 0.vh, gridBorderColor)
-        lgndTableHdr(LGND_TABLE_HEADER_HOR_NTH, 2.vh, gridBorderColor)
-        lgndTableHdr(LGND_TABLE_HEADER_VER, 0.vh, gridLineColor)
-        lgndTableHdr(LGND_TABLE_HEADER_VER_NTH, 2.vh, gridLineColor)
-        fun lgndEntries(pSel: String, pTextDecoLine: TextDecorationLine,
-                pBorderBottomStyle: BorderStyle, pColor: Color)
-                    = rule(pSel.cls()){
-            borderWidth=0.3.vh
-            borderColor=pColor
-            borderStyle=BorderStyle.none
-            borderBottomStyle=pBorderBottomStyle
-            textDecoration=TextDecoration(setOf(pTextDecoLine))
-            lineHeight=LineHeight("2.5vh")
-            hyphens=Hyphens.auto
-        }
-        fun lgndEntriesDir(pClass: String, pColor: Color){
-            lgndEntries(pClass,
-                TextDecorationLine.unset, BorderStyle.dashed, pColor)
-            lgndEntries("${pClass}${LGND_ENTRIES_SOLVED_SFX}",
-                TextDecorationLine.lineThrough, BorderStyle.dashed, pColor)
-            lgndEntries("${pClass}${LGND_LAST_SFX}",
-                TextDecorationLine.unset, BorderStyle.none, pColor)
-            lgndEntries(
-                "${pClass}${LGND_LAST_SFX}${LGND_ENTRIES_SOLVED_SFX}",
-                TextDecorationLine.lineThrough, BorderStyle.none, pColor)
-        }
-        lgndEntriesDir(LGND_ENTRIES_HOR, gridLineColor.darken(70))
-        lgndEntriesDir(LGND_ENTRIES_VER, gridBorderColor.darken(70))
         rule(GRID_TABLE.cls()){
             fontFamily="monospace"
             borderWidth=0.6.vh
@@ -208,56 +343,8 @@ val CSS = fun CSSBuilder.(){
             paddingTop=0.4.vh
             paddingLeft=0.4.vh
         }
-        fun cellIdxNum(pSel: String, pLineHeight: LineHeight,
-                pColor: Color) = rule(pSel.cls()){
-            height=2.9.vh
-            fontSize=2.9.vh
-            fontWeight=FontWeight.bolder
-            lineHeight=pLineHeight
-            textAlign=TextAlign.center
-            color=pColor.darken(40)
-        }
-        cellIdxNum(PUZZLE_CELL_IDX_NUM_HOR, LineHeight("3vh"),
-            gridLineColor)
-        cellIdxNum(PUZZLE_CELL_IDX_NUM_VER, LineHeight("3vh"),
-            gridBorderColor)
-        cellIdxNum(PUZZLE_LGND_IDX_NUM_HOR, LineHeight("3vh"),
-            gridLineColor)
-        cellIdxNum(PUZZLE_LGND_IDX_NUM_VER, LineHeight("3vh"),
-            gridBorderColor)
         rule(PUZZLE_CELL_CHAR_CONTAINER.cls()){
             textAlign=TextAlign.center
-        }
-        fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()){
-            fontSize=7.0.vh
-            color=pColr
-            backgroundColor=Color.transparent
-            borderStyle=BorderStyle.none
-            lineHeight=LineHeight("4vh")
-            padding="0"
-            maxWidth=1.em
-            maxHeight=1.em
-            textAlign=TextAlign.center
-            transition("all", 1.s,
-                Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
-        }
-        cellChar(PUZZLE_CELL_CHAR, colors.CELL_CHAR_COLR)
-        cellChar(PUZZLE_CELL_CHAR_SOLVED, colors.PUZZLE_CELL_CHAR_SOLVED)
-        rule(IDX_SLCT_ROT_SOUTH.cls()){
-            height=2.5.vh
-            transform.rotate(0.grad)
-        }
-        rule(IDX_SLCT_ROT_EAST.cls()){
-            height=2.5.vh
-            transform.rotate(100.grad)
-        }
-        rule(IDX_SLCT_ROT_NORTH.cls()){
-            height=2.5.vh
-            transform.rotate(200.grad)
-        }
-        rule(IDX_SLCT_ROT_WEST.cls()){
-            height=2.5.vh
-            transform.rotate(300.grad)
         }
     }
 }

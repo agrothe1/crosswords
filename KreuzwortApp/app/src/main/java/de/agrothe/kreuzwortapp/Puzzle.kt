@@ -90,15 +90,10 @@ class PuzzleTplt: Template<FlowContent>{
                             else LGND_ENTRIES_VER_LAST}"
                         else "")
                     {
-                /*
-                table(classes=LGND_ENTRIES+if(pLast)
-                        " $LGND_ENTRIES_LAST" else ""){
-
-                 */
-                    id=pId
-                    pSynms?.shuffled()?.take(confWeb.MAX_SYNMS)
-                        ?.forEach{legendEntry(it)}
-            }
+                        id=pId
+                        pSynms?.shuffled()?.take(confWeb.MAX_SYNMS)
+                            ?.forEach{legendEntry(it)}
+                    }
 
             div{
                 div(classes=PUZZLE_GRID){
