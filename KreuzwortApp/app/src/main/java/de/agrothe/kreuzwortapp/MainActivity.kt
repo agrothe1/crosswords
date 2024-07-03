@@ -152,7 +152,8 @@ data class WSDataToSrvr(
 
 @Serializable
 data class WSDataFromSrvr(
-    val charSolved: Boolean, val rowSolved: Boolean, val colSolved: Boolean)
+    val charSolved: Boolean, val rowSolved: Boolean, val colSolved: Boolean,
+    val puzzleSolved: Boolean)
 
 data class PuzzleCacheEntry(
     val puzzleGenerated: Puzzle,
@@ -208,13 +209,13 @@ fun Application.configureSockets(){
                                         send(Frame.Text(
                                             Json.encodeToString(WSDataFromSrvr(
                                                 correctChar,
-                        it.puzzleGenerated.getStringAt(Axis.X, xPos)
-                            .equals(it.puzzleInPlay.getStringAt(Axis.X, xPos)),
-                        it.puzzleGenerated.getStringAt(Axis.Y, yPos)
-                            .equals(it.puzzleInPlay.getStringAt(Axis.Y, yPos))
-                                    ))))
-                        }}}
-                    }
+                        it.puzzleGenerated.getStringAt(Axis.X, xPos).equals(
+                            it.puzzleInPlay.getStringAt(Axis.X, xPos)),
+                        it.puzzleGenerated.getStringAt(Axis.Y, yPos).equals(
+                            it.puzzleInPlay.getStringAt(Axis.Y, yPos)),
+                        it.puzzleGenerated.equals(it.puzzleInPlay)
+                                        ))))
+                    }}}}
                 }
             }
             catch(e: Exception){println(e.localizedMessage)}

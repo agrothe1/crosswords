@@ -61,6 +61,7 @@ class WebAppConfig(
     val LEGND_ENTR_SUBST_REGEX: Regex = Regex(LEGND_ENTR_SUBST),
     val SHOW_INPUT_HINT: Boolean,
     val MAX_SYNMS: Int,
+    val SYNMS_TOTAL_LNGTH_THRSHLD: Int,
 )
 
 class I18n(
@@ -108,6 +109,7 @@ class Css(
     val LGND_ID_SUFFX_COL: String,
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,
+    val TRANSITION_DURATION: Float,
 )
 
 open class ColorPalletteConfig(

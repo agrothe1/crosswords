@@ -92,6 +92,11 @@ class PuzzleTplt: Template<FlowContent>{
                     {
                         id=pId
                         pSynms?.shuffled()?.take(confWeb.MAX_SYNMS)
+                            ?.foldIndexed(mutableListOf<String>()){
+                                idx, acc, syn->
+                                    if(idx==0 || acc.sumOf{it.length}+syn.length
+                                            < confWeb.SYNMS_TOTAL_LNGTH_THRSHLD)
+                                        acc.add(syn); acc}
                             ?.forEach{legendEntry(it)}
                     }
 

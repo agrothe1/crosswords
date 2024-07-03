@@ -88,7 +88,7 @@ val CSS = fun CSSBuilder.(){
                 borderStyle=BorderStyle.none
                 borderBottomStyle=pBorderBottomStyle
                 textDecoration=TextDecoration(setOf(pTextDecoLine))
-                lineHeight=LineHeight("2.5vh")
+                lineHeight=LineHeight("2.6vh")
                 hyphens=Hyphens.auto
             }
             fun lgndEntriesDir(pClass: String, pColor: Color){
@@ -105,8 +105,9 @@ val CSS = fun CSSBuilder.(){
             lgndEntriesDir(LGND_ENTRIES_HOR, gridLineColor.darken(70))
             lgndEntriesDir(LGND_ENTRIES_VER, gridBorderColor.darken(70))
             rule(LGND_TABLE.cls()){
-                fontSize=2.3.vh
+                fontSize=2.5.vh
                 paddingTop=2.vh
+                fontWeight=FontWeight.w700
             }
             fun lgndTableHdr(pSel: String, pTop: LinearDimension, pColor: Color)
                     = rule(pSel.cls()){
@@ -124,7 +125,8 @@ val CSS = fun CSSBuilder.(){
                 lineHeight=LineHeight(pLineHeight)
                 height=LinearDimension(pLineHeight)
                 fontSize=LinearDimension(pLineHeight)
-                color=pColor.darken(40)
+                fontWeight=FontWeight.w800
+                color=pColor.darken(50)
             }
             cellIdxNum(PUZZLE_CELL_IDX_NUM_HOR, "3vh",
                 gridLineColor)
@@ -161,7 +163,7 @@ val CSS = fun CSSBuilder.(){
                 maxWidth=1.em
                 maxHeight=1.em
                 textAlign=TextAlign.center
-                transition("all", 1.s,
+                transition("color", TRANSITION_DURATION.s,
                     Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
             }
             cellChar(PUZZLE_CELL_CHAR, colors.CELL_CHAR_COLR)
@@ -171,7 +173,7 @@ val CSS = fun CSSBuilder.(){
             rule(PUZZLE_GRID.cls()){
                 display=Display.grid
                 gridTemplateColumns=GridTemplateColumns(
-                    LinearDimension("20fr"), LinearDimension("20fr"),
+                    LinearDimension("45fr"), LinearDimension("45fr"),
                     LinearDimension("88fr"), LinearDimension("1fr"))
                 gridTemplateRows=GridTemplateRows(LinearDimension("1fr"))
             }
@@ -201,7 +203,8 @@ val CSS = fun CSSBuilder.(){
                 gridRowStart=GridRowStart("1")
                 gridRowEnd=GridRowEnd("2")
                 nextButton()
-                marginRight=4.0.vh
+                marginRight=3.4.vh
+                fontSize=4.6.vh
             }
             fun lgndEntries(pSel: String, pTextDecoLine: TextDecorationLine,
                     pBorderBottomStyle: BorderStyle, pColor: Color)
@@ -211,7 +214,7 @@ val CSS = fun CSSBuilder.(){
                 borderStyle=BorderStyle.none
                 borderBottomStyle=pBorderBottomStyle
                 textDecoration=TextDecoration(setOf(pTextDecoLine))
-                lineHeight=LineHeight("5.0vh")
+                lineHeight=LineHeight("5.1vh")
                 hyphens=Hyphens.auto
             }
             fun lgndEntriesDir(pClass: String, pColor: Color){
@@ -228,8 +231,9 @@ val CSS = fun CSSBuilder.(){
             lgndEntriesDir(LGND_ENTRIES_HOR, gridLineColor.darken(70))
             lgndEntriesDir(LGND_ENTRIES_VER, gridBorderColor.darken(70))
             rule(LGND_TABLE.cls()){
-                fontSize=4.8.vh
+                fontSize=5.0.vh
                 paddingTop=2.vh
+                fontWeight=FontWeight.w700
             }
             fun lgndTableHdr(pSel: String, pTop: LinearDimension, pColor: Color)
                     = rule(pSel.cls()){
@@ -247,7 +251,8 @@ val CSS = fun CSSBuilder.(){
                 lineHeight=LineHeight(pLineHeight)
                 height=LinearDimension(pHeight)
                 fontSize=LinearDimension(pLineHeight)
-                color=pColor.darken(40)
+                fontWeight=FontWeight.bolder
+                color=pColor.darken(60)
             }
             cellIdxNum(PUZZLE_CELL_IDX_NUM_HOR, "5vh", "5vh",
                 gridLineColor)
@@ -284,7 +289,7 @@ val CSS = fun CSSBuilder.(){
                 maxWidth=1.em
                 maxHeight=1.em
                 textAlign=TextAlign.center
-                transition("all", 1.s,
+                transition("color", TRANSITION_DURATION.s,
                     Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
             }
             cellChar(PUZZLE_CELL_CHAR, colors.CELL_CHAR_COLR)

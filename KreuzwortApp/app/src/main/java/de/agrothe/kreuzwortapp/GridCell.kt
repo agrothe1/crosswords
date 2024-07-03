@@ -78,25 +78,33 @@ override fun FlowContent.apply(){
                         """.trimIndent()
                         // todo move to global function
                     onKeyUp="""
+                        value=value.toUpperCase()
                         let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
                         ws.addEventListener("message",(ev)=>{
                             let d=document
-                            let elm=d.getElementById('$iD')
                             let rpl=JSON.parse(ev.data)
-                            if(rpl.charSolved==true){
-                                elm.disabled=true
-                                elm.className="$PUZZLE_CELL_CHAR_SOLVED"}
                             if(rpl.rowSolved==true){
-                                let e=d.getElementById('${pRowIdx.lgndIdSuffxRow()}')
-                                e.className=e.className+'$LGND_ENTRIES_SOLVED_SFX'}
+                                let l=d.getElementById('${pRowIdx.lgndIdSuffxRow()}')
+                                l.className=l.className+'$LGND_ENTRIES_SOLVED_SFX'
+                                d.querySelectorAll('[id^="${pRowIdx}_"]').forEach(e=>{
+                                    e.disabled=true
+                                    e.className="$PUZZLE_CELL_CHAR_SOLVED"})}
                             if(rpl.colSolved==true){
-                                let e=d.getElementById('${pColIdx.lgndIdSuffxCol()}')
-                                e.className=e.className+'$LGND_ENTRIES_SOLVED_SFX'}
+                                let l=d.getElementById('${pColIdx.lgndIdSuffxCol()}')
+                                l.className=l.className+'$LGND_ENTRIES_SOLVED_SFX'
+                                d.querySelectorAll('[id$="_$pColIdx"]').forEach(e=>{
+                                    e.disabled=true
+                                    e.className="$PUZZLE_CELL_CHAR_SOLVED"})}
                         })
-                        value=value.toUpperCase()
                         ws.onopen=(ev)=>{
                             ws.send('${wsdata}'.replace("%",value||" "))}
                         """.trimIndent()
+                            /*
+                            if(rpl.charSolved==true){
+                                let c=d.getElementById('$iD')
+                                c.disabled=true
+                                c.className="$PUZZLE_CELL_CHAR_SOLVED"}
+                            */
                 }
             }
             idx(pWordAtX?.ornt, pColIdx,
