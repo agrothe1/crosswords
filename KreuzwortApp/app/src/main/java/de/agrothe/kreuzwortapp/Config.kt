@@ -62,10 +62,12 @@ class WebAppConfig(
     val SHOW_INPUT_HINT: Boolean,
     val MAX_SYNMS: Int,
     val SYNMS_TOTAL_LNGTH_THRSHLD: Int,
+    val HELP_PROBABILITY: Int,
 )
 
 class I18n(
     val NEW_GAME: String,
+    val SHOW_HELP: String,
     val HORIZONTAL: String,
     val VERTICAL: String,
 )
@@ -73,6 +75,8 @@ class I18n(
 class Css(
     val PUZZLE_GRID: String,
     val CELL_GRID: String,
+    val SHOW_HELP_BUTTON_ID: String,
+    val NEW_GAME_BUTTON_ID: String,
     val NEW_GAME: String,
     val NUM_GAME: String,
     val LGND_GRID_HORIZ: String,

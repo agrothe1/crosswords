@@ -60,6 +60,13 @@ fun Puzzle.print(){
     println()
 }
 
+fun Puzzle.diff(pOther: Puzzle) =
+    zip(pOther).mapIndexed{rowIdx, row->
+        row.first.zip(row.second).mapIndexedNotNull{colIdx, col->
+            if(col.first==col.second) null
+            else Triple(rowIdx, colIdx, col.first)
+    }}.flatten()
+
 fun Puzzle?.fillGrid(pAxis: Axis, pPos: Pos, pDimen: Int,
         pUsedWords: MutableSet<String>, pKeys: Keys): Puzzle? =
     this?.let{puzzle->

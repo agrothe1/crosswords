@@ -27,6 +27,8 @@ import net.jodah.expiringmap.ExpiringMap
 import java.lang.ref.WeakReference
 import java.time.Duration
 import java.util.concurrent.TimeUnit
+import kotlin.random.Random
+import kotlin.random.nextInt
 
 private val logger by lazy{KotlinLogging.logger{}}
 
@@ -148,12 +150,19 @@ typealias HashCode = Int
 @Serializable
 data class WSDataToSrvr(
     val inpChar: Char='#', val xPos: Int=0, val yPos: Int=0,
-    val hashCode: HashCode=0, val newGame: Boolean=false)
+    val hashCode: HashCode=0, val newGame: Boolean=false,
+    val showHelp: Boolean=false)
+
+@Serializable
+data class WSDataFromSrvrPlcHldrs(
+    val selctr: String, val plcHldr: Char,
+)
 
 @Serializable
 data class WSDataFromSrvr(
-    val charSolved: Boolean, val rowSolved: Boolean, val colSolved: Boolean,
-    val puzzleSolved: Boolean)
+    val charSolved: Boolean=false, val rowSolved: Boolean=false,
+    val colSolved: Boolean=false, val puzzleSolved: Boolean=false,
+    val showPlaceholders: Array<WSDataFromSrvrPlcHldrs>?=null)
 
 data class PuzzleCacheEntry(
     val puzzleGenerated: Puzzle,
@@ -186,6 +195,17 @@ fun Application.configureSockets(){
         maxFrameSize=Long.MAX_VALUE
         contentConverter=KotlinxWebsocketSerializationConverter(Json)
     }
+
+    fun WSDataToSrvr.getHelp() =
+        WSDataFromSrvr(showPlaceholders=puzzleCache[hashCode]?.run{
+            puzzleGenerated.run{
+                diff(puzzleInPlay).shuffled().run{
+                    take(size/confWeb.HELP_PROBABILITY+1).map{
+                            (rowIdx, colIdx, chr)->
+                        WSDataFromSrvrPlcHldrs(
+                        "[id=\"${rowIdx}_${colIdx}\"]", chr)
+        }}}}?.toTypedArray())
+
     routing{
         webSocket(confWeb.WEB_SOCK_ENDPOINT){
             try{
@@ -194,7 +214,9 @@ fun Application.configureSockets(){
                     val wsd=
                         Json.decodeFromString<WSDataToSrvr>(f.readText())
                     logger.debug{"ws data recvd: '$wsd'"}
-                    if(wsd.newGame){
+                    if(wsd.showHelp){
+                        send(Frame.Text(Json.encodeToString(wsd.getHelp())))
+                    }else if(wsd.newGame){
                         webViewReference.get()?.apply{post{
                             loadUrl(confWeb.APP_URL)
                         }}
@@ -221,6 +243,9 @@ fun Application.configureSockets(){
             catch(e: Exception){println(e.localizedMessage)}
         }
     }
+
+
+
 }
 
 fun Application.configureTemplating(){

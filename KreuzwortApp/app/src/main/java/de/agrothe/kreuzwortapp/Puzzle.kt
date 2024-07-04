@@ -102,9 +102,37 @@ class PuzzleTplt: Template<FlowContent>{
 
             div{
                 div(classes=PUZZLE_GRID){
-                    val wsdata = Json.encodeToString(
-                        WSDataToSrvr(newGame=true))
                     button(classes=NEW_GAME){
+                        id=SHOW_HELP_BUTTON_ID
+                        hidden=false
+                        val wsdata = Json.encodeToString(
+                            WSDataToSrvr(showHelp=true,
+                                hashCode=puzzle.hashCode()))
+                        style=NEW_GAME_BUTTON_STYLE
+                        onClick=
+                    """
+                        let d=document
+                        d.getElementById('$SHOW_HELP_BUTTON_ID')
+                            .style.display='none'
+                        d.getElementById('$NEW_GAME_BUTTON_ID')
+                            .style.display='block'
+                        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
+                        ws.addEventListener("message",(ev)=>{ 
+                            JSON.parse(ev.data).showPlaceholders.forEach(
+                                function(p){d.querySelector(p.selctr)
+                                    .placeholder=p.plcHldr})})
+                        ws.onopen=(ev)=>{ws.send('${wsdata}')}
+                    """.trimIndent()
+                            +confWeb.I18n.SHOW_HELP
+                    }
+                    /*
+                    d.querySelectorAll('[id^="${pRowIdx}_"]').forEach(e=>{
+                     */
+                    button(classes=NEW_GAME){
+                        id=NEW_GAME_BUTTON_ID
+                        hidden=true
+                        val wsdata = Json.encodeToString(
+                            WSDataToSrvr(newGame=true))
                         style=NEW_GAME_BUTTON_STYLE
                         onClick=
                 """ 

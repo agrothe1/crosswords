@@ -344,6 +344,10 @@ val CSS = fun CSSBuilder.(){
             backgroundColor=Color.antiqueWhite.lighten((5..7).random())
                 //.changeAlpha((91..94).random()*0.01)
         }
+        rule("::placeholder"){
+            color=gridLineColor.desaturate(25)
+            fontStyle=FontStyle.italic
+        }
         rule(PUZZLE_CELL_GRID_IDX.cls()){
             paddingTop=0.4.vh
             paddingLeft=0.4.vh
