@@ -79,32 +79,10 @@ override fun FlowContent.apply(){
                         // todo move to global function
                     onKeyUp="""
                         value=value.toUpperCase()
-                        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
-                        ws.addEventListener("message",(ev)=>{
-                            let d=document
-                            let rpl=JSON.parse(ev.data)
-                            if(rpl.rowSolved==true){
-                                let l=d.getElementById('${pRowIdx.lgndIdSuffxRow()}')
-                                l.className=l.className+'$LGND_ENTRIES_SOLVED_SFX'
-                                d.querySelectorAll('[id^="${pRowIdx}_"]').forEach(e=>{
-                                    e.disabled=true
-                                    e.className="$PUZZLE_CELL_CHAR_SOLVED"})}
-                            if(rpl.colSolved==true){
-                                let l=d.getElementById('${pColIdx.lgndIdSuffxCol()}')
-                                l.className=l.className+'$LGND_ENTRIES_SOLVED_SFX'
-                                d.querySelectorAll('[id$="_$pColIdx"]').forEach(e=>{
-                                    e.disabled=true
-                                    e.className="$PUZZLE_CELL_CHAR_SOLVED"})}
-                        })
-                        ws.onopen=(ev)=>{
-                            ws.send('${wsdata}'.replace("%",value||" "))}
+                        checkCellInput(value, '$wsdata', $pRowIdx, $pColIdx,
+                            '${pRowIdx.lgndIdSuffxRow()}', 
+                            '${pColIdx.lgndIdSuffxCol()}')
                         """.trimIndent()
-                            /*
-                            if(rpl.charSolved==true){
-                                let c=d.getElementById('$iD')
-                                c.disabled=true
-                                c.className="$PUZZLE_CELL_CHAR_SOLVED"}
-                            */
                 }
             }
             idx(pWordAtX?.ornt, pColIdx,

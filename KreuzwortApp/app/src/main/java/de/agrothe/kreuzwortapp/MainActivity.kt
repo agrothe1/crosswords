@@ -221,31 +221,28 @@ fun Application.configureSockets(){
                             loadUrl(confWeb.APP_URL)
                         }}
                     }else{
-                        puzzleCache[wsd.hashCode]?.let{wsd.apply{
-                            it.puzzleGenerated[xPos][yPos]
-                                .equals(inpChar, true)
-                                    .let{correctChar->
-                                        if(correctChar){
-                                            it.puzzleInPlay[xPos][yPos]=inpChar
-                                        }
-                                        send(Frame.Text(
-                                            Json.encodeToString(WSDataFromSrvr(
-                                                correctChar,
+                    puzzleCache[wsd.hashCode]?.let{wsd.apply{
+                        it.puzzleGenerated[xPos][yPos]
+                            .equals(inpChar, true)
+                                .let{correctChar->
+                                    if(correctChar){
+                                        it.puzzleInPlay[xPos][yPos]=inpChar
+                                    }
+                                    send(Frame.Text(
+                                        Json.encodeToString(WSDataFromSrvr(
+                        correctChar,
                         it.puzzleGenerated.getStringAt(Axis.X, xPos).equals(
                             it.puzzleInPlay.getStringAt(Axis.X, xPos)),
                         it.puzzleGenerated.getStringAt(Axis.Y, yPos).equals(
                             it.puzzleInPlay.getStringAt(Axis.Y, yPos)),
-                        it.puzzleGenerated.equals(it.puzzleInPlay)
-                                        ))))
+                        it.puzzleGenerated.sameContent(it.puzzleInPlay)
+                                    ))))
                     }}}}
                 }
             }
             catch(e: Exception){println(e.localizedMessage)}
         }
     }
-
-
-
 }
 
 fun Application.configureTemplating(){

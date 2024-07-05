@@ -23,6 +23,9 @@ enum class Axis{
     X, Y
 }
 
+fun Puzzle.sameContent(pOther: Puzzle): Boolean =
+    zip(pOther).all{it.first.asList().equals(it.second.asList())}
+
 fun Pos.advance(pAxis: Axis): Pair<Axis, Pos> =
     when(pAxis){
         X->Pair(Y, this)

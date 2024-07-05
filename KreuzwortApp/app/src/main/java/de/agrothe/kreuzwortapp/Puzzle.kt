@@ -31,8 +31,8 @@ class BodyTplt: Template<HTML>{
             }
              */
             insert(PuzzleTplt(), puzzle)
-        }
-    }
+            script{unsafe{raw(scripts)}}
+    }}
 }
 
 class PuzzleTplt: Template<FlowContent>{
@@ -105,29 +105,14 @@ class PuzzleTplt: Template<FlowContent>{
                     button(classes=NEW_GAME){
                         id=SHOW_HELP_BUTTON_ID
                         hidden=false
+                        style=NEW_GAME_BUTTON_STYLE
                         val wsdata = Json.encodeToString(
                             WSDataToSrvr(showHelp=true,
                                 hashCode=puzzle.hashCode()))
-                        style=NEW_GAME_BUTTON_STYLE
-                        onClick=
-                    """
-                        let d=document
-                        d.getElementById('$SHOW_HELP_BUTTON_ID')
-                            .style.display='none'
-                        d.getElementById('$NEW_GAME_BUTTON_ID')
-                            .style.display='block'
-                        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
-                        ws.addEventListener("message",(ev)=>{ 
-                            JSON.parse(ev.data).showPlaceholders.forEach(
-                                function(p){d.querySelector(p.selctr)
-                                    .placeholder=p.plcHldr})})
-                        ws.onopen=(ev)=>{ws.send('${wsdata}')}
-                    """.trimIndent()
-                            +confWeb.I18n.SHOW_HELP
+                        onClick="showHelp('$wsdata')"
+
+                        +confWeb.I18n.SHOW_HELP
                     }
-                    /*
-                    d.querySelectorAll('[id^="${pRowIdx}_"]').forEach(e=>{
-                     */
                     button(classes=NEW_GAME){
                         id=NEW_GAME_BUTTON_ID
                         hidden=true
@@ -217,10 +202,54 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
                                             cellTmplt)
                                 }
                             }
-                        }
-                    }
-                }
-            }
+            }}}}
         }
     }
 }
+
+val scripts="""
+    function showNextButton(pDoc){ 
+        pDoc.getElementById('${confCss.SHOW_HELP_BUTTON_ID}')
+            .style.display='none' 
+        pDoc.getElementById('${confCss.NEW_GAME_BUTTON_ID}')
+            .style.display='block'
+    }
+    function checkCellInput(pValue, pWSData, pRowIdx, pColIdx, pRowId, pColId){
+        let d=document
+        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}') 
+        ws.addEventListener("message",(ev)=>{
+            function rowColSolved(pId, pSel){
+                let l=d.getElementById(pId)
+                l.className=l.className+"${confCss.LGND_ENTRIES_SOLVED_SFX}"
+                d.querySelectorAll(pSel).forEach(e=>{
+                    e.disabled=true
+                    e.className='${confCss.PUZZLE_CELL_CHAR_SOLVED}'
+                })
+            }
+            let rpl=JSON.parse(ev.data)
+            if(rpl.rowSolved===true){
+                rowColSolved(pRowId, '[id^="'+pRowIdx+'_"]')
+            }
+            if(rpl.colSolved===true){
+                rowColSolved(pColId, '[id$="_'+pColIdx+'"]')
+            }
+            if(rpl.puzzleSolved===true){
+                showNextButton(d)
+            }
+        })
+        ws.onopen=(ev)=>{ws.send(pWSData.replace("%",pValue||" "))}
+    }
+    function showHelp(pWSData){                                   
+        let d=document
+        showNextButton(d)
+        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
+        ws.addEventListener("message",(ev)=>{
+            JSON.parse(ev.data).showPlaceholders.forEach(
+                function(p){
+                    d.querySelector(p.selctr).placeholder=p.plcHldr}
+            )
+        })
+        ws.onopen=(ev)=>{ws.send(pWSData)}
+    }
+""".trimIndent()
+
