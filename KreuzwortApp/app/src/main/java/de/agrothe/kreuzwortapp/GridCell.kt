@@ -66,7 +66,6 @@ override fun FlowContent.apply(){
                     type=InputType.text){
                     id=iD
                     maxLength="1"
-                    // todo make interactive
                     placeholder=if(webAppConf.SHOW_INPUT_HINT)
                         pChar.toString() else ""
                     // todo does "new WS" reuse existing WS?

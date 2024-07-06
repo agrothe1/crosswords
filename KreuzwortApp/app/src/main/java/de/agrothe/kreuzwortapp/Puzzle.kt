@@ -23,6 +23,12 @@ class BodyTplt: Template<HTML>{
                 href="/styles.css"
                 type="text/css"
             }
+            /*
+            link{
+                href="/Callbacsk.js"
+                type="text/javascript"
+            }
+             */
         }
         body{
             /*
@@ -32,7 +38,8 @@ class BodyTplt: Template<HTML>{
              */
             insert(PuzzleTplt(), puzzle)
             script{unsafe{raw(scripts)}}
-    }}
+            //script(src="js/Callbacks.js"){}
+        }}
 }
 
 class PuzzleTplt: Template<FlowContent>{
@@ -208,7 +215,7 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
 }
 
 val scripts="""
-    function showNextButton(pDoc){ 
+    function showNewButton(pDoc){ 
         pDoc.getElementById('${confCss.SHOW_HELP_BUTTON_ID}')
             .style.display='none' 
         pDoc.getElementById('${confCss.NEW_GAME_BUTTON_ID}')
@@ -233,15 +240,13 @@ val scripts="""
             if(rpl.colSolved===true){
                 rowColSolved(pColId, '[id$="_'+pColIdx+'"]')
             }
-            if(rpl.puzzleSolved===true){
-                showNextButton(d)
-            }
+            if(rpl.puzzleSolved===true){showNewButton(d)}
         })
         ws.onopen=(ev)=>{ws.send(pWSData.replace("%",pValue||" "))}
     }
     function showHelp(pWSData){                                   
         let d=document
-        showNextButton(d)
+        showNewButton(d)
         let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
         ws.addEventListener("message",(ev)=>{
             JSON.parse(ev.data).showPlaceholders.forEach(

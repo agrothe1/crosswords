@@ -24,6 +24,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.jodah.expiringmap.ExpiringMap
+import java.io.File
 import java.lang.ref.WeakReference
 import java.time.Duration
 import java.util.concurrent.TimeUnit
@@ -221,25 +222,27 @@ fun Application.configureSockets(){
                             loadUrl(confWeb.APP_URL)
                         }}
                     }else{
-                    puzzleCache[wsd.hashCode]?.let{wsd.apply{
-                        it.puzzleGenerated[xPos][yPos]
-                            .equals(inpChar, true)
-                                .let{correctChar->
-                                    if(correctChar){
-                                        it.puzzleInPlay[xPos][yPos]=inpChar
-                                    }
-                                    send(Frame.Text(
-                                        Json.encodeToString(WSDataFromSrvr(
-                        correctChar,
+    puzzleCache[wsd.hashCode]?.let{wsd.apply{
+        logger.debug{"inpChar: '$inpChar'"}
+        it.puzzleInPlay[xPos][yPos]=inpChar
+        it.puzzleGenerated[xPos][yPos]
+            .equals(inpChar, true)
+                .let{correctChar->
+                    if(correctChar){
                         it.puzzleGenerated.getStringAt(Axis.X, xPos).equals(
-                            it.puzzleInPlay.getStringAt(Axis.X, xPos)),
-                        it.puzzleGenerated.getStringAt(Axis.Y, yPos).equals(
-                            it.puzzleInPlay.getStringAt(Axis.Y, yPos)),
-                        it.puzzleGenerated.sameContent(it.puzzleInPlay)
-                                    ))))
-                    }}}}
-                }
-            }
+                            it.puzzleInPlay.getStringAt(Axis.X, xPos))
+                        .let{correctRow->
+                            it.puzzleGenerated.getStringAt(Axis.Y, yPos).equals(
+                                it.puzzleInPlay.getStringAt(Axis.Y, yPos))
+                            .let{correctCol->
+                        send(Frame.Text(Json.encodeToString(WSDataFromSrvr(
+                            correctChar, correctRow, correctCol,
+                            correctRow && correctCol &&
+                                it.puzzleGenerated.sameContent(it.puzzleInPlay)
+                            ))))
+                }}}}
+        }}
+            }}}
             catch(e: Exception){println(e.localizedMessage)}
         }
     }
@@ -262,6 +265,7 @@ fun Application.configureTemplating(){
                  // 1080x2400 2,22
              }
         }
+//        staticResources("/js", "/js")
         staticResources("/imgs", "/imgs")
     }
 }
