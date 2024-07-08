@@ -78,6 +78,7 @@ class Css(
     val SHOW_HELP_BUTTON_ID: String,
     val NEW_GAME_BUTTON_ID: String,
     val NEW_GAME: String,
+    val NEW_GAME_LABEL: String,
     val NUM_GAME: String,
     val LGND_GRID_HORIZ: String,
     var LGND_GRID_VERT: String,

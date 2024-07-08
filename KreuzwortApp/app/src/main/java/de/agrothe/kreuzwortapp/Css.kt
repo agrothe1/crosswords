@@ -41,8 +41,6 @@ val CSS = fun CSSBuilder.(){
             lineHeight=LineHeight("2.0vh")
             fontWeight=FontWeight.w700
             color=gridBorderColor.darken(40)
-            border="0.2vh groove ${gridLineColor.darken(50)}"
-            borderRadius=0.8.vh
             background="none"
         }}
         media("only screen and (orientation: portrait)"){
@@ -70,6 +68,7 @@ val CSS = fun CSSBuilder.(){
                 gridRowStart=GridRowStart("1")
                 gridColumnStart=GridColumnStart("3")
                 nextButton()
+                border="none"
                 marginLeft=0.5.vh
                 marginRight=1.0.vh
             }
@@ -203,6 +202,7 @@ val CSS = fun CSSBuilder.(){
                 gridRowStart=GridRowStart("1")
                 gridRowEnd=GridRowEnd("2")
                 nextButton()
+                border="none"
                 marginRight=3.4.vh
                 fontSize=4.6.vh
             }
@@ -354,6 +354,19 @@ val CSS = fun CSSBuilder.(){
         }
         rule(PUZZLE_CELL_CHAR_CONTAINER.cls()){
             textAlign=TextAlign.center
+        }
+        rule(NUM_GAME.cls()){
+            margin="auto"
+            padding(LinearDimension("0.2vh"))
+            paddingBottom=LinearDimension("1.5vh")
+            color=Color.black
+            fontWeight=FontWeight.lighter
+            fontStyle=FontStyle.italic
+        }
+        rule(NEW_GAME_LABEL.cls()){
+            border="0.2vh groove ${gridLineColor.darken(50)}"
+            borderRadius=0.8.vh
+            padding="0.4vh"
         }
     }
 }

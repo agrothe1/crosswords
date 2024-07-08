@@ -1,6 +1,7 @@
 package de.agrothe.kreuzwortapp
 
 import io.ktor.server.html.*
+import kotlinx.css.style
 import kotlinx.html.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -106,34 +107,42 @@ class PuzzleTplt: Template<FlowContent>{
                                         acc.add(syn); acc}
                             ?.forEach{legendEntry(it)}
                     }
+            fun numGame() = "44"
+            fun BUTTON.gameButton(pLabel: String, pShowImg: Boolean = false) =
+                table{tr{td(classes=NUM_GAME){
+                        style=NEW_GAME_BUTTON_STYLE
+                        +numGame()
+                    }}
+                tr{td(classes=NEW_GAME_LABEL){
+                    style=NEW_GAME_BUTTON_STYLE
+                    +pLabel
+                    if(pShowImg)
+                        img(classes=IDX_SLCT_ROT_WEST,
+                            src=webAppConf.DIRCTN_IMG)
+                }}}
 
             div{
                 div(classes=PUZZLE_GRID){
                     button(classes=NEW_GAME){
                         id=SHOW_HELP_BUTTON_ID
                         hidden=false
-                        style=NEW_GAME_BUTTON_STYLE
                         val wsdata = Json.encodeToString(
                             WSDataToSrvr(showHelp=true,
                                 hashCode=puzzle.hashCode()))
                         onClick="showHelp('$wsdata')"
-
-                        +confWeb.I18n.SHOW_HELP
+                        gameButton(confWeb.I18n.SHOW_HELP)
                     }
                     button(classes=NEW_GAME){
                         id=NEW_GAME_BUTTON_ID
                         hidden=true
                         val wsdata = Json.encodeToString(
                             WSDataToSrvr(newGame=true))
-                        style=NEW_GAME_BUTTON_STYLE
                         onClick=
                 """ 
                     let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
                     ws.onopen=(ev)=>{ws.send('${wsdata}')}
                 """.trimIndent()
-                        +confWeb.I18n.NEW_GAME
-                        img(classes=IDX_SLCT_ROT_WEST,
-                            src=webAppConf.DIRCTN_IMG)
+                        gameButton(confWeb.I18n.NEW_GAME, true)
                     }
                     div(classes=LGND_GRID_HORIZ){
                         table(classes=LGND_TABLE){
@@ -215,15 +224,15 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
 }
 
 val scripts="""
-    function showNewButton(pDoc){ 
+    function showNewButton(pDoc){
         pDoc.getElementById('${confCss.SHOW_HELP_BUTTON_ID}')
-            .style.display='none' 
+            .style.display='none'
         pDoc.getElementById('${confCss.NEW_GAME_BUTTON_ID}')
             .style.display='block'
     }
     function checkCellInput(pValue, pWSData, pRowIdx, pColIdx, pRowId, pColId){
         let d=document
-        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}') 
+        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
         ws.addEventListener("message",(ev)=>{
             function rowColSolved(pId, pSel){
                 let l=d.getElementById(pId)
@@ -244,7 +253,7 @@ val scripts="""
         })
         ws.onopen=(ev)=>{ws.send(pWSData.replace("%",pValue||" "))}
     }
-    function showHelp(pWSData){                                   
+    function showHelp(pWSData){                  
         let d=document
         showNewButton(d)
         let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
@@ -256,5 +265,4 @@ val scripts="""
         })
         ws.onopen=(ev)=>{ws.send(pWSData)}
     }
-""".trimIndent()
-
+""".lines().map{it.trimStart().trimEnd()}.joinToString("\n")

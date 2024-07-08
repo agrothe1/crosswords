@@ -82,9 +82,11 @@ class MainActivity : ComponentActivity(){
         logger.info{"...web server started"}
 
         if(savedInstanceState!=null){
-            //restoredGame =
-                savedInstanceState.getString(conf.BUNDLE_KEY)?.apply{
-                    logger.debug{"onCreate: $this"}}
+            //restoredGame = todo
+                savedInstanceState.getString(conf.BUNDLE_KEY)?.run{
+                    logger.debug{"onCreate: $this"}
+                    //Json.decodeFromString<Game>(this) todo
+                }
             logger.debug{
                 "restored saved game: '${restoredGame?.puzzleInPlay}'"}
         }
@@ -118,27 +120,27 @@ class MainActivity : ComponentActivity(){
     }
 
     override fun onSaveInstanceState(outState: Bundle){
+        super.onSaveInstanceState(outState)
         with(puzzleCache.toSortedMap().entries){
             if(isNotEmpty()){first().value.let{first->
                 outState.putString(conf.BUNDLE_KEY,
                     Json.encodeToString(
                         Game(first.puzzleGenerated,
-                            first.puzzleInPlay, 4)
+                            first.puzzleInPlay, 4) // todo dimen
                     ).apply{
                         logger.debug{"onSaveInstanceState: save game: $this"}}
                 )
             }}
         }
-        super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle){
+        super.onRestoreInstanceState(savedInstanceState)
         logger.debug{"onRestoreInstanceState: $this"}
         savedInstanceState.getString(conf.BUNDLE_KEY)?.run{
             logger.debug{"onRestoreInstanceState: $this"}
-            restoredGame = Json.decodeFromString<Game>(this)
+            //restoredGame = Json.decodeFromString<Game>(this) // todo
         }
-        super.onRestoreInstanceState(savedInstanceState)
     }
 
     companion object{
@@ -239,10 +241,12 @@ fun Application.configureSockets(){
                             correctChar, correctRow, correctCol,
                             correctRow && correctCol &&
                                 it.puzzleGenerated.sameContent(it.puzzleInPlay)
-                            ))))
-                }}}}
-        }}
-            }}}
+                        ))))
+                            }
+                        }
+                    }
+                }}}}}
+            }
             catch(e: Exception){println(e.localizedMessage)}
         }
     }
