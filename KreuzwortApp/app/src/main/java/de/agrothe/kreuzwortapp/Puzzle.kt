@@ -1,14 +1,13 @@
 package de.agrothe.kreuzwortapp
 
 import io.ktor.server.html.*
-import kotlinx.css.style
 import kotlinx.html.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 private val confCss=confWeb.CSS
 
-class BodyTplt: Template<HTML>{
+class BodyTplt(val pNumSolvedGames: Int): Template<HTML>{
     val header = Placeholder<FlowContent>()
     val puzzle = TemplatePlaceholder<PuzzleTplt>()
     override fun HTML.apply(){
@@ -37,13 +36,13 @@ class BodyTplt: Template<HTML>{
                 insert(header)
             }
              */
-            insert(PuzzleTplt(), puzzle)
+            insert(PuzzleTplt(pNumSolvedGames), puzzle)
             script{unsafe{raw(scripts)}}
             //script(src="js/Callbacks.js"){}
         }}
 }
 
-class PuzzleTplt: Template<FlowContent>{
+class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
     val dimen = 4 // todo
     private val entries = dict.entries
         .map{(key, values)
@@ -107,11 +106,11 @@ class PuzzleTplt: Template<FlowContent>{
                                         acc.add(syn); acc}
                             ?.forEach{legendEntry(it)}
                     }
-            fun numGame() = "44"
             fun BUTTON.gameButton(pLabel: String, pShowImg: Boolean = false) =
                 table{tr{td(classes=NUM_GAME){
                         style=NEW_GAME_BUTTON_STYLE
-                        +numGame()
+                        id=NUM_GAME_ID
+                        +pNumSolvedGames.toString()
                     }}
                 tr{td(classes=NEW_GAME_LABEL){
                     style=NEW_GAME_BUTTON_STYLE
@@ -231,18 +230,18 @@ val scripts="""
             .style.display='block'
     }
     function checkCellInput(pValue, pWSData, pRowIdx, pColIdx, pRowId, pColId){
-        let d=document
-        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
+        var d=document
+        var ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
         ws.addEventListener("message",(ev)=>{
             function rowColSolved(pId, pSel){
-                let l=d.getElementById(pId)
+                var l=d.getElementById(pId)
                 l.className=l.className+"${confCss.LGND_ENTRIES_SOLVED_SFX}"
                 d.querySelectorAll(pSel).forEach(e=>{
                     e.disabled=true
                     e.className='${confCss.PUZZLE_CELL_CHAR_SOLVED}'
                 })
             }
-            let rpl=JSON.parse(ev.data)
+            var rpl=JSON.parse(ev.data)
             if(rpl.rowSolved===true){
                 rowColSolved(pRowId, '[id^="'+pRowIdx+'_"]')
             }
@@ -254,7 +253,7 @@ val scripts="""
         ws.onopen=(ev)=>{ws.send(pWSData.replace("%",pValue||" "))}
     }
     function showHelp(pWSData){                  
-        let d=document
+        var d=document
         showNewButton(d)
         let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
         ws.addEventListener("message",(ev)=>{

@@ -72,8 +72,8 @@ override fun FlowContent.apply(){
                     onClick="""
                         value=''
                         """.trimIndent()
-                    onInput=""" 
-                        if(value.length>1){value=value.charAt(0)}           
+                    onInput="""
+                        if(value.length>1){value=value.charAt(0)}
                         """.trimIndent()
                         // todo move to global function
                     onKeyUp="""

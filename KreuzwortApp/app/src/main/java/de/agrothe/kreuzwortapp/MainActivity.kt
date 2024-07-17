@@ -1,6 +1,8 @@
 package de.agrothe.kreuzwortapp
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.SharedPreferences
 import android.content.res.AssetManager
 import android.os.Bundle
 import android.webkit.WebSettings
@@ -24,12 +26,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.jodah.expiringmap.ExpiringMap
-import java.io.File
 import java.lang.ref.WeakReference
 import java.time.Duration
 import java.util.concurrent.TimeUnit
-import kotlin.random.Random
-import kotlin.random.nextInt
 
 private val logger by lazy{KotlinLogging.logger{}}
 
@@ -64,6 +63,19 @@ data class Game(
     }
 }
 
+lateinit var sharedPrefs: SharedPreferences
+
+fun readSolvedGamesCnt(): Int =
+    sharedPrefs.getInt(confWeb.SHRD_PRFS_NUM_SLVD_GMES_CNT_KEY, 0)
+
+fun saveSolvedGamesCnt(pCnt: Int) =
+    sharedPrefs.let{prefs->
+        with(prefs.edit()){
+            putInt(confWeb.SHRD_PRFS_NUM_SLVD_GMES_CNT_KEY, pCnt)
+        apply() // persist changes
+    }
+}
+
 var restoredGame: Game? = null
 
 class MainActivity : ComponentActivity(){
@@ -81,6 +93,7 @@ class MainActivity : ComponentActivity(){
         }.start(wait=false)
         logger.info{"...web server started"}
 
+/*
         if(savedInstanceState!=null){
             //restoredGame = todo
                 savedInstanceState.getString(conf.BUNDLE_KEY)?.run{
@@ -90,6 +103,9 @@ class MainActivity : ComponentActivity(){
             logger.debug{
                 "restored saved game: '${restoredGame?.puzzleInPlay}'"}
         }
+*/
+        sharedPrefs = getSharedPreferences(
+            conf.webApp.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
 
         webViewReference = WeakReference(
             WebView(this).apply{
@@ -119,7 +135,7 @@ class MainActivity : ComponentActivity(){
         super.onDestroy()
     }
 
-    override fun onSaveInstanceState(outState: Bundle){
+    /*override*/ fun XonSaveInstanceState(outState: Bundle){ // todo
         super.onSaveInstanceState(outState)
         with(puzzleCache.toSortedMap().entries){
             if(isNotEmpty()){first().value.let{first->
@@ -175,8 +191,9 @@ data class PuzzleCacheEntry(
         if(this===other) return true
         if(javaClass!=other?.javaClass) return false
         other as PuzzleCacheEntry
-        if (!puzzleGenerated.contentDeepEquals(other.puzzleGenerated)) return false
-        if (!puzzleInPlay.contentDeepEquals(other.puzzleInPlay)) return false
+        if(!puzzleGenerated.contentDeepEquals(other.puzzleGenerated))
+            return false
+        if(!puzzleInPlay.contentDeepEquals(other.puzzleInPlay)) return false
         return true
     }
     override fun hashCode(): Int {
@@ -239,8 +256,12 @@ fun Application.configureSockets(){
                             .let{correctCol->
                         send(Frame.Text(Json.encodeToString(WSDataFromSrvr(
                             correctChar, correctRow, correctCol,
-                            correctRow && correctCol &&
-                                it.puzzleGenerated.sameContent(it.puzzleInPlay)
+                            (correctRow && correctCol
+                                && it.puzzleGenerated
+                                    .sameContent(it.puzzleInPlay)).apply{
+                                        if(this) readSolvedGamesCnt().run{
+                                           (this+1).let{
+                                               saveSolvedGamesCnt(it)}}}
                         ))))
                             }
                         }
@@ -258,12 +279,7 @@ fun Application.configureTemplating(){
             call.respondCss(CSS)
         }
         get("/puzzler"){
-             call.respondHtmlTemplate(BodyTplt()){
-                 /*
-                 header{
-                     +"Puzzler"
-                 }
-                  */
+             call.respondHtmlTemplate(BodyTplt(readSolvedGamesCnt())){
                  puzzle
                  // dph 866.2857 x dpw 411.42856 = 2,10 dp
                  // 1080x2400 2,22
