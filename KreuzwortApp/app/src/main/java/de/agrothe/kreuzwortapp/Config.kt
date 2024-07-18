@@ -93,6 +93,7 @@ class Css(
     val PUZZLE_CELL_CHAR_CONTAINER: String,
     val PUZZLE_CELL_CHAR: String,
     val PUZZLE_CELL_CHAR_SOLVED: String,
+    val PUZZLE_CELL_CHAR_FINISHED: String,
     val PUZZLE_CELL_IDX_NUM_HOR: String,
     val PUZZLE_CELL_IDX_NUM_VER: String,
     val PUZZLE_LGND_IDX_NUM_HOR: String,
@@ -118,6 +119,8 @@ class Css(
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,
     val TRANSITION_DURATION: Float,
+    val ANIMATION_DURATION: Float,
+    val ANIMATION_ITER_CNT: String,
 )
 
 open class ColorPalletteConfig(

@@ -152,7 +152,8 @@ val CSS = fun CSSBuilder.(){
                 height=IDX_SCT_ROT_HGHT
                 transform.rotate(300.grad)
             }
-            fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()){
+            fun cellChar(pSel: String, pColr: Color,
+                    pIterCnt: String="0")= rule(pSel.cls()){
                 fontSize=7.0.vh
                 color=pColr
                 backgroundColor=Color.transparent
@@ -164,9 +165,14 @@ val CSS = fun CSSBuilder.(){
                 textAlign=TextAlign.center
                 transition("color", TRANSITION_DURATION.s,
                     Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
+                animation(name=PUZZLE_CELL_CHAR_FINISHED,
+                    duration=ANIMATION_DURATION.s,
+                    iterationCount=IterationCount(pIterCnt))
             }
             cellChar(PUZZLE_CELL_CHAR, colors.CELL_CHAR_COLR)
             cellChar(PUZZLE_CELL_CHAR_SOLVED, colors.PUZZLE_CELL_CHAR_SOLVED)
+            cellChar(PUZZLE_CELL_CHAR_FINISHED,
+                colors.PUZZLE_CELL_CHAR_SOLVED, ANIMATION_ITER_CNT)
         }
         media("only screen and (orientation: landscape)"){
             rule(PUZZLE_GRID.cls()){
@@ -279,7 +285,8 @@ val CSS = fun CSSBuilder.(){
                 height=IDX_SCT_ROT_HGHT
                 transform.rotate(300.grad)
             }
-            fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()){
+            fun cellChar(pSel: String, pColr: Color,
+                    pIterCnt: String="0")= rule(pSel.cls()){
                 fontSize=10.0.vh
                 color=pColr
                 backgroundColor=Color.transparent
@@ -291,9 +298,14 @@ val CSS = fun CSSBuilder.(){
                 textAlign=TextAlign.center
                 transition("color", TRANSITION_DURATION.s,
                     Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
+                animation(name=PUZZLE_CELL_CHAR_FINISHED,
+                    duration=ANIMATION_DURATION.s,
+                    iterationCount=IterationCount(pIterCnt))
             }
             cellChar(PUZZLE_CELL_CHAR, colors.CELL_CHAR_COLR)
             cellChar(PUZZLE_CELL_CHAR_SOLVED, colors.PUZZLE_CELL_CHAR_SOLVED)
+            cellChar(PUZZLE_CELL_CHAR_FINISHED,
+                colors.PUZZLE_CELL_CHAR_SOLVED, ANIMATION_ITER_CNT)
         }
         rule(LGND_TABLE.cls()){
             fontFamily="sans-serif"
@@ -359,7 +371,7 @@ val CSS = fun CSSBuilder.(){
             margin="auto"
             padding(LinearDimension("0.2vh"))
             paddingBottom=LinearDimension("1.5vh")
-            color=Color.black
+            color=gridLineColor.darken(40)
             fontWeight=FontWeight.lighter
             fontStyle=FontStyle.italic
         }

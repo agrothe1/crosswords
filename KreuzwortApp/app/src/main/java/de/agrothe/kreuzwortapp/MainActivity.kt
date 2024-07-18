@@ -11,6 +11,7 @@ import android.webkit.WebView.setWebContentsDebuggingEnabled
 import androidx.activity.ComponentActivity
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -26,6 +27,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.jodah.expiringmap.ExpiringMap
+import java.io.File
 import java.lang.ref.WeakReference
 import java.time.Duration
 import java.util.concurrent.TimeUnit
@@ -285,7 +287,7 @@ fun Application.configureTemplating(){
                  // 1080x2400 2,22
              }
         }
-//        staticResources("/js", "/js")
+        staticResources("/css", "/css")
         staticResources("/imgs", "/imgs")
     }
 }

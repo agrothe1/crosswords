@@ -1,0 +1,6 @@
+
+@keyframes puzzleCellCharFinished {
+    100% {
+        transform: rotateZ(400grad)
+    }
+}

@@ -23,9 +23,14 @@ class BodyTplt(val pNumSolvedGames: Int): Template<HTML>{
                 href="/styles.css"
                 type="text/css"
             }
+            link{
+                rel="stylesheet"
+                href="/css/anim.css"
+                type="text/css"
+            }
             /*
             link{
-                href="/Callbacsk.js"
+                href="/Callbacks.js"
                 type="text/javascript"
             }
              */
@@ -248,7 +253,13 @@ val scripts="""
             if(rpl.colSolved===true){
                 rowColSolved(pColId, '[id$="_'+pColIdx+'"]')
             }
-            if(rpl.puzzleSolved===true){showNewButton(d)}
+            if(rpl.puzzleSolved===true){
+                showNewButton(d)
+                d.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR_SOLVED}')
+                    .forEach((e)=>{
+                        e.classList.remove('${confCss.PUZZLE_CELL_CHAR_SOLVED}') 
+                        e.classList.add('${confCss.PUZZLE_CELL_CHAR_FINISHED}')})
+            }
         })
         ws.onopen=(ev)=>{ws.send(pWSData.replace("%",pValue||" "))}
     }
