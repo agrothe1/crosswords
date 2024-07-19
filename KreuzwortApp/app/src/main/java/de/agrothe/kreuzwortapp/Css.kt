@@ -2,6 +2,7 @@ package de.agrothe.kreuzwortapp
 
 import kotlinx.css.*
 import kotlinx.css.properties.*
+import kotlin.random.Random
 
 private val confCss=config.webApp.CSS
 
@@ -165,7 +166,7 @@ val CSS = fun CSSBuilder.(){
                 textAlign=TextAlign.center
                 transition("color", TRANSITION_DURATION.s,
                     Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
-                animation(name=PUZZLE_CELL_CHAR_FINISHED,
+                animation(name="${PUZZLE_CELL_CHAR_FINISHED}${(1..3).random()}",
                     duration=ANIMATION_DURATION.s,
                     iterationCount=IterationCount(pIterCnt))
             }
@@ -298,7 +299,7 @@ val CSS = fun CSSBuilder.(){
                 textAlign=TextAlign.center
                 transition("color", TRANSITION_DURATION.s,
                     Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
-                animation(name=PUZZLE_CELL_CHAR_FINISHED,
+                animation(name="${PUZZLE_CELL_CHAR_FINISHED}${(1..3).random()}",
                     duration=ANIMATION_DURATION.s,
                     iterationCount=IterationCount(pIterCnt))
             }
