@@ -270,7 +270,10 @@ val scripts="""
         ws.addEventListener("message",(ev)=>{
             JSON.parse(ev.data).showPlaceholders.forEach(
                 function(p){
-                    d.querySelector(p.selctr).placeholder=p.plcHldr}
+                    var c=d.querySelector(p.selctr)
+                    c.placeholder=p.plcHldr
+                    if(c.value!=p.plcHldr){c.value=''}
+                }
             )
         })
         ws.onopen=(ev)=>{ws.send(pWSData)}
