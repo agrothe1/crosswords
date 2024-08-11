@@ -16,7 +16,7 @@ class BodyTplt(val pNumSolvedGames: Int): Template<HTML>{
             meta{
                 charset="utf-8"
                 name="viewport"
-                content="height=device-height,width=device-width"
+                content="height=device-height,width=device-width" // todo initial-scale ?
             }
             link{
                 rel="stylesheet"

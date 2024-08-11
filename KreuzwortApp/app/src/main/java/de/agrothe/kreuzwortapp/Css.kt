@@ -368,6 +368,9 @@ val CSS = fun CSSBuilder.(){
         rule(PUZZLE_CELL_CHAR_CONTAINER.cls()){
             textAlign=TextAlign.center
         }
+        rule((PUZZLE_CELL_CHAR+":focus-within").cls()){
+            backgroundColor=Color.white
+        }
         rule(NUM_GAME.cls()){
             margin="auto"
             padding(LinearDimension("0.2vh"))

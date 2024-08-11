@@ -13,7 +13,7 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.KreuzwortApp"
             android:usesCleartextTraffic="true"
-            tools:targetApi="31">
+            tools:targetApi="34">
         <activity
                 android:name=".MainActivity"
                 android:exported="true"
