@@ -2,11 +2,10 @@ package de.agrothe.kreuzwortapp
 
 import kotlinx.css.*
 import kotlinx.css.properties.*
-import kotlin.random.Random
 
 private val confCss=config.webApp.CSS
 
-val NEW_GAME_BUTTON_STYLE = // no support for these attributes in kotlin.css
+const val NEW_GAME_BUTTON_STYLE = // no support for these attributes in kotlin.css
     "writing-mode:vertical-lr;text-orientation:upright"
 
 val CSS = fun CSSBuilder.(){

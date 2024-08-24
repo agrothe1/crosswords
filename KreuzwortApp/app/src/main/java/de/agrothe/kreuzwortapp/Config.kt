@@ -51,6 +51,7 @@ class WebAppConfig(
     val PORT: Int,
     val APP_URL: String,
     val WEB_SOCK_ENDPOINT: String,
+    val WEB_SOCK_URL: String,
     val WS_PING_PERIODS_SECS: Long,
     val SHARED_PREFS_NAME: String,
     val SHRD_PRFS_NUM_SLVD_GMES_CNT_KEY: String,
@@ -132,13 +133,14 @@ open class ColorPalletteConfig(
 
     val GRID_BORDER_COLR: Color = GRID_BORDER.toColor(),
     val GRID_LINES_COLR: Color = GRID_LINES.toColor(),
+    @Suppress("unused")
     val IDX_NUM_COLR: Color = IDX_NUM.toColor().darken(60),
     val CELL_CHAR_COLR: Color = CELL_CHAR.toColor().darken(20),
     val PUZZLE_CELL_CHAR_SOLVED: Color = CELL_CHAR_SOLVED.toColor(),
 )
     {
         companion object{
-            private fun String.toColor() = Color('#'+this)
+            private fun String.toColor() = Color("#$this")
         }
     }
 
@@ -146,6 +148,7 @@ data class AppConfig(
     val dict: ReadDictConfig,
     val puzzle: PuzzleConfig,
     val webApp: WebAppConfig,
+    @Suppress("ArrayInDataClass")
     val GENERATED_PUZZLES_DIR: Array<String>,
     val GENERATED_PUZZLE_SUFFX: String,
     val BUNDLE_KEY: String,

@@ -1,7 +1,6 @@
-package de.agrothe.crosswords
+package de.agrothe.kreuzwortapp
 
-import de.agrothe.crosswords.Axis.X
-import de.agrothe.crosswords.Axis.Y
+import de.agrothe.kreuzwortapp.Axis.*
 import de.agrothe.kreuzwortapp.MainActivity.Companion.appAssets
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.File
@@ -145,7 +144,7 @@ fun generate(pDimen: Int): Puzzle? =
             dict.words.filter{it.length == pDimen})
 
 fun main(){
-    val numPuzzls = 5
+    val numPuzzls = 1
     val dimen = 4
 
     (1..numPuzzls).forEach{

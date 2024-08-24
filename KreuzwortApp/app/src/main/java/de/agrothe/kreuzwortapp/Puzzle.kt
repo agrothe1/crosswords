@@ -143,7 +143,7 @@ class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
                             WSDataToSrvr(newGame=true))
                         onClick=
                 """ 
-                    let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
+                    let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
                     ws.onopen=(ev)=>{ws.send('${wsdata}')}
                 """.trimIndent()
                         gameButton(confWeb.I18n.NEW_GAME, true)
@@ -236,7 +236,7 @@ val scripts="""
     }
     function checkCellInput(pValue, pWSData, pRowIdx, pColIdx, pRowId, pColId){
         var d=document
-        var ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
+        var ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
         ws.addEventListener("message",(ev)=>{
             function rowColSolved(pId, pSel){
                 var l=d.getElementById(pId)
@@ -266,7 +266,7 @@ val scripts="""
     function showHelp(pWSData){                  
         var d=document
         showNewButton(d)
-        let ws=new WebSocket('${webAppConf.WEB_SOCK_ENDPOINT}')
+        let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
         ws.addEventListener("message",(ev)=>{
             JSON.parse(ev.data).showPlaceholders.forEach(
                 function(p){

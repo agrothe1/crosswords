@@ -1,4 +1,4 @@
-package de.agrothe.crosswords
+package de.agrothe.kreuzwortapp
 
 import de.agrothe.kreuzwortapp.MainActivity.Companion.appAssets
 

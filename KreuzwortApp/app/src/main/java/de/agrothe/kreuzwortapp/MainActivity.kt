@@ -11,7 +11,6 @@ import android.webkit.WebView.setWebContentsDebuggingEnabled
 import androidx.activity.ComponentActivity
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
-import io.ktor.http.content.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -22,6 +21,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
+import io.netty.handler.codec.http.websocketx.extensions.WebSocketServerExtension
 import kotlinx.css.CSSBuilder
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -71,11 +71,9 @@ fun readSolvedGamesCnt(): Int =
     sharedPrefs.getInt(confWeb.SHRD_PRFS_NUM_SLVD_GMES_CNT_KEY, 0)
 
 fun saveSolvedGamesCnt(pCnt: Int) =
-    sharedPrefs.let{prefs->
-        with(prefs.edit()){
-            putInt(confWeb.SHRD_PRFS_NUM_SLVD_GMES_CNT_KEY, pCnt)
-        apply() // persist changes
-    }
+    with(sharedPrefs.edit()){
+        putInt(confWeb.SHRD_PRFS_NUM_SLVD_GMES_CNT_KEY, pCnt)
+    apply() // persist changes
 }
 
 var restoredGame: Game? = null
