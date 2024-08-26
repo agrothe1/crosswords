@@ -49,6 +49,7 @@ class ReadDictConfig(
 
 class WebAppConfig(
     val PORT: Int,
+    val CERT_NAME: String,
     val APP_URL: String,
     val WEB_SOCK_ENDPOINT: String,
     val WEB_SOCK_URL: String,

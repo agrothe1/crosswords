@@ -4,13 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.AssetManager
+import android.net.http.SslError
 import android.os.Bundle
-import android.webkit.WebSettings
-import android.webkit.WebView
+import android.webkit.*
 import android.webkit.WebView.setWebContentsDebuggingEnabled
 import androidx.activity.ComponentActivity
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
+import io.ktor.network.tls.certificates.*
 import io.ktor.serialization.kotlinx.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -21,13 +22,11 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
-import io.netty.handler.codec.http.websocketx.extensions.WebSocketServerExtension
 import kotlinx.css.CSSBuilder
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.jodah.expiringmap.ExpiringMap
-import java.io.File
 import java.lang.ref.WeakReference
 import java.time.Duration
 import java.util.concurrent.TimeUnit
@@ -87,28 +86,47 @@ class MainActivity : ComponentActivity(){
         appAssets=assets
 
         logger.info{"web server starting..."}
-        server=embeddedServer(Netty, port=confWeb.PORT){
-            configureTemplating()
-            configureSockets()
-        }.start(wait=false)
+        confWeb.CERT_NAME.let{certName->
+            certName.toCharArray().let{certNameArr->
+                server=embeddedServer(Netty,
+                    environment=applicationEngineEnvironment{
+                        sslConnector(
+                            keyStore=buildKeyStore {
+                                certificate(certName){
+                                    password=certName
+                                    domains=listOf("localhost")
+                                }
+                            },
+                            keyAlias=certName,
+                            keyStorePassword={certNameArr},
+                            privateKeyPassword={certNameArr}
+                        )
+                        {port=confWeb.PORT}
+                    })
+                .apply{
+                    application.run{
+                        configureTemplating()
+                        configureSockets()
+                    }
+                }.start(wait=false)}}
         logger.info{"...web server started"}
 
-/*
         if(savedInstanceState!=null){
             //restoredGame = todo
-                savedInstanceState.getString(conf.BUNDLE_KEY)?.run{
-                    logger.debug{"onCreate: $this"}
-                    //Json.decodeFromString<Game>(this) todo
-                }
+            savedInstanceState.getString(conf.BUNDLE_KEY)?.run{
+                logger.debug{"onCreate: $this"}
+                //Json.decodeFromString<Game>(this) todo
+            }
             logger.debug{
                 "restored saved game: '${restoredGame?.puzzleInPlay}'"}
         }
-*/
+
         sharedPrefs = getSharedPreferences(
             conf.webApp.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
 
         webViewReference = WeakReference(
             WebView(this).apply{
+                webViewClient=SslWebView()
                 setContentView(this)
                 setWebContentsDebuggingEnabled(true)
                 with(settings){
@@ -293,4 +311,29 @@ fun Application.configureTemplating(){
 suspend inline fun ApplicationCall.respondCss(builder: CSSBuilder.() -> Unit){
     this.respondText(CSSBuilder().apply(builder).toString(),
         ContentType.Text.CSS)
+}
+
+class SslWebView(): WebViewClient(){
+    @SuppressLint("WebViewClientOnReceivedSslError")
+    override
+    fun onReceivedSslError(pView: WebView?, pHandler: SslErrorHandler,
+            pError: SslError?){
+        logger.debug{"SslError: $pError"}
+        pHandler.proceed()
+    }
+
+    override
+    fun onReceivedError(pView: WebView?,
+            pRequest: WebResourceRequest?, pError: WebResourceError?){
+        logger.debug{"onReceivedError: ${pError?.description}"}
+        super.onReceivedError(pView, pRequest, pError)
+    }
+
+    override
+    fun onReceivedClientCertRequest(pView: WebView?,
+        pRequest: ClientCertRequest)
+    {
+        logger.debug{"onReceivedClientCertRequest: $pRequest"}
+        super.onReceivedClientCertRequest(pView, pRequest)
+    }
 }
