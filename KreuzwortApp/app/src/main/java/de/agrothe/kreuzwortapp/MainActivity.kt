@@ -28,6 +28,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.jodah.expiringmap.ExpiringMap
 import java.lang.ref.WeakReference
+import java.security.PublicKey
 import java.time.Duration
 import java.util.concurrent.TimeUnit
 
@@ -86,17 +87,19 @@ class MainActivity : ComponentActivity(){
         appAssets=assets
 
         logger.info{"web server starting..."}
+        var myPubKey: PublicKey? = null
         confWeb.CERT_NAME.let{certName->
             certName.toCharArray().let{certNameArr->
                 server=embeddedServer(Netty,
                     environment=applicationEngineEnvironment{
                         sslConnector(
-                            keyStore=buildKeyStore {
+                            keyStore=buildKeyStore{
                                 certificate(certName){
                                     password=certName
                                     domains=listOf("localhost")
-                                }
-                            },
+                                    daysValid=confWeb.CERT_DAYS_VALID
+                                }}.apply{
+                                    myPubKey=getCertificate(certName).publicKey},
                             keyAlias=certName,
                             keyStorePassword={certNameArr},
                             privateKeyPassword={certNameArr}
@@ -108,7 +111,8 @@ class MainActivity : ComponentActivity(){
                         configureTemplating()
                         configureSockets()
                     }
-                }.start(wait=false)}}
+                }
+                .start(wait=false)}}
         logger.info{"...web server started"}
 
         if(savedInstanceState!=null){
@@ -126,7 +130,7 @@ class MainActivity : ComponentActivity(){
 
         webViewReference = WeakReference(
             WebView(this).apply{
-                webViewClient=SslWebView()
+                webViewClient=SslWebView(myPubKey)
                 setContentView(this)
                 setWebContentsDebuggingEnabled(true)
                 with(settings){
@@ -229,7 +233,6 @@ val puzzleCache: ExpiringMap<HashCode, PuzzleCacheEntry> = ExpiringMap.builder()
 fun Application.configureSockets(){
     install(WebSockets){
         pingPeriod=Duration.ofSeconds(confWeb.WS_PING_PERIODS_SECS)
-        //timeout=Duration.ofSeconds(15)
         maxFrameSize=Long.MAX_VALUE
         contentConverter=KotlinxWebsocketSerializationConverter(Json)
     }
@@ -313,19 +316,29 @@ suspend inline fun ApplicationCall.respondCss(builder: CSSBuilder.() -> Unit){
         ContentType.Text.CSS)
 }
 
-class SslWebView(): WebViewClient(){
+class SslWebView(private val pubKey: PublicKey?): WebViewClient(){
     @SuppressLint("WebViewClientOnReceivedSslError")
     override
     fun onReceivedSslError(pView: WebView?, pHandler: SslErrorHandler,
             pError: SslError?){
-        logger.debug{"SslError: $pError"}
-        pHandler.proceed()
+        logger.info{"onReceivedSslError: $pError"}
+        with(pHandler){
+            try{
+                pError?.certificate?.x509Certificate?.verify(pubKey)
+                logger.info{"onReceivedSslError: verified key ok"}
+                proceed()
+            }
+            catch (e: Exception){
+                logger.error{"onReceivedSslError, unverified key: $e"}
+            }
+            cancel()
+        }
     }
 
     override
     fun onReceivedError(pView: WebView?,
             pRequest: WebResourceRequest?, pError: WebResourceError?){
-        logger.debug{"onReceivedError: ${pError?.description}"}
+        logger.error{"onReceivedError: ${pError?.description}"}
         super.onReceivedError(pView, pRequest, pError)
     }
 
@@ -333,7 +346,7 @@ class SslWebView(): WebViewClient(){
     fun onReceivedClientCertRequest(pView: WebView?,
         pRequest: ClientCertRequest)
     {
-        logger.debug{"onReceivedClientCertRequest: $pRequest"}
+        logger.info{"onReceivedClientCertRequest: $pRequest"}
         super.onReceivedClientCertRequest(pView, pRequest)
     }
 }

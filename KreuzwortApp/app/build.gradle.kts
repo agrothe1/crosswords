@@ -11,10 +11,11 @@ android{
 
     defaultConfig{
         applicationId = "de.agrothe.kreuzwortapp"
-        minSdk=26
+        minSdk=29
+        //noinspection OldTargetApi
         targetSdk=34
-        versionCode=2
-        versionName="1.2"
+        versionCode=5
+        versionName="1.5"
 
         testInstrumentationRunner="androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables{
@@ -27,6 +28,7 @@ android{
             isMinifyEnabled=false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro")
+            isDebuggable=false
         }
     }
     compileOptions{
@@ -72,6 +74,7 @@ dependencies{
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.10.1")
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty-jvm:2.3.12")
+    /*implementation("io.ktor:ktor-server-jetty-jvm:2.3.12")*/
     implementation("io.github.config4k:config4k:0.6.0")
     implementation("org.jetbrains:kotlin-css-jvm:1.0.0-pre.156-kotlin-1.5.0")
     implementation("io.github.oshai:kotlin-logging-jvm:6.0.3")
