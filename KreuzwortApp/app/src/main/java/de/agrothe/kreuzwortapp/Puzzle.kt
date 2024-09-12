@@ -1,9 +1,12 @@
 package de.agrothe.kreuzwortapp
 
+import io.ktor.http.content.*
 import io.ktor.server.html.*
 import kotlinx.html.*
+import kotlinx.serialization.StringFormat
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.text.Format
 
 private val confCss=confWeb.CSS
 
@@ -112,7 +115,8 @@ class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
                             ?.forEach{legendEntry(it)}
                     }
             fun BUTTON.gameButton(pLabel: String, pShowImg: Boolean = false) =
-                table{tr{td(classes=NUM_GAME){
+                table{
+                    tr{td(classes=NUM_GAME){
                         style=NEW_GAME_BUTTON_STYLE
                         id=NUM_GAME_ID
                         +pNumSolvedGames.toString()
@@ -130,21 +134,30 @@ class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
                     button(classes=NEW_GAME){
                         id=SHOW_HELP_BUTTON_ID
                         hidden=false
-                        val wsdata = Json.encodeToString(
-                            WSDataToSrvr(showHelp=true,
-                                hashCode=puzzle.hashCode()))
+                        val wsdata=Json.encodeToString(
+                            WSDataToSrvr(
+                                showHelp=true,
+                                hashCode=puzzle.hashCode()
+                            )
+                        )
                         onClick="showHelp('$wsdata')"
                         gameButton(confWeb.I18n.SHOW_HELP)
                     }
                     button(classes=NEW_GAME){
                         id=NEW_GAME_BUTTON_ID
                         hidden=true
-                        val wsdata = Json.encodeToString(
-                            WSDataToSrvr(newGame=true))
+                        val wsdata=Json.encodeToString(
+                            WSDataToSrvr(newGame=true)
+                        )
                         onClick=
-                """ 
-                    let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
-                    ws.onopen=(ev)=>{ws.send('${wsdata}')}
+                            """
+                    if(${confWeb.IS_PLUS_VERSION})
+                        document.getElementById('$GLASS_LAYER')
+                            .style.display='grid'
+                    else{
+                        let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
+                        ws.onopen=(ev)=>{ws.send('${wsdata}')}
+                    }
                 """.trimIndent()
                         gameButton(confWeb.I18n.NEW_GAME, true)
                     }
@@ -192,6 +205,34 @@ class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
                                                 true)}
                             }}}
                         }
+                    }
+                    div(classes=GLASS_LAYER){
+                        id=GLASS_LAYER
+                        table(classes=MENU_LAYER){
+                            style=NEW_GAME_DIALOG_STYLE
+                            // todo
+                            listDimens()?.forEach{dimen->
+                                tr{td{
+                                    button(classes=MENU_LAYER_NEXT_BUTTON){
+                                        +String.format(
+                                            confWeb.I18n.PUZZLE_DIMEN_TMPLT,
+                                                dimen, dimen)
+                                    }
+                            }}}
+                        }
+                    }
+                    button(classes=NEW_GAME){
+                        id=NEW_GAME_BUTTON_ID
+                        hidden=true
+                        val wsdata=Json.encodeToString(
+                            WSDataToSrvr(newGame=true)
+                        )
+                        onClick=
+                            """
+                    let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
+                    ws.onopen=(ev)=>{ws.send('${wsdata}')}
+                """.trimIndent()
+                        gameButton(confWeb.I18n.NEW_GAME, true)
                     }
                 }
             }

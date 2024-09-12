@@ -107,6 +107,12 @@ fun Puzzle.save(): Puzzle =
 fun InputStream.readPuzzle(): Puzzle =
     reader().readLines().map{it.toCharArray()}.toTypedArray()
 
+fun listDimens(): List<String>? =
+    appAssets.list(
+        Path("", *config.GENERATED_PUZZLES_DIR).toString())?.map{
+            dir->dir.substringAfterLast('.')
+        }
+
 fun getRandom(pDimen: Int): Puzzle? = // todo
 //  File(Path("", *config.GENERATED_PUZZLES_DIR.plus(pDimen.toString()))
 //        .listDirectoryEntries().random().toString()).run{

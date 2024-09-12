@@ -1,20 +1,28 @@
 package de.agrothe.kreuzwortapp
 
+import android.print.PrintAttributes.Margins
+import androidx.compose.ui.text.style.TextAlign.Companion.Justify
 import kotlinx.css.*
 import kotlinx.css.properties.*
 
 private val confCss=config.webApp.CSS
 
-const val NEW_GAME_BUTTON_STYLE = // no support for these attributes in kotlin.css
+// no support for these attributes in kotlin.css
+const val NEW_GAME_BUTTON_STYLE =
     "writing-mode:vertical-lr;text-orientation:upright"
+const val NEW_GAME_DIALOG_STYLE =
+    "box-shadow:0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19)"
 
 val CSS = fun CSSBuilder.(){
-    fun String.cls() = ".$this"
+    fun String.cls()=".$this"
 
     with(confCss){
-        val colors = COLOR_PALETTES.random()
-        val gridBorderColor = colors.GRID_BORDER_COLR
-        val gridLineColor = colors.GRID_LINES_COLR
+        val colors=COLOR_PALETTES.random()
+        val gridBorderColor=colors.GRID_BORDER_COLR
+        val gridLineColor=colors.GRID_LINES_COLR
+
+        val NEW_GAME_BORDER_STYLE=
+            "0.2vh groove ${gridBorderColor.darken(20)}"
 
         rule("html, body"){
             //backgroundColor=Color.transparent // todo
@@ -37,7 +45,7 @@ val CSS = fun CSSBuilder.(){
             fontFamily="sans-serif"
             fontSize=2.6.vh
             margin="auto"
-            padding(LinearDimension("0.2vh"))
+            padding="0.2vh"
             lineHeight=LineHeight("2.0vh")
             fontWeight=FontWeight.w700
             color=gridBorderColor.darken(40)
@@ -77,7 +85,7 @@ val CSS = fun CSSBuilder.(){
                 gridColumnEnd=GridColumnEnd("4")
                 gridRowStart=GridRowStart("2")
                 gridRowEnd=GridRowEnd("3")
-                paddingTop=0.7.vh
+                padding="0.2vh"
             }
             fun lgndEntries(pSel: String, pTextDecoLine: TextDecorationLine,
                     pBorderBottomStyle: BorderStyle, pColor: Color)
@@ -372,16 +380,52 @@ val CSS = fun CSSBuilder.(){
         }
         rule(NUM_GAME.cls()){
             margin="auto"
-            padding(LinearDimension("0.2vh"))
+            padding="0.2vh"
             paddingBottom=LinearDimension("1.5vh")
             color=gridLineColor.darken(40)
             fontWeight=FontWeight.lighter
             fontStyle=FontStyle.italic
+            top=LinearDimension("0")
         }
-        rule(NEW_GAME_LABEL.cls()){
-            border="0.2vh groove ${gridLineColor.darken(50)}"
+        fun StyledElement.newGameBoder(){apply{
+            border=NEW_GAME_BORDER_STYLE
             borderRadius=0.8.vh
+        }}
+        rule(NEW_GAME_LABEL.cls()){
             padding="0.4vh"
+            newGameBoder()
+        }
+        rule(GLASS_LAYER.cls()){
+            display=Display.none
+            zIndex=1
+            position=Position.fixed
+            top=0.px
+            left=0.px
+            width=100.pct
+            height=100.pct
+            alignItems=Align.center
+            justifyItems=JustifyItems.center
+            alignContent=Align.center
+            justifyContent=JustifyContent.center
+        }
+        rule(MENU_LAYER.cls()){
+            newGameBoder()
+            borderWidth=0.4.vh
+            margin="none"
+            fontSize=2.7.vh
+            lineHeight=LineHeight("5.0vh")
+            color=gridBorderColor.darken(60)
+            alignContent=Align.center
+            width=87.pct
+            padding="1.0vh"
+            textAlign=TextAlign.center
+            backgroundColor=Color.white
+        }
+        rule(MENU_LAYER_NEXT_BUTTON.cls()){
+            newGameBoder()
+            nextButton()
+            padding="0.5vh"
+            whiteSpace=WhiteSpace.nowrap
         }
     }
 }

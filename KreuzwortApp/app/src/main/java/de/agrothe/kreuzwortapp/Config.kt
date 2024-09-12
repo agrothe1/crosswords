@@ -68,6 +68,7 @@ class WebAppConfig(
     val MAX_SYNMS: Int,
     val SYNMS_TOTAL_LNGTH_THRSHLD: Int,
     val HELP_PROBABILITY: Int,
+    val IS_PLUS_VERSION: Boolean,
 )
 
 class I18n(
@@ -75,6 +76,7 @@ class I18n(
     val SHOW_HELP: String,
     val HORIZONTAL: String,
     val VERTICAL: String,
+    val PUZZLE_DIMEN_TMPLT: String,
 )
 
 class Css(
@@ -86,6 +88,9 @@ class Css(
     val NEW_GAME_LABEL: String,
     val NUM_GAME: String,
     val NUM_GAME_ID: String,
+    val GLASS_LAYER: String,
+    val MENU_LAYER: String,
+    val MENU_LAYER_NEXT_BUTTON: String,
     val LGND_GRID_HORIZ: String,
     var LGND_GRID_VERT: String,
     var FIELD_GRID: String,
