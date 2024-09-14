@@ -31,6 +31,7 @@ import java.lang.ref.WeakReference
 import java.security.PublicKey
 import java.time.Duration
 import java.util.concurrent.TimeUnit
+import kotlin.math.log
 
 private val logger by lazy{KotlinLogging.logger{}}
 
@@ -75,6 +76,16 @@ fun saveSolvedGamesCnt(pCnt: Int) =
         putInt(confWeb.SHRD_PRFS_NUM_SLVD_GMES_CNT_KEY, pCnt)
     apply() // persist changes
 }
+
+fun readPuzzleDimen(): Int =
+    sharedPrefs.getInt(confWeb.SHRD_PRFS_PUZZLE_DIMEN_KEY,
+        config.puzzle.DEFAULT_PUZZLE_DIMEN)
+
+fun savePuzzleDimen(pCnt: Int) = // todo
+    with(sharedPrefs.edit()){
+        putInt(confWeb.SHRD_PRFS_PUZZLE_DIMEN_KEY, pCnt)
+        apply() // persist changes
+    }
 
 var restoredGame: Game? = null
 
@@ -148,7 +159,7 @@ class MainActivity : ComponentActivity(){
                     displayMetrics.density
                 logger.debug{"dpHeight: $dpHeight, dpWidth: $dpWidth"}
 
-                loadUrl(confWeb.APP_URL)
+                loadUrl(String.format(confWeb.APP_URL, readPuzzleDimen()))
             })
     }
 
@@ -191,7 +202,8 @@ typealias HashCode = Int
 @Serializable
 data class WSDataToSrvr(
     val inpChar: Char='#', val xPos: Int=0, val yPos: Int=0,
-    val hashCode: HashCode=0, val newGame: Boolean=false,
+    val hashCode: HashCode=0,
+    val newGame: Boolean=false, val dimen: Int,
     val showHelp: Boolean=false)
 
 @Serializable
@@ -257,9 +269,14 @@ fun Application.configureSockets(){
                     logger.debug{"ws data recvd: '$wsd'"}
                     if(wsd.showHelp){
                         send(Frame.Text(Json.encodeToString(wsd.getHelp())))
-                    }else if(wsd.newGame){
-                        webViewReference.get()?.apply{post{
-                            loadUrl(confWeb.APP_URL)
+                    }else if(wsd.newGame)
+                        wsd.dimen.let{dimen->
+                            savePuzzleDimen(dimen)
+                            webViewReference.get()?.apply{post{
+                                with(String.format(confWeb.APP_URL, dimen)){
+                            logger.debug{"ws data post load url: '$this'"}
+                                    loadUrl(this)
+                                }
                         }}
                     }else{
     puzzleCache[wsd.hashCode]?.let{wsd.apply{
@@ -300,11 +317,17 @@ fun Application.configureTemplating(){
             call.respondCss(CSS)
         }
         get("/puzzler"){
-             call.respondHtmlTemplate(BodyTplt(readSolvedGamesCnt())){
-                 puzzle
-                 // dph 866.2857 x dpw 411.42856 = 2,10 dp
-                 // 1080x2400 2,22
-             }
+            (call.request.queryParameters.get(confWeb.DIMEN_PARAM_NAME)?.toInt()
+                    ?: config.puzzle.DEFAULT_PUZZLE_DIMEN).let{dimen->
+                logger.debug{"dimenParamName:'$dimen'"}
+                call.respondHtmlTemplate(
+                    BodyTplt(readSolvedGamesCnt(), dimen)
+                ){
+                    puzzle
+                    // dph 866.2857 x dpw 411.42856 = 2,10 dp
+                    /* 1080x2400 2,22 */
+                }
+            }
         }
         staticResources("/css", "/css")
         staticResources("/imgs", "/imgs")

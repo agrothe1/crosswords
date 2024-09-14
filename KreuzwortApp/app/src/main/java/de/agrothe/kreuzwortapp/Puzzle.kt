@@ -1,16 +1,13 @@
 package de.agrothe.kreuzwortapp
 
-import io.ktor.http.content.*
 import io.ktor.server.html.*
 import kotlinx.html.*
-import kotlinx.serialization.StringFormat
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import java.text.Format
 
 private val confCss=confWeb.CSS
 
-class BodyTplt(val pNumSolvedGames: Int): Template<HTML>{
+class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int): Template<HTML>{
     val header = Placeholder<FlowContent>()
     val puzzle = TemplatePlaceholder<PuzzleTplt>()
     override fun HTML.apply(){
@@ -44,32 +41,32 @@ class BodyTplt(val pNumSolvedGames: Int): Template<HTML>{
                 insert(header)
             }
              */
-            insert(PuzzleTplt(pNumSolvedGames), puzzle)
+            insert(PuzzleTplt(pNumSolvedGames, pDimen), puzzle)
             script{unsafe{raw(scripts)}}
             //script(src="js/Callbacks.js"){}
         }}
 }
 
-class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
-    val dimen = 4 // todo
+class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int)
+        : Template<FlowContent>{
     private val entries = dict.entries
         .map{(key, values)
             ->Pair(key.uppercase(), values)}.toMap()
 
     private val puzzle: Puzzle =
         restoredGame?.puzzleInPlay
-            ?: getRandom(dimen)!!.map{row->row.map{it.uppercaseChar()}
+            ?: getRandom(pDimen)!!.map{row->row.map{it.uppercaseChar()}
                 .toCharArray()}.toTypedArray()
 
     init{
         if(restoredGame==null)
-            puzzleCache.put(puzzle.hashCode(),
-                PuzzleCacheEntry(puzzle, emptyPuzzle(dimen)))
+            puzzleCache[puzzle.hashCode()]=
+                PuzzleCacheEntry(puzzle, emptyPuzzle(pDimen))
         else
             restoredGame?.apply{
-                puzzleCache.put(puzzleGenerated.hashCode(),
-                    PuzzleCacheEntry(puzzleGenerated, puzzleInPlay))
-                    // todo mark solved
+                puzzleCache[puzzleGenerated.hashCode()]=
+                    PuzzleCacheEntry(puzzleGenerated, puzzleInPlay)
+                // todo mark solved
             }
     }
 
@@ -84,8 +81,8 @@ class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
                             else PUZZLE_CELL_IDX_NUM_VER)
                         {
                             dirImg(ornt,
-                                if(ornt == KeyDirct.NORMAL) 0 else dimen-1,
-                                pRowIdx, pColIdx, pIdxSelct, dimen,
+                                if(ornt == KeyDirct.NORMAL) 0 else pDimen-1,
+                                pRowIdx, pColIdx, pIdxSelct, pDimen,
                                 false, this)
                         }}
             fun TABLE.legendEntry(pSynm: String) =
@@ -136,7 +133,7 @@ class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
                         hidden=false
                         val wsdata=Json.encodeToString(
                             WSDataToSrvr(
-                                showHelp=true,
+                                showHelp=true, dimen=pDimen,
                                 hashCode=puzzle.hashCode()
                             )
                         )
@@ -147,7 +144,7 @@ class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
                         id=NEW_GAME_BUTTON_ID
                         hidden=true
                         val wsdata=Json.encodeToString(
-                            WSDataToSrvr(newGame=true)
+                            WSDataToSrvr(newGame=true, dimen=pDimen)
                         )
                         onClick=
                             """
@@ -177,13 +174,13 @@ class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
                                                 )
                                             td{legendEntries(it.synms,
                                                 rowIdx.lgndIdSuffxRow(),
-                                                rowIdx==dimen-1,
+                                                rowIdx==pDimen-1,
                                                 false)}
                             }}}
                         }
                     }
                     div(classes=FIELD_GRID){
-                        insert(PuzzleGrid(entries, puzzle, dimen, confWeb),
+                        insert(PuzzleGrid(entries, puzzle, pDimen, confWeb),
                             gridTmplt)
                     }
                     div(classes=LGND_GRID_VERT){
@@ -201,7 +198,7 @@ class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
                                                     IDX_SLCT_ROT_NORTH))
                                             td{legendEntries(it.synms,
                                                 colIdx.lgndIdSuffxCol(),
-                                                colIdx==dimen-1,
+                                                colIdx==pDimen-1,
                                                 true)}
                             }}}
                         }
@@ -214,6 +211,14 @@ class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
                             listDimens()?.forEach{dimen->
                                 tr{td{
                                     button(classes=MENU_LAYER_NEXT_BUTTON){
+                                        onClick=
+                                            """
+                            let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
+                            ws.onopen=(ev)=>{ws.send('${Json.encodeToString(
+                                        WSDataToSrvr(newGame=true, 
+                                            dimen=dimen.toInt())
+                                    )}')}
+                                            """.trimIndent()
                                         +String.format(
                                             confWeb.I18n.PUZZLE_DIMEN_TMPLT,
                                                 dimen, dimen)
@@ -225,7 +230,7 @@ class PuzzleTplt(val pNumSolvedGames: Int): Template<FlowContent>{
                         id=NEW_GAME_BUTTON_ID
                         hidden=true
                         val wsdata=Json.encodeToString(
-                            WSDataToSrvr(newGame=true)
+                            WSDataToSrvr(newGame=true, dimen=pDimen)
                         )
                         onClick=
                             """
@@ -268,6 +273,7 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
     }
 }
 
+@Suppress("SimplifiableCallChain")
 val scripts="""
     function showNewButton(pDoc){
         pDoc.getElementById('${confCss.SHOW_HELP_BUTTON_ID}')

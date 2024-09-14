@@ -6,6 +6,7 @@ import kotlinx.css.Color
 
 class PuzzleConfig(
     val ALLOW_DUPLICATES: Boolean,
+    val DEFAULT_PUZZLE_DIMEN: Int,
 )
 
 open class DictConfig(
@@ -52,11 +53,13 @@ class WebAppConfig(
     val CERT_NAME: String,
     val CERT_DAYS_VALID: Long,
     val APP_URL: String,
+    val DIMEN_PARAM_NAME: String,
     val WEB_SOCK_ENDPOINT: String,
     val WEB_SOCK_URL: String,
     val WS_PING_PERIODS_SECS: Long,
     val SHARED_PREFS_NAME: String,
     val SHRD_PRFS_NUM_SLVD_GMES_CNT_KEY: String,
+    val SHRD_PRFS_PUZZLE_DIMEN_KEY: String,
     val PUZZLE_CACHE_MAX_SIZE: Int,
     val PUZZLE_CACHE_EXPIRATION_MINS: Long,
     val DIRCTN_IMG: String,

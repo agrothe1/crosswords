@@ -56,7 +56,8 @@ override fun FlowContent.apply(){
             div(classes=PUZZLE_CELL_CHAR_CONTAINER){
                 val iD = getRowColIdx(pRowIdx, pColIdx)
                 val wsdata = Json.encodeToString(
-                    WSDataToSrvr('%', pRowIdx, pColIdx, pHashCode))
+                    WSDataToSrvr('%', pRowIdx, pColIdx, pHashCode,
+                        dimen=pDimen))
                 input(
                     classes=
                         if(puzzleCache.get(pHashCode)?.run{
