@@ -3,6 +3,7 @@ package de.agrothe.crosswords
 import de.agrothe.crosswords.Axis.X
 import de.agrothe.crosswords.Axis.Y
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.*
 import java.io.File
 import java.lang.System.currentTimeMillis
 import kotlin.io.path.*
@@ -126,16 +127,27 @@ fun generate(pDimen: Int): Puzzle? =
             dict.words.filter{it.length == pDimen})
 
 fun main(){
-    val numPuzzls = 4
+    val numPuzzls = 8
     val dimen = 5
+    val maxParallel = 8
 
-    (1..numPuzzls).forEach{
-        generate(dimen)?.run{
-            println("--> solution: $it")
-            print()
-            save()
+    fun gen(pTaskNum: Int){
+        (1..numPuzzls/maxParallel).forEach{
+            generate(dimen)?.run{
+                println("$pTaskNum --> solution: $it")
+                print()
+                save()
+            }
+        }}
+
+    runBlocking(Dispatchers.Default){
+        (1..maxParallel).map{taskNum->
+            launch{
+                gen(taskNum)
+            }
         }
     }
 }
+
 
 

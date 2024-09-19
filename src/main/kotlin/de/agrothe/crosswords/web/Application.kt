@@ -19,7 +19,6 @@ import kotlinx.serialization.json.Json
 import net.jodah.expiringmap.ExpiringMap
 import java.time.Duration
 import java.util.concurrent.TimeUnit
-import kotlinx.serialization.encodeToString
 
 fun main(args: Array<String>){
     //io.ktor.server.netty.EngineMain.main(args)
@@ -71,13 +70,12 @@ fun Application.configureSockets(){
             try{
                 for(frame in incoming){
                     val f = frame as? Frame.Text ?: continue
-                    val wsd=
-                        Json.decodeFromString<WSData>(f.readText())
+                    val wsd= Json.decodeFromString<WSData>(f.readText())
                     println(wsd)
                     puzzleCache.get(wsd.hashCode)?.let{
                         send(Frame.Text(
-                            (it.get(wsd.yPos).get(wsd.xPos).equals(
-                                wsd.inpChar, true)).toString()))
+                            it.get(wsd.yPos).get(wsd.xPos).equals(
+                                wsd.inpChar, true).toString()))
                     }
                 }
             }

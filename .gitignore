@@ -47,3 +47,4 @@ bin/
 /target/classes/
 /puzzles/generated/
 /src/main/resources/x
+/.kotlin/metadata/kotlinTransformedMetadataLibraries/org.jetbrains.kotlin-kotlin-stdlib-2.0.0-commonMain-2bbUHA.klib
