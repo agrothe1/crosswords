@@ -210,7 +210,10 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int)
                             // todo
                             listDimens()?.forEach{dimen->
                                 tr{td{
-                                    button(classes=MENU_LAYER_NEXT_BUTTON){
+                                    button(classes=
+                                        if(pDimen==dimen.toInt())
+                                                MENU_LAYER_NEXT_BUTTON_ACTIVE
+                                            else MENU_LAYER_NEXT_BUTTON){
                                         onClick=
                                             """
                             let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')

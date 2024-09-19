@@ -12,7 +12,7 @@
             android:roundIcon="@drawable/kreuzwort"
             android:supportsRtl="true"
             android:theme="@style/Theme.KreuzwortApp"
-            android:usesCleartextTraffic="true"
+            android:usesCleartextTraffic="false"
             tools:targetApi="34">
         <activity
                 android:name=".MainActivity"

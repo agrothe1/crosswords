@@ -12,7 +12,6 @@ android{
     defaultConfig{
         applicationId = "de.agrothe.kreuzwortapp"
         minSdk=29
-        //noinspection OldTargetApi
         targetSdk=34
         versionCode=6
         versionName="1.6"
@@ -23,12 +22,29 @@ android{
         }
     }
 
+    signingConfigs {
+        create("release"){
+            keyAlias="Kreuzwort"
+            keyPassword="Kreuzwort"
+            storeFile=file("/home/agr/Dev/src/crosswordsApp/KreuzwortApp/PLAYSTORE/keystore.jks")
+            storePassword="Kreuzwort"
+        }
+    }
+
     buildTypes{
         release{
-            isMinifyEnabled=false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),
+            proguardFiles(getDefaultProguardFile(
+                    "proguard-android-optimize.txt"),
                 "proguard-rules.pro")
             isDebuggable=false
+        }
+        getByName("release"){
+            isMinifyEnabled=false
+            isShrinkResources=false
+            proguardFiles(getDefaultProguardFile(
+                    "proguard-android-optimize.txt"),
+                "proguard-rules.pro")
+            signingConfig=signingConfigs.getByName("release")
         }
     }
     compileOptions{
@@ -57,7 +73,7 @@ dependencies{
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.5")
     implementation("androidx.activity:activity-compose:1.9.2")
-    implementation(platform("androidx.compose:compose-bom:2024.09.00"))
+    implementation(platform("androidx.compose:compose-bom:2024.09.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")

@@ -1,7 +1,5 @@
 package de.agrothe.kreuzwortapp
 
-import android.print.PrintAttributes.Margins
-import androidx.compose.ui.text.style.TextAlign.Companion.Justify
 import kotlinx.css.*
 import kotlinx.css.properties.*
 
@@ -421,11 +419,20 @@ val CSS = fun CSSBuilder.(){
             textAlign=TextAlign.center
             backgroundColor=Color.white
         }
-        rule(MENU_LAYER_NEXT_BUTTON.cls()){
+        fun StyledElement.menuLayerNextButton(){apply{
             newGameBoder()
             nextButton()
+            borderColor=gridLineColor
             padding="0.5vh"
             whiteSpace=WhiteSpace.nowrap
+        }}
+        rule(MENU_LAYER_NEXT_BUTTON.cls()){
+            menuLayerNextButton()
+        }
+        rule(MENU_LAYER_NEXT_BUTTON_ACTIVE.cls()){
+            menuLayerNextButton()
+            borderWidth=0.5.vh
+            fontWeight=FontWeight.w900
         }
     }
 }

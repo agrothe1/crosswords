@@ -31,7 +31,6 @@ import java.lang.ref.WeakReference
 import java.security.PublicKey
 import java.time.Duration
 import java.util.concurrent.TimeUnit
-import kotlin.math.log
 
 private val logger by lazy{KotlinLogging.logger{}}
 
@@ -59,9 +58,9 @@ data class Game(
         return true
     }
     override fun hashCode(): Int{
-        var result= puzzleGenerated.contentDeepHashCode()
-        result= 31*result + puzzleInPlay.contentDeepHashCode()
-        result= 31*result + dimen
+        var result=puzzleGenerated.contentDeepHashCode()
+        result=31*result+puzzleInPlay.contentDeepHashCode()
+        result=31*result+dimen
         return result
     }
 }

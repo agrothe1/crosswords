@@ -94,6 +94,7 @@ class Css(
     val GLASS_LAYER: String,
     val MENU_LAYER: String,
     val MENU_LAYER_NEXT_BUTTON: String,
+    val MENU_LAYER_NEXT_BUTTON_ACTIVE: String,
     val LGND_GRID_HORIZ: String,
     var LGND_GRID_VERT: String,
     var FIELD_GRID: String,
