@@ -7,7 +7,8 @@ import kotlinx.serialization.json.Json
 
 private val confCss=confWeb.CSS
 
-class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int): Template<HTML>{
+class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
+        val pExcluded: Collection<String>? = null): Template<HTML>{
     val header = Placeholder<FlowContent>()
     val puzzle = TemplatePlaceholder<PuzzleTplt>()
     override fun HTML.apply(){
@@ -41,13 +42,14 @@ class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int): Template<HTML>{
                 insert(header)
             }
              */
-            insert(PuzzleTplt(pNumSolvedGames, pDimen), puzzle)
+            insert(PuzzleTplt(pNumSolvedGames, pDimen, pExcluded), puzzle)
             script{unsafe{raw(scripts)}}
             //script(src="js/Callbacks.js"){}
         }}
 }
 
-class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int)
+class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
+    pExcludedPuzzleNames: Collection<String>?)
         : Template<FlowContent>{
     private val entries = dict.entries
         .map{(key, values)
@@ -55,7 +57,8 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int)
 
     private val puzzle: Puzzle =
         restoredGame?.puzzleInPlay
-            ?: getRandom(pDimen)!!.map{row->row.map{it.uppercaseChar()}
+            ?: getRandom(pDimen, pExcludedPuzzleNames)!!
+                .map{row->row.map{it.uppercaseChar()}
                 .toCharArray()}.toTypedArray()
 
     init{

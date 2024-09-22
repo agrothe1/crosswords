@@ -113,18 +113,23 @@ fun listDimens(): List<String>? =
             dir->dir.substringAfterLast('.')
         }
 
-fun getRandom(pDimen: Int): Puzzle? = // todo
+fun getRandom(pDimen: Int, pExcludes: Collection<String>?): Puzzle? =
 //  File(Path("", *config.GENERATED_PUZZLES_DIR.plus(pDimen.toString()))
 //        .listDirectoryEntries().random().toString()).run{
     Path("",
             *config.GENERATED_PUZZLES_DIR.plus(pDimen.toString())).toString()
         .let{path->
-            appAssets.list(path)?.random()?.let{fname->
-                appAssets.open(Path(path, fname).toString()).let{
-                    logger.info{"reading puzzle: $fname"}
-                    it.readPuzzle()
+            appAssets.list(path)
+                ?.filterNot{(pExcludes!=null && pExcludes.contains(it)).apply{
+                    if(this==true) logger.info{"excluded puzzle: $it"}
+                }}
+                ?.random()?.let{fname->
+                    savePuzzleHistory(fname)
+                    appAssets.open(Path(path, fname).toString()).let{
+                        logger.info{"reading puzzle: $fname"}
+                        it.readPuzzle()
+                    }
                 }
-            }
         }?.randomMirror()
 
 fun emptyPuzzle(pDimen: Int): Puzzle =
@@ -150,8 +155,8 @@ fun generate(pDimen: Int): Puzzle? =
             dict.words.filter{it.length == pDimen})
 
 fun main(){
-    val numPuzzls = 1
-    val dimen = 4
+    val numPuzzls = 10
+    val dimen = 5
 
     (1..numPuzzls).forEach{
         generate(dimen)?.run{

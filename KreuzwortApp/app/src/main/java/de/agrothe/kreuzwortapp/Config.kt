@@ -59,6 +59,8 @@ class WebAppConfig(
     val WS_PING_PERIODS_SECS: Long,
     val SHARED_PREFS_NAME: String,
     val SHRD_PRFS_NUM_SLVD_GMES_CNT_KEY: String,
+    val SHRD_PRFS_PUZZLE_HISTORY_KEY: String,
+    val SHRD_PRFS_PUZZLE_HISTORY_SIZE: Int,
     val SHRD_PRFS_PUZZLE_DIMEN_KEY: String,
     val PUZZLE_CACHE_MAX_SIZE: Int,
     val PUZZLE_CACHE_EXPIRATION_MINS: Long,

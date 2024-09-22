@@ -30,6 +30,7 @@ import net.jodah.expiringmap.ExpiringMap
 import java.lang.ref.WeakReference
 import java.security.PublicKey
 import java.time.Duration
+import java.util.LinkedList
 import java.util.concurrent.TimeUnit
 
 private val logger by lazy{KotlinLogging.logger{}}
@@ -73,8 +74,54 @@ fun readSolvedGamesCnt(): Int =
 fun saveSolvedGamesCnt(pCnt: Int) =
     with(sharedPrefs.edit()){
         putInt(confWeb.SHRD_PRFS_NUM_SLVD_GMES_CNT_KEY, pCnt)
-    apply() // persist changes
+        apply() // persist changes
+    }
+
+@Serializable
+data class GameHistoryEntry(
+    val puzzleId: String,
+    val timeStamp: Long)
+{
+    constructor(pPuzzleId: String) :
+        this(pPuzzleId, System.currentTimeMillis())
 }
+
+fun readPuzzleHistory(): List<GameHistoryEntry> =
+    try{
+        sharedPrefs.getStringSet(confWeb.SHRD_PRFS_PUZZLE_HISTORY_KEY,
+                mutableSetOf<String>())
+            ?.map{Json.decodeFromString<GameHistoryEntry>(it)}
+            ?.sortedBy{it.timeStamp}
+            ?.mapIndexed{idx, elm->
+                logger.debug{"read from history $idx: '$elm'"}
+                elm}
+            .orEmpty()
+    }
+    catch(e: Exception){
+        logger.error{"failed 'readPuzzleHistory' '$e'"}
+        emptyList()
+    }
+
+fun savePuzzleHistory(pId: String) =
+    try{
+        with(sharedPrefs.edit()){
+            putStringSet(confWeb.SHRD_PRFS_PUZZLE_HISTORY_KEY,
+                readPuzzleHistory()
+                    .take(confWeb.SHRD_PRFS_PUZZLE_HISTORY_SIZE-1)
+                    .toMutableList()
+                    .apply{add(0, GameHistoryEntry(pId))}
+                    .map{Json.encodeToString(it)}
+                    .toMutableSet()
+                    .apply{forEachIndexed{idx, elm->
+                        logger.debug{"saved to history $idx: '$elm'"}}
+                    }
+            )
+            apply() // persist changes
+        }
+    }
+    catch(e: Exception){
+        logger.error{"failed 'savePuzzleHistory' '$e'"}
+    }
 
 fun readPuzzleDimen(): Int =
     sharedPrefs.getInt(confWeb.SHRD_PRFS_PUZZLE_DIMEN_KEY,
@@ -135,7 +182,7 @@ class MainActivity : ComponentActivity(){
                 "restored saved game: '${restoredGame?.puzzleInPlay}'"}
         }
 
-        sharedPrefs = getSharedPreferences(
+        sharedPrefs=getSharedPreferences(
             conf.webApp.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
 
         webViewReference = WeakReference(
@@ -320,7 +367,8 @@ fun Application.configureTemplating(){
                     ?: config.puzzle.DEFAULT_PUZZLE_DIMEN).let{dimen->
                 logger.debug{"dimenParamName:'$dimen'"}
                 call.respondHtmlTemplate(
-                    BodyTplt(readSolvedGamesCnt(), dimen)
+                    BodyTplt(readSolvedGamesCnt(), dimen,
+                        readPuzzleHistory().map{it.puzzleId})
                 ){
                     puzzle
                     // dph 866.2857 x dpw 411.42856 = 2,10 dp
