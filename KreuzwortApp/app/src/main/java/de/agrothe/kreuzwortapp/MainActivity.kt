@@ -30,7 +30,6 @@ import net.jodah.expiringmap.ExpiringMap
 import java.lang.ref.WeakReference
 import java.security.PublicKey
 import java.time.Duration
-import java.util.LinkedList
 import java.util.concurrent.TimeUnit
 
 private val logger by lazy{KotlinLogging.logger{}}
@@ -329,7 +328,7 @@ fun Application.configureSockets(){
         logger.debug{"inpChar: '$inpChar'"}
         it.puzzleInPlay[xPos][yPos]=inpChar
         it.puzzleGenerated[xPos][yPos]
-            .equals(inpChar, true)
+            .equals(inpChar,    true)
                 .let{correctChar->
                     if(correctChar){
                         it.puzzleGenerated.getStringAt(Axis.X, xPos).equals(
@@ -344,8 +343,8 @@ fun Application.configureSockets(){
                                 && it.puzzleGenerated
                                     .sameContent(it.puzzleInPlay)).apply{
                                         if(this) readSolvedGamesCnt().run{
-                                           (this+1).let{
-                                               saveSolvedGamesCnt(it)}}}
+                                            saveSolvedGamesCnt(this+1)
+                                        }}
                         ))))
                             }
                         }
@@ -363,7 +362,7 @@ fun Application.configureTemplating(){
             call.respondCss(CSS)
         }
         get("/puzzler"){
-            (call.request.queryParameters.get(confWeb.DIMEN_PARAM_NAME)?.toInt()
+            (call.request.queryParameters[confWeb.DIMEN_PARAM_NAME]?.toInt()
                     ?: config.puzzle.DEFAULT_PUZZLE_DIMEN).let{dimen->
                 logger.debug{"dimenParamName:'$dimen'"}
                 call.respondHtmlTemplate(

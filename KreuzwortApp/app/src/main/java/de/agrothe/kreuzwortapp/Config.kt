@@ -49,6 +49,8 @@ class ReadDictConfig(
     }
 
 class WebAppConfig(
+    val IS_PLUS_VERSION: Boolean,
+
     val PORT: Int,
     val CERT_NAME: String,
     val CERT_DAYS_VALID: Long,
@@ -73,7 +75,6 @@ class WebAppConfig(
     val MAX_SYNMS: Int,
     val SYNMS_TOTAL_LNGTH_THRSHLD: Int,
     val HELP_PROBABILITY: Int,
-    val IS_PLUS_VERSION: Boolean,
 )
 
 class I18n(
