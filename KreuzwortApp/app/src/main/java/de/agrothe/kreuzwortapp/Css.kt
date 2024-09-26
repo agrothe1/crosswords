@@ -434,5 +434,26 @@ val CSS = fun CSSBuilder.(){
             borderWidth=0.5.vh
             fontWeight=FontWeight.w900
         }
+        rule(MENU_FIELD_SET_ENTRY.cls()){
+            position=Position.relative
+            borderStyle=BorderStyle.none
+            margin="0"
+            padding="0"
+            lineHeight=LineHeight("3.7vh")
+            textAlign=TextAlign.left
+        }
+        rule("""${MENU_FIELD_SET_ENTRY.cls()}
+                | input[type="radio"]""".trimMargin()){
+            appearance=Appearance.none
+            newGameBoder()
+            nextButton()
+            borderRadius=50.pct
+            width=1.9.vh
+            height=width
+        }
+        rule("""${MENU_FIELD_SET_ENTRY.cls()}
+                | input[type="radio"]:checked""".trimMargin()){
+            borderWidth=0.5.vh
+        }
     }
 }

@@ -327,10 +327,8 @@ fun Application.configureSockets(){
                         puzzleCache[wsd.hashCode]?.let{pc->wsd.apply{
                             logger.debug{"inpChar: '$inpChar'"}
                             pc.puzzleInPlay[xPos][yPos]=inpChar
-                            pc.puzzleGenerated[xPos][yPos]
-                                .equals(inpChar, true)
-                            .let{correctChar->
-                                if(correctChar){
+                            if(pc.puzzleGenerated[xPos][yPos]
+                                .equals(inpChar, true)){
                             (pc.puzzleGenerated.getStringAt(Axis.X, xPos)==
                                 pc.puzzleInPlay.getStringAt(Axis.X, xPos))
                             .let{correctRow->
@@ -346,8 +344,9 @@ fun Application.configureSockets(){
                                             if(this) readSolvedGamesCnt().run{
                                                 saveSolvedGamesCnt(this+1)
                                                     }}
-                                ))))
-                        }}}}}}
+                                    )
+                                )))
+                        }}}}}
                     }
                 }
             }

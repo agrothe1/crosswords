@@ -4,6 +4,10 @@ import com.typesafe.config.ConfigFactory
 import io.github.config4k.extract
 import kotlinx.css.Color
 
+enum class PuzzleType{
+    SCHWEDEN, SCHUETTEL
+}
+
 class PuzzleConfig(
     val ALLOW_DUPLICATES: Boolean,
     val DEFAULT_PUZZLE_DIMEN: Int,
@@ -83,6 +87,11 @@ class I18n(
     val HORIZONTAL: String,
     val VERTICAL: String,
     val PUZZLE_DIMEN_TMPLT: String,
+    var SCHUETTEL: String,
+    var SCHWEDEN: String,
+    val PUZZLE_TYPES: Map<PuzzleType, String> =
+        mapOf(PuzzleType.SCHWEDEN to SCHWEDEN,
+            PuzzleType.SCHUETTEL to SCHUETTEL),
 )
 
 class Css(
@@ -90,6 +99,8 @@ class Css(
     val CELL_GRID: String,
     val SHOW_HELP_BUTTON_ID: String,
     val NEW_GAME_BUTTON_ID: String,
+    val PUZZLE_TYPE_RADIO_GROUP_NAME: String,
+    val MENU_FIELD_SET_ENTRY: String,
     val NEW_GAME: String,
     val NEW_GAME_LABEL: String,
     val NUM_GAME: String,

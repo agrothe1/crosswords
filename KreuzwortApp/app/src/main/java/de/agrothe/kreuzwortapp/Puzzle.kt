@@ -1,6 +1,7 @@
 package de.agrothe.kreuzwortapp
 
 import io.ktor.server.html.*
+import kotlinx.css.fieldset
 import kotlinx.html.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -49,6 +50,7 @@ class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
 }
 
 class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
+    /*val pType: PuzzleType=PuzzleType.SCHWEDEN,*/
     pExcludedPuzzleNames: Collection<String>?)
         : Template<FlowContent>{
     private val entries = dict.entries
@@ -208,29 +210,7 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                     }
                     div(classes=GLASS_LAYER){
                         id=GLASS_LAYER
-                        table(classes=MENU_LAYER){
-                            style=NEW_GAME_DIALOG_STYLE
-                            // todo
-                            listDimens()?.forEach{dimen->
-                                tr{td{
-                                    button(classes=
-                                        if(pDimen==dimen.toInt())
-                                                MENU_LAYER_NEXT_BUTTON_ACTIVE
-                                            else MENU_LAYER_NEXT_BUTTON){
-                                        onClick=
-                                            """
-                            let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
-                            ws.onopen=(ev)=>{ws.send('${Json.encodeToString(
-                                        WSDataToSrvr(newGame=true, 
-                                            dimen=dimen.toInt())
-                                    )}')}
-                                            """.trimIndent()
-                                        +String.format(
-                                            confWeb.I18n.PUZZLE_DIMEN_TMPLT,
-                                                dimen, dimen)
-                                    }
-                            }}}
-                        }
+                        menu(confCss)
                     }
                     button(classes=NEW_GAME){
                         id=NEW_GAME_BUTTON_ID
@@ -248,6 +228,51 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                 }
             }
         }
+    }
+
+    fun DIV.menu(pCss: Css){
+        table(classes=pCss.MENU_LAYER){
+            style=NEW_GAME_DIALOG_STYLE
+            tr{td{
+                table{
+                    //legend(classes="menuFieldSetLegend"){+"Rätsel"}
+                    pCss.PUZZLE_TYPE_RADIO_GROUP_NAME.let{gName->
+                        PuzzleType.entries.forEachIndexed{pIdx, pType->
+                            tr(classes= confCss.MENU_FIELD_SET_ENTRY){td{
+                                input(type=InputType.radio){
+                                    id=gName+pIdx
+                                    name=gName
+                                    checked=(pIdx == 0) // todo
+                                    //value=pType.name
+                                }}
+                                td{label{
+                                    htmlFor=gName+pIdx
+                                    +confWeb.I18n.PUZZLE_TYPES.getOrDefault(
+                                        pType, pType.toString())
+                                }}
+                        }}
+                    }
+                }}
+            }
+            listDimens()?.forEach{dimen->
+                tr{td{
+                    button(classes=
+                        if(pDimen==dimen.toInt())
+                            pCss.MENU_LAYER_NEXT_BUTTON_ACTIVE
+                        else pCss.MENU_LAYER_NEXT_BUTTON){
+                        onClick=
+                            """
+                            let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
+                            ws.onopen=(ev)=>{ws.send(
+                                '${Json.encodeToString(WSDataToSrvr(
+                                    newGame=true, dimen=dimen.toInt()))
+                                }')}
+                            """.trimIndent()
+                            +String.format(
+                                confWeb.I18n.PUZZLE_DIMEN_TMPLT,
+                                dimen, dimen)
+                    }
+        }}}}
     }
 }
 
