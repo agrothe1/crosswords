@@ -325,38 +325,37 @@ fun Application.configureSockets(){
             try{
                 for(frame in incoming){
                     val f = frame as? Frame.Text ?: continue
-                    val wsd=Json.decodeFromString<WSDataToSrvr>(f.readText())
-                    logger.debug{"ws data recvd: '$wsd'"}
-                    if(wsd.showHelp){
-                        send(Frame.Text(Json.encodeToString(wsd.getHelp())))
-                    }else if(wsd.newGame)
-                        wsd.dimen.let{dimen->
+                    Json.decodeFromString<WSDataToSrvr>(f.readText()).run{
+                        logger.debug{"ws data recvd: '$this'"}
+                        if(showHelp){
+                            send(Frame.Text(Json.encodeToString(getHelp())))
+                        }else if(newGame){
                             savePuzzleDimen(dimen)
-                            savePuzzleType(PuzzleType.valueOf(wsd.puzzleType))
+                            savePuzzleType(PuzzleType.valueOf(puzzleType))
                             webViewReference.get()?.apply{post{
                                 with(String.format(confWeb.APP_URL,
-                                    wsd.dimen, wsd.puzzleType)){
-                                    logger.debug{
-                                        "ws data post load url: '$this'"}
-                                    loadUrl(this)
+                                    dimen, puzzleType)){
+                                        logger.debug{
+                                            "ws data post load url: '$this'"}
+                                        loadUrl(this)
                             }}}}
-                    else{
-                        puzzleCache[wsd.hashCode]?.let{pc->wsd.apply{
-                            logger.debug{"inpChar: '$inpChar'"}
-                            pc.puzzleInPlay[xPos][yPos]=inpChar
-                            if(pc.puzzleGenerated[xPos][yPos]
-                                .equals(inpChar, true)){
-                            (pc.puzzleGenerated.getStringAt(Axis.X, xPos)==
-                                pc.puzzleInPlay.getStringAt(Axis.X, xPos))
-                            .let{correctRow->
-                                (pc.puzzleGenerated.getStringAt(Axis.Y, yPos)==
-                                    pc.puzzleInPlay.getStringAt(Axis.Y, yPos))
+                        else{
+                            puzzleCache[hashCode]?.run{
+                                logger.debug{"inpChar: '$inpChar'"}
+                                puzzleInPlay[xPos][yPos]=inpChar
+                                if(puzzleGenerated[xPos][yPos]
+                                    .equals(inpChar, true)){
+                                (puzzleGenerated.getStringAt(Axis.X, xPos)==
+                                    puzzleInPlay.getStringAt(Axis.X, xPos))
+                                        .let{correctRow->
+                                (puzzleGenerated.getStringAt(Axis.Y, yPos)==
+                                    puzzleInPlay.getStringAt(Axis.Y, yPos))
                             .let{correctCol->
                                 send(Frame.Text(Json.encodeToString(
                                     WSDataFromSrvr(correctRow,
                                         correctCol, (correctRow && correctCol
-                                            && pc.puzzleGenerated
-                                                .sameContent(pc.puzzleInPlay))
+                                            && puzzleGenerated
+                                                .sameContent(puzzleInPlay))
                                                     .apply{
                                             if(this) readSolvedGamesCnt().run{
                                                 saveSolvedGamesCnt(this+1)

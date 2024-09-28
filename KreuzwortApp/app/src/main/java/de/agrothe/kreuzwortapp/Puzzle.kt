@@ -98,8 +98,8 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                             td{+it}
                     }
                 }
-            fun TD.legendEntries(pSynms: DictSynms?, pId: String,
-                    pLast: Boolean, pHoriz: Boolean) =
+            fun TD.legendEntries(pWord: CharArray, pSynms: DictSynmsOrnt,
+                    pId: String, pLast: Boolean, pHoriz: Boolean) =
                 table(classes=
                     (if(pHoriz)LGND_ENTRIES_HOR else LGND_ENTRIES_VER)
                         +if(pLast) " ${
@@ -108,13 +108,16 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                         else "")
                     {
                         id=pId
-                        pSynms?.shuffled()?.take(confWeb.MAX_SYNMS)
-                            ?.foldIndexed(mutableListOf<String>()){
+                        (if(pPuzzleType==PuzzleType.SCHWEDEN)
+                            pSynms.synms.shuffled().take(confWeb.MAX_SYNMS)
+                        else listOf(pWord.toList()
+                                .shuffled().joinToString("")))
+                            .foldIndexed(mutableListOf<String>()){
                                 idx, acc, syn->
                                     if(idx==0 || acc.sumOf{it.length}+syn.length
                                             < confWeb.SYNMS_TOTAL_LNGTH_THRSHLD)
                                         acc.add(syn); acc}
-                            ?.forEach{legendEntry(it)}
+                            .forEach{legendEntry(it)}
                     }
 
             fun BUTTON.gameButton(pLabel: String, pShowImg: Boolean = false) =
@@ -170,15 +173,15 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                                 th(classes=LGND_TABLE_HEADER_HOR)
                                     {colSpan="2"; +confWeb.I18n.HORIZONTAL}
                             }
-                            puzzle.forEachIndexed{rowIdx, _->
+                            puzzle.forEachIndexed{rowIdx, horWord->
                                 tr{
                                     entries[puzzle.getStringAt(Axis.X, rowIdx)]
-                                        ?.let{
-                                            legendIdx(rowIdx, 0, it,
+                                        ?.let{synms->
+                                            legendIdx(rowIdx, 0, synms,
                                                 Pair(IDX_SLCT_ROT_WEST,
                                                     IDX_SLCT_ROT_EAST)
                                                 )
-                                            td{legendEntries(it.synms,
+                                            td{legendEntries(horWord, synms,
                                                 rowIdx.lgndIdSuffxRow(),
                                                 rowIdx==pDimen-1,
                                                 false)}
@@ -197,16 +200,19 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                             }
                             puzzle.forEachIndexed{colIdx, _->
                                 tr{
+                                    puzzle.getStringAt(Axis.Y, colIdx)
+                                        .let{vertWord->
                                     entries[puzzle.getStringAt(Axis.Y, colIdx)]
-                                        ?.let{
-                                            legendIdx(0, colIdx, it,
+                                        ?.let{synms->
+                                            legendIdx(0, colIdx, synms,
                                                 Pair(IDX_SLCT_ROT_SOUTH,
                                                     IDX_SLCT_ROT_NORTH))
-                                            td{legendEntries(it.synms,
-                                                colIdx.lgndIdSuffxCol(),
+                                            td{legendEntries(
+                                                vertWord.toCharArray(),
+                                                synms, colIdx.lgndIdSuffxCol(),
                                                 colIdx==pDimen-1,
                                                 true)}
-                            }}}
+                            }}}}
                         }
                     }
                     div(classes=GLASS_LAYER){
