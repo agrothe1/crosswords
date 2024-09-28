@@ -1,7 +1,6 @@
 package de.agrothe.kreuzwortapp
 
 import io.ktor.server.html.*
-import kotlinx.css.fieldset
 import kotlinx.html.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -9,7 +8,8 @@ import kotlinx.serialization.json.Json
 private val confCss=confWeb.CSS
 
 class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
-        val pExcluded: Collection<String>? = null): Template<HTML>{
+        val pExcluded: Collection<String>? = null,
+        val pPuzzleType: PuzzleType): Template<HTML>{
     val header = Placeholder<FlowContent>()
     val puzzle = TemplatePlaceholder<PuzzleTplt>()
     override fun HTML.apply(){
@@ -43,15 +43,15 @@ class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
                 insert(header)
             }
              */
-            insert(PuzzleTplt(pNumSolvedGames, pDimen, pExcluded), puzzle)
+            insert(PuzzleTplt(pNumSolvedGames, pDimen, pExcluded,
+                pPuzzleType), puzzle)
             script{unsafe{raw(scripts)}}
             //script(src="js/Callbacks.js"){}
         }}
 }
 
 class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
-    /*val pType: PuzzleType=PuzzleType.SCHWEDEN,*/
-    pExcludedPuzzleNames: Collection<String>?)
+    pExcludedPuzzleNames: Collection<String>?, val pPuzzleType: PuzzleType)
         : Template<FlowContent>{
     private val entries = dict.entries
         .map{(key, values)
@@ -116,6 +116,7 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                                         acc.add(syn); acc}
                             ?.forEach{legendEntry(it)}
                     }
+
             fun BUTTON.gameButton(pLabel: String, pShowImg: Boolean = false) =
                 table{
                     tr{td(classes=NUM_GAME){
@@ -236,17 +237,18 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
             tr{td{
                 table{
                     //legend(classes="menuFieldSetLegend"){+"Rätsel"}
-                    pCss.PUZZLE_TYPE_RADIO_GROUP_NAME.let{gName->
+                    pCss.PUZZLE_TYPE_RADIO_GROUP_NAME.let{grpName->
                         PuzzleType.entries.forEachIndexed{pIdx, pType->
-                            tr(classes= confCss.MENU_FIELD_SET_ENTRY){td{
-                                input(type=InputType.radio){
-                                    id=gName+pIdx
-                                    name=gName
-                                    checked=(pIdx == 0) // todo
-                                    //value=pType.name
-                                }}
+                            tr(classes=confCss.MENU_FIELD_SET_ENTRY){
+                                td{pType.name.let{typeName->
+                                    input(type=InputType.radio){
+                                        id=grpName+pIdx
+                                        name=grpName
+                                        checked=typeName==pPuzzleType.name
+                                        value=typeName
+                                }}}
                                 td{label{
-                                    htmlFor=gName+pIdx
+                                    htmlFor=grpName+pIdx
                                     +confWeb.I18n.PUZZLE_TYPES.getOrDefault(
                                         pType, pType.toString())
                                 }}
@@ -260,17 +262,13 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                         if(pDimen==dimen.toInt())
                             pCss.MENU_LAYER_NEXT_BUTTON_ACTIVE
                         else pCss.MENU_LAYER_NEXT_BUTTON){
+                        val wsdata=Json.encodeToString(WSDataToSrvr(
+                            newGame=true, dimen=dimen.toInt(),
+                            puzzleType=webAppConf.PUZZLE_TYPE_PLACEHOLDER))
                         onClick=
-                            """
-                            let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
-                            ws.onopen=(ev)=>{ws.send(
-                                '${Json.encodeToString(WSDataToSrvr(
-                                    newGame=true, dimen=dimen.toInt()))
-                                }')}
-                            """.trimIndent()
-                            +String.format(
-                                confWeb.I18n.PUZZLE_DIMEN_TMPLT,
-                                dimen, dimen)
+                            """newGame('$wsdata')""".trimIndent()
+                        +String.format(
+                            confWeb.I18n.PUZZLE_DIMEN_TMPLT, dimen, dimen)
                     }
         }}}}
     }
@@ -306,6 +304,19 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
 
 @Suppress("SimplifiableCallChain")
 val scripts="""
+    function newGame(pWSData){
+        function getGameType(){
+            for(let t of document.getElementsByName(
+                '${confCss.PUZZLE_TYPE_RADIO_GROUP_NAME}'))
+            {
+                if(t.checked){return t.value}
+            }
+            return '${PuzzleType.SCHWEDEN.name}'
+        }
+        let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
+        ws.onopen=(ev)=>{ws.send(pWSData.replace(
+            "${webAppConf.PUZZLE_TYPE_PLACEHOLDER}", getGameType()))}
+    }
     function showNewButton(pDoc){
         pDoc.getElementById('${confCss.SHOW_HELP_BUTTON_ID}')
             .style.display='none'

@@ -11,7 +11,11 @@ enum class PuzzleType{
 class PuzzleConfig(
     val ALLOW_DUPLICATES: Boolean,
     val DEFAULT_PUZZLE_DIMEN: Int,
-)
+    DEFAULT_PUZZLE_TYPE_STR: String
+){
+    val DEFAULT_PUZZLE_TYPE =
+        PuzzleType.valueOf(DEFAULT_PUZZLE_TYPE_STR.uppercase())
+}
 
 open class DictConfig(
     val LEGAL_KEY_CHARS: Regex,
@@ -60,6 +64,7 @@ class WebAppConfig(
     val CERT_DAYS_VALID: Long,
     val APP_URL: String,
     val DIMEN_PARAM_NAME: String,
+    val TYPE_PARAM_NAME: String,
     val WEB_SOCK_ENDPOINT: String,
     val WEB_SOCK_URL: String,
     val WS_PING_PERIODS_SECS: Long,
@@ -68,6 +73,7 @@ class WebAppConfig(
     val SHRD_PRFS_PUZZLE_HISTORY_KEY: String,
     val SHRD_PRFS_PUZZLE_HISTORY_SIZE: Int,
     val SHRD_PRFS_PUZZLE_DIMEN_KEY: String,
+    val SHRD_PRFS_PUZZLE_TYPE: String,
     val PUZZLE_CACHE_MAX_SIZE: Int,
     val PUZZLE_CACHE_EXPIRATION_MINS: Long,
     val DIRCTN_IMG: String,
@@ -79,6 +85,7 @@ class WebAppConfig(
     val MAX_SYNMS: Int,
     val SYNMS_TOTAL_LNGTH_THRSHLD: Int,
     val HELP_PROBABILITY: Int,
+    val PUZZLE_TYPE_PLACEHOLDER: String,
 )
 
 class I18n(

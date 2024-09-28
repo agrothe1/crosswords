@@ -76,6 +76,18 @@ fun saveSolvedGamesCnt(pCnt: Int) =
         apply() // persist changes
     }
 
+fun readPuzzleType(): PuzzleType =
+    sharedPrefs.getString(confWeb.SHRD_PRFS_PUZZLE_TYPE,
+            PuzzleType.SCHWEDEN.name)
+        ?.let{PuzzleType.valueOf(it)} ?: PuzzleType.SCHWEDEN
+
+
+fun savePuzzleType(pType: PuzzleType) =
+    with(sharedPrefs.edit()){
+        putString(confWeb.SHRD_PRFS_PUZZLE_TYPE, pType.name)
+        apply() // persist changes
+    }
+
 @Serializable
 data class GameHistoryEntry(
     val puzzleId: String,
@@ -204,7 +216,8 @@ class MainActivity : ComponentActivity(){
                     displayMetrics.density
                 logger.debug{"dpHeight: $dpHeight, dpWidth: $dpWidth"}
 
-                loadUrl(String.format(confWeb.APP_URL, readPuzzleDimen()))
+                loadUrl(String.format(confWeb.APP_URL, readPuzzleDimen(),
+                    readPuzzleType()))
             })
     }
 
@@ -246,10 +259,11 @@ typealias HashCode = Int
 
 @Serializable
 data class WSDataToSrvr(
-    val inpChar: Char='#', val xPos: Int=0, val yPos: Int=0,
-    val hashCode: HashCode=0,
-    val newGame: Boolean=false, val dimen: Int,
-    val showHelp: Boolean=false)
+    val inpChar: Char='#', val xPos: Int=-1, val yPos: Int=-1,
+    val hashCode: HashCode=-1,
+    val newGame: Boolean=false, val dimen: Int=-1,
+    val showHelp: Boolean=false,
+    val puzzleType: String="NOT SET")
 
 @Serializable
 data class WSDataFromSrvrPlcHldrs(
@@ -261,7 +275,8 @@ data class WSDataFromSrvrPlcHldrs(
 data class WSDataFromSrvr(
     val rowSolved: Boolean=false, val colSolved: Boolean=false,
     val puzzleSolved: Boolean=false,
-    val showPlaceholders: Array<WSDataFromSrvrPlcHldrs>?=null)
+    val showPlaceholders: Array<WSDataFromSrvrPlcHldrs>?=null,
+    val puzzleType: PuzzleType=PuzzleType.SCHWEDEN)
 
 data class PuzzleCacheEntry(
     val puzzleGenerated: Puzzle,
@@ -317,8 +332,10 @@ fun Application.configureSockets(){
                     }else if(wsd.newGame)
                         wsd.dimen.let{dimen->
                             savePuzzleDimen(dimen)
+                            savePuzzleType(PuzzleType.valueOf(wsd.puzzleType))
                             webViewReference.get()?.apply{post{
-                                with(String.format(confWeb.APP_URL, dimen)){
+                                with(String.format(confWeb.APP_URL,
+                                    wsd.dimen, wsd.puzzleType)){
                                     logger.debug{
                                         "ws data post load url: '$this'"}
                                     loadUrl(this)
@@ -363,18 +380,22 @@ fun Application.configureTemplating(){
             call.respondCss(CSS)
         }
         get("/puzzler"){
-            (call.request.queryParameters[confWeb.DIMEN_PARAM_NAME]?.toInt()
-                    ?: config.puzzle.DEFAULT_PUZZLE_DIMEN).let{dimen->
-                logger.debug{"dimenParamName:'$dimen'"}
+            call.request.queryParameters.let{params->
+                (params[confWeb.DIMEN_PARAM_NAME]?.toInt()
+                        ?: conf.puzzle.DEFAULT_PUZZLE_DIMEN).let{dimen->
+                    (params[confWeb.TYPE_PARAM_NAME]
+                        ?: conf.puzzle.DEFAULT_PUZZLE_TYPE.name).let{type->
+                logger.debug{"dimenParamName:'$dimen', typeParamName: '$type'"}
                 call.respondHtmlTemplate(
                     BodyTplt(readSolvedGamesCnt(), dimen,
-                        readPuzzleHistory().map{it.puzzleId})
+                        readPuzzleHistory().map{it.puzzleId},
+                        PuzzleType.valueOf(type.uppercase()))
                 ){
                     puzzle
                     // dph 866.2857 x dpw 411.42856 = 2,10 dp
                     /* 1080x2400 2,22 */
                 }
-            }
+            }}}
         }
         staticResources("/css", "/css")
         staticResources("/imgs", "/imgs")
