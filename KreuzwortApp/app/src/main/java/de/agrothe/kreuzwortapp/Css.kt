@@ -55,18 +55,20 @@ val CSS = fun CSSBuilder.(){
                 gridTemplateColumns=GridTemplateColumns(
                     LinearDimension("4fr"), LinearDimension("4fr"),
                     LinearDimension("1fr"))
-                gridTemplateRows=GridTemplateRows(
-                    LinearDimension("8fr"), LinearDimension("14fr"))
             }
             rule(LGND_GRID_HORIZ.cls()){
+                display=Display.grid
                 gridRowStart=GridRowStart("1")
                 gridColumnStart=GridColumnStart("1")
                 gridColumnEnd=GridColumnEnd("2")
+                alignSelf=Align.selfStart
             }
             rule(LGND_GRID_VERT.cls()){
+                display=Display.grid
                 gridRowStart=GridRowStart("1")
                 gridColumnStart=GridColumnStart("2")
                 gridColumnEnd=GridColumnEnd("3")
+                alignSelf=Align.selfStart
                 marginLeft=LinearDimension.auto
                 marginRight=LinearDimension("0")
             }
@@ -79,6 +81,7 @@ val CSS = fun CSSBuilder.(){
                 marginRight=1.0.vh
             }
             rule(FIELD_GRID.cls()){
+                display=Display.grid
                 gridColumnStart=GridColumnStart("1")
                 gridColumnEnd=GridColumnEnd("4")
                 gridRowStart=GridRowStart("2")
@@ -111,7 +114,7 @@ val CSS = fun CSSBuilder.(){
             lgndEntriesDir(LGND_ENTRIES_VER, gridBorderColor.darken(70))
             rule(LGND_TABLE.cls()){
                 fontSize=2.5.vh
-                paddingTop=2.vh
+                paddingTop=0.5.vh
                 fontWeight=FontWeight.w700
             }
             fun lgndTableHdr(pSel: String, pTop: LinearDimension, pColor: Color)
@@ -193,6 +196,7 @@ val CSS = fun CSSBuilder.(){
                 gridColumnEnd=GridColumnEnd("2")
                 gridRowStart=GridRowStart("1")
                 gridRowEnd=GridRowEnd("2")
+                //display=Display.grid
             }
             rule(LGND_GRID_VERT.cls()){
                 gridColumnStart=GridColumnStart("2")
@@ -200,6 +204,7 @@ val CSS = fun CSSBuilder.(){
                 gridRowStart=GridRowStart("1")
                 gridRowEnd=GridRowEnd("2")
                 marginRight=LinearDimension("0")
+                //display=Display.grid
             }
             rule(FIELD_GRID.cls()){
                 gridColumnStart=GridColumnStart("3")
