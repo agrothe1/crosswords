@@ -153,7 +153,8 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                         id=NEW_GAME_BUTTON_ID
                         hidden=true
                         val wsdata=Json.encodeToString(
-                            WSDataToSrvr(newGame=true, dimen=pDimen)
+                            WSDataToSrvr(newGame=true, dimen=pDimen,
+                                puzzleType=pPuzzleType.name)
                         )
                         onClick=
                             """

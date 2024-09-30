@@ -1,8 +1,6 @@
 package de.agrothe.kreuzwortapp
 
-import java.io.File
-
-//import de.agrothe.kreuzwortapp.MainActivity.Companion.appAssets
+import de.agrothe.kreuzwortapp.MainActivity.Companion.appAssets
 
 typealias DictWord = String
 typealias DictSynms = Collection<String>
@@ -31,8 +29,8 @@ class Dict(conf: ReadDictConfig){
 }
 
 fun readDictFile(pConf: ReadDictConfig): DictEntry =
-   File(pConf.DICT_FILE_NAME).useLines{line-> // todo generify
-    //appAssets.open(pConf.DICT_FILE_NAME).reader().useLines{line->
+   //File(pConf.DICT_FILE_NAME).useLines{line-> // todo generify
+    appAssets.open(pConf.DICT_FILE_NAME).reader().useLines{line->
        line.parseDict(pConf)
    }
 

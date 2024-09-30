@@ -216,7 +216,9 @@ class MainActivity : ComponentActivity(){
                     displayMetrics.density
                 logger.debug{"dpHeight: $dpHeight, dpWidth: $dpWidth"}
 
-                loadUrl(String.format(confWeb.APP_URL, readPuzzleDimen(),
+                loadUrl(String.format(confWeb.APP_URL,
+                    (if(confWeb.IS_PLUS_VERSION) readPuzzleDimen()
+                        else conf.puzzle.DEFAULT_PUZZLE_DIMEN),
                     readPuzzleType()))
             })
     }
@@ -325,21 +327,21 @@ fun Application.configureSockets(){
             try{
                 for(frame in incoming){
                     val f = frame as? Frame.Text ?: continue
-                    Json.decodeFromString<WSDataToSrvr>(f.readText()).run{
+                    Json.decodeFromString<WSDataToSrvr>(f.readText()).let{wsd->
                         logger.debug{"ws data recvd: '$this'"}
-                        if(showHelp){
-                            send(Frame.Text(Json.encodeToString(getHelp())))
-                        }else if(newGame){
-                            savePuzzleDimen(dimen)
-                            savePuzzleType(PuzzleType.valueOf(puzzleType))
+                        if(wsd.showHelp){
+                            send(Frame.Text(Json.encodeToString(wsd.getHelp())))
+                        }else if(wsd.newGame){
+                            savePuzzleDimen(wsd.dimen)
+                            savePuzzleType(PuzzleType.valueOf(wsd.puzzleType))
                             webViewReference.get()?.apply{post{
                                 with(String.format(confWeb.APP_URL,
-                                    dimen, puzzleType)){
+                                    wsd.dimen, wsd.puzzleType)){
                                         logger.debug{
                                             "ws data post load url: '$this'"}
                                         loadUrl(this)
                             }}}}
-                        else{
+                        else{wsd.run{
                             puzzleCache[hashCode]?.run{
                                 logger.debug{"inpChar: '$inpChar'"}
                                 puzzleInPlay[xPos][yPos]=inpChar
@@ -362,7 +364,7 @@ fun Application.configureSockets(){
                                                     }}
                                     )
                                 )))
-                        }}}}}
+                        }}}}}}
                     }
                 }
             }
