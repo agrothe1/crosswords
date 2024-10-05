@@ -131,6 +131,7 @@ class Css(
     val PUZZLE_CELL_IDX_NUM_VER: String,
     val PUZZLE_LGND_IDX_NUM_HOR: String,
     val PUZZLE_LGND_IDX_NUM_VER: String,
+    val PUZZLE_CELL_GRID_IDX_BACKGRD: String,
     val IDX_SLCT_ROT_EAST: String,
     val IDX_SLCT_ROT_WEST: String,
     val IDX_SLCT_ROT_SOUTH: String,

@@ -81,15 +81,11 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
             fun TR.legendIdx(pRowIdx: Int, pColIdx: Int, pSynms: DictSynmsOrnt?,
                     pIdxSelct: Pair<String, String>) =
                 pSynms?.ornt.let{ornt->
-                    td(classes=if(ornt == KeyDirct.NORMAL)
-                            PUZZLE_CELL_IDX_NUM_HOR
-                            else PUZZLE_CELL_IDX_NUM_VER)
-                        {
-                            dirImg(ornt,
-                                if(ornt == KeyDirct.NORMAL) 0 else pDimen-1,
-                                pRowIdx, pColIdx, pIdxSelct, pDimen,
-                                false, this)
-                        }}
+                    td{dirImg(ornt,
+                        if(ornt == KeyDirct.NORMAL) 0 else pDimen-1,
+                        pRowIdx, pColIdx, pIdxSelct, pDimen,
+                        false, this)
+                    }}
             fun TABLE.legendEntry(pSynm: String) =
                 tr{
                     td{b{+Entities.middot}}
@@ -292,17 +288,17 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
                     puzzle.forEachIndexed{rowIdx, row->
                         tr(GRID_TABLE_ROW){
                             row.forEachIndexed{colIdx, char->
-                                td(GRID_TABLE_COL +' '+
-                                        TABLE_CELL_BACKGROUND
-                                            +setOf(1,2).random()){
+                                (TABLE_CELL_BACKGROUND+setOf(1,2).random())
+                                    .let{bckgdColor->
+                                td(GRID_TABLE_COL +' '+ bckgdColor){
                                     insert(GridCell(rowIdx, colIdx, char,
                                         pEntries[
                                             puzzle.getStringAt(Axis.X, rowIdx)],
                                         pEntries[
                                             puzzle.getStringAt(Axis.Y, colIdx)],
-                                        pDimen, puzzle.hashCode()),
+                                        pDimen, puzzle.hashCode(), bckgdColor),
                                             cellTmplt)
-                                }
+                                }}
                             }
             }}}}
         }

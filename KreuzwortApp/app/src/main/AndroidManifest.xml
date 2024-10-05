@@ -28,7 +28,8 @@
                 android:exported="true"
                 android:theme="@style/Theme.KreuzwortApp"
                 android:configChanges="orientation|screenSize">
-            <!-- todo: disable configChanges and implement restore from bundle? -->
+            <!-- todo: disable configChanges and implement restore from bundle?
+                no, it is handled automatically with this setting -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

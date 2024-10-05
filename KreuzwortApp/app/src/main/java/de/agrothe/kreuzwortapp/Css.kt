@@ -18,9 +18,18 @@ val CSS = fun CSSBuilder.(){
         val colors=COLOR_PALETTES.random()
         val gridBorderColor=colors.GRID_BORDER_COLR
         val gridLineColor=colors.GRID_LINES_COLR
-
+        val tableCellBackgroundColor1=Color.floralWhite.lighten((1..3)
+            .random())//.changeAlpha((84..90).random()*0.01)
+        val tableCellBackgroundColor2=Color.antiqueWhite.lighten((5..7)
+            .random())//.changeAlpha((91..94).random()*0.01)
         val NEW_GAME_BORDER_STYLE=
             "0.2vh groove ${gridBorderColor.darken(20)}"
+        val PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE1=
+            "radial-gradient(circle at center," +
+                    "${tableCellBackgroundColor1} 0%,transparent 200%)"
+        val PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE2=
+            "radial-gradient(circle at center," +
+                    "${tableCellBackgroundColor2} 0%,transparent 200%)"
 
         rule("html, body"){
             //backgroundColor=Color.transparent // todo
@@ -121,7 +130,8 @@ val CSS = fun CSSBuilder.(){
                     = rule(pSel.cls()){
                 paddingTop=pTop
                 textAlign=TextAlign.left
-                textDecoration=TextDecoration(setOf(TextDecorationLine.underline))
+                textDecoration=
+                    TextDecoration(setOf(TextDecorationLine.underline))
                 color=pColor.darken(65)
             }
             lgndTableHdr(LGND_TABLE_HEADER_HOR, 0.vh, gridBorderColor)
@@ -135,6 +145,8 @@ val CSS = fun CSSBuilder.(){
                 fontSize=LinearDimension(pLineHeight)
                 fontWeight=FontWeight.w800
                 color=pColor.darken(50)
+                zIndex=1
+                opacity=0.8
             }
             cellIdxNum(PUZZLE_CELL_IDX_NUM_HOR, "3vh",
                 gridLineColor)
@@ -163,7 +175,11 @@ val CSS = fun CSSBuilder.(){
             }
             fun cellChar(pSel: String, pColr: Color,
                     pIterCnt: String="0")= rule(pSel.cls()){
-                fontSize=7.0.vh
+                position=Position.absolute
+                top=50.pct
+                left=50.pct
+                transform.translate(-50.pct, -50.pct)
+                fontSize=15.vh
                 color=pColr
                 backgroundColor=Color.transparent
                 borderStyle=BorderStyle.none
@@ -174,7 +190,8 @@ val CSS = fun CSSBuilder.(){
                 textAlign=TextAlign.center
                 transition("color", TRANSITION_DURATION.s,
                     Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
-                animation(name="${PUZZLE_CELL_CHAR_FINISHED}${(1..3).random()}",
+                animation(
+                    name="${PUZZLE_CELL_CHAR_FINISHED}${(1..3).random()}",
                     duration=ANIMATION_DURATION.s,
                     iterationCount=IterationCount(pIterCnt))
             }
@@ -256,7 +273,8 @@ val CSS = fun CSSBuilder.(){
                     = rule(pSel.cls()){
                 paddingTop=pTop
                 textAlign=TextAlign.left
-                textDecoration=TextDecoration(setOf(TextDecorationLine.underline))
+                textDecoration=
+                    TextDecoration(setOf(TextDecorationLine.underline))
                 color=pColor.darken(65)
             }
             lgndTableHdr(LGND_TABLE_HEADER_HOR, 0.vh, gridBorderColor)
@@ -275,9 +293,11 @@ val CSS = fun CSSBuilder.(){
                 gridLineColor)
             cellIdxNum(PUZZLE_CELL_IDX_NUM_VER, "5vh", "5vh",
                 gridBorderColor)
-            cellIdxNum(PUZZLE_LGND_IDX_NUM_HOR, "3.8vh","4.4vh",
+            cellIdxNum(
+                PUZZLE_LGND_IDX_NUM_HOR, "3.8vh","4.4vh",
                 gridLineColor)
-            cellIdxNum(PUZZLE_LGND_IDX_NUM_VER, "3.8vh","4.4vh",
+            cellIdxNum(
+                PUZZLE_LGND_IDX_NUM_VER, "3.8vh","4.4vh",
                 gridBorderColor)
             val IDX_SCT_ROT_HGHT = 3.4.vh
             rule(IDX_SLCT_ROT_SOUTH.cls()){
@@ -309,7 +329,8 @@ val CSS = fun CSSBuilder.(){
                 textAlign=TextAlign.center
                 transition("color", TRANSITION_DURATION.s,
                     Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
-                animation(name="${PUZZLE_CELL_CHAR_FINISHED}${(1..3).random()}",
+                animation(
+                    name="${PUZZLE_CELL_CHAR_FINISHED}${(1..3).random()}",
                     duration=ANIMATION_DURATION.s,
                     iterationCount=IterationCount(pIterCnt))
             }
@@ -326,6 +347,7 @@ val CSS = fun CSSBuilder.(){
             wordWrap=WordWrap.breakWord
         }
         rule(CELL_GRID.cls()){
+            position=Position.relative
             display=Display.grid
             gridTemplateColumns=GridTemplateColumns(
                 LinearDimension("3fr"))
@@ -353,8 +375,7 @@ val CSS = fun CSSBuilder.(){
             borderColor=gridLineColor
         }
         rule((TABLE_CELL_BACKGROUND+"1").cls()){
-            backgroundColor=Color.floralWhite.lighten((1..3).random())
-                //.changeAlpha((84..90).random()*0.01)
+            backgroundColor=tableCellBackgroundColor1
         }
         /*
         rule((TABLE_CELL_BACKGROUND+"1").cls()
@@ -364,8 +385,7 @@ val CSS = fun CSSBuilder.(){
         }
          */
         rule((TABLE_CELL_BACKGROUND+"2").cls()){
-            backgroundColor=Color.antiqueWhite.lighten((5..7).random())
-                //.changeAlpha((91..94).random()*0.01)
+            backgroundColor=tableCellBackgroundColor2
         }
         rule("::placeholder"){
             color=gridLineColor.desaturate(25)
@@ -374,6 +394,13 @@ val CSS = fun CSSBuilder.(){
         rule(PUZZLE_CELL_GRID_IDX.cls()){
             paddingTop=0.4.vh
             paddingLeft=0.4.vh
+            zIndex=1
+        }
+        rule(PUZZLE_CELL_GRID_IDX_BACKGRD+"1".cls()){
+            background=PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE1
+        }
+        rule(PUZZLE_CELL_GRID_IDX_BACKGRD+"2".cls()){
+            background=PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE2
         }
         rule(PUZZLE_CELL_CHAR_CONTAINER.cls()){
             textAlign=TextAlign.center
@@ -400,7 +427,7 @@ val CSS = fun CSSBuilder.(){
         }
         rule(GLASS_LAYER.cls()){
             display=Display.none
-            zIndex=1
+            zIndex=2
             position=Position.fixed
             top=0.px
             left=0.px

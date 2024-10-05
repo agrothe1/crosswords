@@ -15,31 +15,36 @@ fun Int.lgndIdSuffxCol() = "${cssConf.LGND_ID_SUFFX_COL}$this"
 fun Css.dirImg(
         pDirct: KeyDirct?,
         pIdx: Int, pRowIdx: Int, pColIdx: Int, pRot: Pair<String, String>,
-        pDimen: Int, pHorizntl: Boolean, pParentCnt: FlowContent)
+        pDimen: Int, pHorizntl: Boolean, pParentCnt: FlowContent,
+        pBckgdColor: String="", pIsLegend: Boolean=false)
     {
         pParentCnt.apply{
             (pRot.first==IDX_SLCT_ROT_SOUTH).let{isVert->
-                span(if(pHorizntl){
+                span(
+                    if(pHorizntl){
                         if(isVert) PUZZLE_CELL_IDX_NUM_HOR
                         else PUZZLE_CELL_IDX_NUM_VER}
-                    else if(isVert) PUZZLE_LGND_IDX_NUM_HOR
-                         else PUZZLE_LGND_IDX_NUM_VER)
+                    else
+                        if(isVert) PUZZLE_LGND_IDX_NUM_HOR
+                        else PUZZLE_LGND_IDX_NUM_VER)
                 {
                     Pair(pDirct, pIdx).also{
                         if(it==Pair(KeyDirct.NORMAL, 0)
-                                || it==Pair(KeyDirct.REVERSED, pDimen-1)){
-                            +(if(isVert)
-                                pColIdx else pRowIdx).inc().toString()
-                            img(classes=if(pDirct==KeyDirct.NORMAL)
-                                    pRot.first else pRot.second,
-                                src=webAppConf.DIRCTN_IMG)
+                                || it==Pair(KeyDirct.REVERSED, pDimen-1))
+                            {span(if(pIsLegend) ""
+                                    else " $pBckgdColor"){
+                                +(if(isVert)
+                                    pColIdx else pRowIdx).inc().toString()
+                                img(classes=if(pDirct==KeyDirct.NORMAL)
+                                        pRot.first else pRot.second,
+                                    src=webAppConf.DIRCTN_IMG)}
                         } else span(classes=pRot.first){+Entities.nbsp}
             }}}
     }}
 
 class GridCell(val pRowIdx: Int, val pColIdx: Int, val pChar: Char,
     val pWordAtX: DictSynmsOrnt?, val pWordAtY: DictSynmsOrnt?,
-    val pDimen: Int, val pHashCode: HashCode)
+    val pDimen: Int, val pHashCode: HashCode, val pBckgdColor: String)
         : Template<FlowContent>
 {
 override fun FlowContent.apply(){
@@ -48,7 +53,7 @@ override fun FlowContent.apply(){
             fun idx(pDirct: KeyDirct?, pIdx: Int, pRot: Pair<String, String>){
                 div(classes=PUZZLE_CELL_GRID_IDX){
                         dirImg(pDirct, pIdx, pRowIdx, pColIdx, pRot, pDimen,
-                    true, this)
+                    true,  this, pBckgdColor)
                 }
             }
             idx(pWordAtY?.ornt, pRowIdx,

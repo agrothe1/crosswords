@@ -183,6 +183,7 @@ class MainActivity : ComponentActivity(){
                 .start(wait=false)}}
         logger.info{"...web server started"}
 
+        /* not needed
         if(savedInstanceState!=null){
             //restoredGame = todo
             savedInstanceState.getString(conf.BUNDLE_KEY)?.run{
@@ -192,6 +193,7 @@ class MainActivity : ComponentActivity(){
             logger.debug{
                 "restored saved game: '${restoredGame?.puzzleInPlay}'"}
         }
+        */
 
         sharedPrefs=getSharedPreferences(
             conf.webApp.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
@@ -215,11 +217,13 @@ class MainActivity : ComponentActivity(){
                 val dpWidth = displayMetrics.widthPixels /
                     displayMetrics.density
                 logger.debug{"dpHeight: $dpHeight, dpWidth: $dpWidth"}
-
-                loadUrl(String.format(confWeb.APP_URL,
-                    (if(confWeb.IS_PLUS_VERSION) readPuzzleDimen()
-                        else conf.puzzle.DEFAULT_PUZZLE_DIMEN),
-                    readPuzzleType()))
+                confWeb.IS_PLUS_VERSION.let{
+                    loadUrl(String.format(confWeb.APP_URL,
+                        if(it) readPuzzleDimen()
+                            else conf.puzzle.DEFAULT_PUZZLE_DIMEN,
+                        if(it) readPuzzleType()
+                            else conf.puzzle.DEFAULT_PUZZLE_TYPE.name))
+                }
             })
     }
 
@@ -228,7 +232,8 @@ class MainActivity : ComponentActivity(){
         super.onDestroy()
     }
 
-    /*override*/ fun XonSaveInstanceState(outState: Bundle){ // todo
+    /* never called because of Manifest: configChanges="orientation|screenSize"
+    override fun onSaveInstanceState(outState: Bundle){ // todo
         super.onSaveInstanceState(outState)
         with(puzzleCache.toSortedMap().entries){
             if(isNotEmpty()){first().value.let{first->
@@ -251,6 +256,7 @@ class MainActivity : ComponentActivity(){
             //restoredGame = Json.decodeFromString<Game>(this) // todo
         }
     }
+    */
 
     companion object{
         lateinit var appAssets: AssetManager
