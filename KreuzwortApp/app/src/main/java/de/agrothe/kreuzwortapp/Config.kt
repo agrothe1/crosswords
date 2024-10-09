@@ -127,8 +127,10 @@ class Css(
     val PUZZLE_CELL_CHAR: String,
     val PUZZLE_CELL_CHAR_SOLVED: String,
     val PUZZLE_CELL_CHAR_FINISHED: String,
+    val PUZZLE_CELL_CHAR_ALL_FINISHED: String,
     val PUZZLE_CELL_IDX_NUM_HOR: String,
     val PUZZLE_CELL_IDX_NUM_VER: String,
+    val PUZZLE_CELL_IDX_NUM_BKGND: String,
     val PUZZLE_LGND_IDX_NUM_HOR: String,
     val PUZZLE_LGND_IDX_NUM_VER: String,
     val PUZZLE_CELL_GRID_IDX_BACKGRD: String,
@@ -155,6 +157,7 @@ class Css(
     val TRANSITION_DURATION: Float,
     val ANIMATION_DURATION: Float,
     val ANIMATION_ITER_CNT: String,
+    val ANIMATION_VARIATION_CNT: Int,
 )
 
 open class ColorPalletteConfig(

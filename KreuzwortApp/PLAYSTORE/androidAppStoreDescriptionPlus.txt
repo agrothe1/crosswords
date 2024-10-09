@@ -1,0 +1,7 @@
+Kreuzworträtsel
+- mehr als 150 verschiedene Rätsel
+- als Schweden- und Schüttel-Varianten
+- in verschiedenen Grössen
+- mit Lösungshinweisen
+- und Erfolgszähler
+- basierend auf 'OpenThesaurus' Wörterbuch

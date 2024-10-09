@@ -1,0 +1,6 @@
+Kreuzworträtsel
+- mehr als achtzig verschiedene Rätsel
+- in verschiedenen Varianten
+- mit Lösungshinweisen
+- und Erfolgszähler
+- basierend auf 'OpenThesaurus' Wörterbuch

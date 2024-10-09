@@ -350,7 +350,12 @@ val scripts="""
                 d.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR_SOLVED}')
                     .forEach((e)=>{
                         e.classList.remove('${confCss.PUZZLE_CELL_CHAR_SOLVED}') 
-                        e.classList.add('${confCss.PUZZLE_CELL_CHAR_FINISHED}')})
+                        e.classList.add(
+                            '${confCss.PUZZLE_CELL_CHAR_FINISHED}')})
+                d.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR_CONTAINER}')
+                    .forEach((e)=>{
+                        e.classList.add(
+                            '${confCss.PUZZLE_CELL_CHAR_ALL_FINISHED}')})
             }
         })
         ws.onopen=(ev)=>{ws.send(pWSData.replace("%",pValue||" "))}

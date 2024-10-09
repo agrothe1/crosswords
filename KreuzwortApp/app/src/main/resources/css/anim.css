@@ -1,15 +1,14 @@
-
-@keyframes puzzleCellCharFinished1{
+@keyframes puzzleCellCharAllFinished1{
     100% {
         transform: rotateX(400grad)
     }
 }
-@keyframes puzzleCellCharFinished2{
+@keyframes puzzleCellCharAllFinished2{
     100% {
         transform: rotateY(400grad)
     }
 }
-@keyframes puzzleCellCharFinished3{
+@keyframes puzzleCellCharAllFinished3{
     100% {
         transform: rotateZ(400grad)
     }

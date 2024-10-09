@@ -31,8 +31,11 @@ fun Css.dirImg(
                     Pair(pDirct, pIdx).also{
                         if(it==Pair(KeyDirct.NORMAL, 0)
                                 || it==Pair(KeyDirct.REVERSED, pDimen-1))
-                            {span(if(pIsLegend) ""
-                                    else " $pBckgdColor"){
+                            {span(
+                                if(pIsLegend) ""
+                                else "$pBckgdColor " +
+                                    cssConf.PUZZLE_CELL_IDX_NUM_BKGND
+                            ){
                                 +(if(isVert)
                                     pColIdx else pRowIdx).inc().toString()
                                 img(classes=if(pDirct==KeyDirct.NORMAL)

@@ -10,11 +10,15 @@ const val NEW_GAME_BUTTON_STYLE =
     "writing-mode:vertical-lr;text-orientation:upright"
 const val NEW_GAME_DIALOG_STYLE =
     "box-shadow:0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19)"
+const val CLR_PLCH = "%COLOR"
+const val PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE_TPLT =
+    "radial-gradient(circle at center,${CLR_PLCH} 0%,transparent 400%)"
 
 val CSS = fun CSSBuilder.(){
     fun String.cls()=".$this"
 
     with(confCss){
+        val CELL_CHAR_FONT_SIZE=15.vh
         val colors=COLOR_PALETTES.random()
         val gridBorderColor=colors.GRID_BORDER_COLR
         val gridLineColor=colors.GRID_LINES_COLR
@@ -25,11 +29,11 @@ val CSS = fun CSSBuilder.(){
         val NEW_GAME_BORDER_STYLE=
             "0.2vh groove ${gridBorderColor.darken(20)}"
         val PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE1=
-            "radial-gradient(circle at center," +
-                    "${tableCellBackgroundColor1} 0%,transparent 200%)"
+            PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE_TPLT
+                .replace(CLR_PLCH, tableCellBackgroundColor1.toString())
         val PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE2=
-            "radial-gradient(circle at center," +
-                    "${tableCellBackgroundColor2} 0%,transparent 200%)"
+            PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE_TPLT
+                .replace(CLR_PLCH, tableCellBackgroundColor2.toString())
 
         rule("html, body"){
             //backgroundColor=Color.transparent // todo
@@ -66,14 +70,14 @@ val CSS = fun CSSBuilder.(){
                     LinearDimension("1fr"))
             }
             rule(LGND_GRID_HORIZ.cls()){
-                display=Display.grid
+                //display=Display.grid
                 gridRowStart=GridRowStart("1")
                 gridColumnStart=GridColumnStart("1")
                 gridColumnEnd=GridColumnEnd("2")
                 alignSelf=Align.selfStart
             }
             rule(LGND_GRID_VERT.cls()){
-                display=Display.grid
+                //display=Display.grid
                 gridRowStart=GridRowStart("1")
                 gridColumnStart=GridColumnStart("2")
                 gridColumnEnd=GridColumnEnd("3")
@@ -138,6 +142,10 @@ val CSS = fun CSSBuilder.(){
             lgndTableHdr(LGND_TABLE_HEADER_HOR_NTH, 2.vh, gridBorderColor)
             lgndTableHdr(LGND_TABLE_HEADER_VER, 0.vh, gridLineColor)
             lgndTableHdr(LGND_TABLE_HEADER_VER_NTH, 2.vh, gridLineColor)
+            fun cellIdxNumBkgnd(pHeight: String) =
+                    rule(PUZZLE_CELL_IDX_NUM_BKGND.cls()){
+                borderRadius=LinearDimension(pHeight)
+            }
             fun cellIdxNum(pSel: String, pLineHeight: String,
                     pColor: Color) = rule(pSel.cls()){
                 lineHeight=LineHeight(pLineHeight)
@@ -148,6 +156,7 @@ val CSS = fun CSSBuilder.(){
                 zIndex=1
                 opacity=0.8
             }
+            cellIdxNumBkgnd("6vh")
             cellIdxNum(PUZZLE_CELL_IDX_NUM_HOR, "3vh",
                 gridLineColor)
             cellIdxNum(PUZZLE_CELL_IDX_NUM_VER, "3vh",
@@ -156,25 +165,15 @@ val CSS = fun CSSBuilder.(){
                 gridLineColor)
             cellIdxNum(PUZZLE_LGND_IDX_NUM_VER, "2.4vh",
                 gridBorderColor)
-            val IDX_SCT_ROT_HGHT = 1.9.vh
-            rule(IDX_SLCT_ROT_SOUTH.cls()){
-                height=IDX_SCT_ROT_HGHT
-                transform.rotate(0.grad)
+            rule(PUZZLE_CELL_CHAR_ALL_FINISHED.cls()){
+                animation(
+                    name=
+            "${PUZZLE_CELL_CHAR_ALL_FINISHED}${(1..ANIMATION_VARIATION_CNT)
+                .random()}",
+                    duration=ANIMATION_DURATION.s,
+                    iterationCount=IterationCount(ANIMATION_ITER_CNT))
             }
-            rule(IDX_SLCT_ROT_EAST.cls()){
-                height=IDX_SCT_ROT_HGHT
-                transform.rotate(100.grad)
-            }
-            rule(IDX_SLCT_ROT_NORTH.cls()){
-                height=IDX_SCT_ROT_HGHT
-                transform.rotate(200.grad)
-            }
-            rule(IDX_SLCT_ROT_WEST.cls()){
-                height=IDX_SCT_ROT_HGHT
-                transform.rotate(300.grad)
-            }
-            fun cellChar(pSel: String, pColr: Color,
-                    pIterCnt: String="0")= rule(pSel.cls()){
+            fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()){
                 position=Position.absolute
                 top=50.pct
                 left=50.pct
@@ -190,15 +189,10 @@ val CSS = fun CSSBuilder.(){
                 textAlign=TextAlign.center
                 transition("color", TRANSITION_DURATION.s,
                     Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
-                animation(
-                    name="${PUZZLE_CELL_CHAR_FINISHED}${(1..3).random()}",
-                    duration=ANIMATION_DURATION.s,
-                    iterationCount=IterationCount(pIterCnt))
             }
             cellChar(PUZZLE_CELL_CHAR, colors.CELL_CHAR_COLR)
             cellChar(PUZZLE_CELL_CHAR_SOLVED, colors.PUZZLE_CELL_CHAR_SOLVED)
-            cellChar(PUZZLE_CELL_CHAR_FINISHED,
-                colors.PUZZLE_CELL_CHAR_SOLVED, ANIMATION_ITER_CNT)
+            cellChar(PUZZLE_CELL_CHAR_FINISHED, colors.PUZZLE_CELL_CHAR_SOLVED)
         }
         media("only screen and (orientation: landscape)"){
             rule(PUZZLE_GRID.cls()){
@@ -281,13 +275,14 @@ val CSS = fun CSSBuilder.(){
             lgndTableHdr(LGND_TABLE_HEADER_HOR_NTH, 2.vh, gridBorderColor)
             lgndTableHdr(LGND_TABLE_HEADER_VER, 0.vh, gridLineColor)
             lgndTableHdr(LGND_TABLE_HEADER_VER_NTH, 2.vh, gridLineColor)
-            fun cellIdxNum(pSel: String, pLineHeight: String, pHeight: String,
-                    pColor: Color) = rule(pSel.cls()){
+            fun cellIdxNum(pSel: String, pLineHeight: String,
+                    pHeight: String, pColor: Color) = rule(pSel.cls()){
                 lineHeight=LineHeight(pLineHeight)
                 height=LinearDimension(pHeight)
                 fontSize=LinearDimension(pLineHeight)
-                fontWeight=FontWeight.bolder
+                fontWeight=FontWeight.w800
                 color=pColor.darken(60)
+                opacity=0.8
             }
             cellIdxNum(PUZZLE_CELL_IDX_NUM_HOR, "5vh", "5vh",
                 gridLineColor)
@@ -299,25 +294,17 @@ val CSS = fun CSSBuilder.(){
             cellIdxNum(
                 PUZZLE_LGND_IDX_NUM_VER, "3.8vh","4.4vh",
                 gridBorderColor)
-            val IDX_SCT_ROT_HGHT = 3.4.vh
-            rule(IDX_SLCT_ROT_SOUTH.cls()){
-                height=IDX_SCT_ROT_HGHT
-                transform.rotate(0.grad)
+            rule(PUZZLE_CELL_IDX_NUM_BKGND.cls()){
+                borderRadius=LinearDimension("8vh")
             }
-            rule(IDX_SLCT_ROT_EAST.cls()){
-                height=IDX_SCT_ROT_HGHT
-                transform.rotate(100.grad)
+            rule(PUZZLE_CELL_CHAR_ALL_FINISHED.cls()){
+                animation(name=
+            "${PUZZLE_CELL_CHAR_ALL_FINISHED}${(1..ANIMATION_VARIATION_CNT)
+                        .random()}",
+                    duration=ANIMATION_DURATION.s,
+                    iterationCount=IterationCount(ANIMATION_ITER_CNT))
             }
-            rule(IDX_SLCT_ROT_NORTH.cls()){
-                height=IDX_SCT_ROT_HGHT
-                transform.rotate(200.grad)
-            }
-            rule(IDX_SLCT_ROT_WEST.cls()){
-                height=IDX_SCT_ROT_HGHT
-                transform.rotate(300.grad)
-            }
-            fun cellChar(pSel: String, pColr: Color,
-                    pIterCnt: String="0")= rule(pSel.cls()){
+            fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()) {
                 fontSize=10.0.vh
                 color=pColr
                 backgroundColor=Color.transparent
@@ -327,17 +314,14 @@ val CSS = fun CSSBuilder.(){
                 maxWidth=1.em
                 maxHeight=1.em
                 textAlign=TextAlign.center
-                transition("color", TRANSITION_DURATION.s,
-                    Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
-                animation(
-                    name="${PUZZLE_CELL_CHAR_FINISHED}${(1..3).random()}",
-                    duration=ANIMATION_DURATION.s,
-                    iterationCount=IterationCount(pIterCnt))
+                transition(
+                    "color", TRANSITION_DURATION.s,
+                    Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s
+                )
             }
             cellChar(PUZZLE_CELL_CHAR, colors.CELL_CHAR_COLR)
             cellChar(PUZZLE_CELL_CHAR_SOLVED, colors.PUZZLE_CELL_CHAR_SOLVED)
-            cellChar(PUZZLE_CELL_CHAR_FINISHED,
-                colors.PUZZLE_CELL_CHAR_SOLVED, ANIMATION_ITER_CNT)
+            cellChar(PUZZLE_CELL_CHAR_FINISHED, colors.PUZZLE_CELL_CHAR_SOLVED)
         }
         rule(LGND_TABLE.cls()){
             fontFamily="sans-serif"
@@ -377,13 +361,6 @@ val CSS = fun CSSBuilder.(){
         rule((TABLE_CELL_BACKGROUND+"1").cls()){
             backgroundColor=tableCellBackgroundColor1
         }
-        /*
-        rule((TABLE_CELL_BACKGROUND+"1").cls()
-                +" "+ PUZZLE_CELL_CHAR_SOLVED.cls()){
-            backgroundColor=Color.floralWhite.lighten((1..3).random())
-                .changeAlpha((84..90).random()*0.01)
-        }
-         */
         rule((TABLE_CELL_BACKGROUND+"2").cls()){
             backgroundColor=tableCellBackgroundColor2
         }
@@ -486,6 +463,23 @@ val CSS = fun CSSBuilder.(){
         rule("""${MENU_FIELD_SET_ENTRY.cls()}
                 | input[type="radio"]:checked""".trimMargin()){
             borderWidth=0.5.vh
+        }
+        val IDX_SLCT_ROT_HGHT=1.9.vh
+        rule(IDX_SLCT_ROT_SOUTH.cls()){
+            height=IDX_SLCT_ROT_HGHT
+            transform.rotate(0.grad)
+        }
+        rule(IDX_SLCT_ROT_EAST.cls()){
+            height=IDX_SLCT_ROT_HGHT
+            transform.rotate(100.grad)
+        }
+        rule(IDX_SLCT_ROT_NORTH.cls()){
+            height=IDX_SLCT_ROT_HGHT
+            transform.rotate(200.grad)
+        }
+        rule(IDX_SLCT_ROT_WEST.cls()){
+            height=IDX_SLCT_ROT_HGHT
+            transform.rotate(300.grad)
         }
     }
 }
