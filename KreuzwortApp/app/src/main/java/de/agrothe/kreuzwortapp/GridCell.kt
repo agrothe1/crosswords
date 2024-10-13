@@ -81,6 +81,12 @@ override fun FlowContent.apply(){
                     onClick="""
                         value=''
                         """.trimIndent()
+                    /*
+                    onFocus="""
+                        value=''
+                    """.trimIndent()
+                        Android.scrollToElement('${idxId}')
+                     */
                     onInput="""
                         if(value.length>1){value=value.charAt(0)}
                         """.trimIndent()

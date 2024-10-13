@@ -1,7 +1,10 @@
 package de.agrothe.kreuzwortapp
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.css.*
 import kotlinx.css.properties.*
+
+private val logger by lazy{ KotlinLogging.logger{}}
 
 private val confCss=config.webApp.CSS
 
@@ -14,8 +17,10 @@ const val CLR_PLCH = "%COLOR"
 const val PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE_TPLT =
     "radial-gradient(circle at center,${CLR_PLCH} 0%,transparent 400%)"
 
-val CSS = fun CSSBuilder.(){
+val CSS = fun(pDimen: Int) = CSSBuilder().apply{
     fun String.cls()=".$this"
+
+    logger.debug{"CSS dimenParamName:'$pDimen'"}
 
     with(confCss){
         val CELL_CHAR_FONT_SIZE=15.vh
@@ -203,11 +208,11 @@ val CSS = fun CSSBuilder.(){
                 gridTemplateRows=GridTemplateRows(LinearDimension("1fr"))
             }
             rule(LGND_GRID_HORIZ.cls()){
+                //display=Display.grid
                 gridColumnStart=GridColumnStart("1")
                 gridColumnEnd=GridColumnEnd("2")
                 gridRowStart=GridRowStart("1")
                 gridRowEnd=GridRowEnd("2")
-                //display=Display.grid
             }
             rule(LGND_GRID_VERT.cls()){
                 gridColumnStart=GridColumnStart("2")
@@ -215,7 +220,6 @@ val CSS = fun CSSBuilder.(){
                 gridRowStart=GridRowStart("1")
                 gridRowEnd=GridRowEnd("2")
                 marginRight=LinearDimension("0")
-                //display=Display.grid
             }
             rule(FIELD_GRID.cls()){
                 gridColumnStart=GridColumnStart("3")
@@ -305,6 +309,10 @@ val CSS = fun CSSBuilder.(){
                     iterationCount=IterationCount(ANIMATION_ITER_CNT))
             }
             fun cellChar(pSel: String, pColr: Color)= rule(pSel.cls()) {
+                position=Position.absolute
+                top=50.pct
+                left=50.pct
+                transform.translate(-50.pct, -50.pct)
                 fontSize=10.0.vh
                 color=pColr
                 backgroundColor=Color.transparent

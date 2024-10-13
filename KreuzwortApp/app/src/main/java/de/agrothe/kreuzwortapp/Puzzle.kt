@@ -22,7 +22,7 @@ class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
             }
             link{
                 rel="stylesheet"
-                href="/styles.css"
+                href="/styles.css?dimen=$pDimen"
                 type="text/css"
             }
             link{

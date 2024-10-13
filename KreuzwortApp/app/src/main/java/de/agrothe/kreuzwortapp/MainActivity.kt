@@ -200,7 +200,21 @@ class MainActivity : ComponentActivity(){
 
         webViewReference = WeakReference(
             WebView(this).apply{
+                class JavaScriptInterface {
+                    @android.webkit.JavascriptInterface
+                    fun scrollToElement(pId: String){
+                        runOnUiThread{
+                            loadUrl(
+                    """javascript:{
+                        console.debug('scrolling to: $pId')
+                        document.querySelector('#${pId}').scrollIntoView({
+                            behavior:'smooth', block:'end'
+                        })}
+                    """.trimIndent()
+                    )}}
+                }
                 webViewClient=SslWebView(myPubKey)
+                //addJavascriptInterface(JavaScriptInterface(), "Android")
                 setContentView(this)
                 setWebContentsDebuggingEnabled(true)
                 with(settings){
@@ -383,35 +397,35 @@ fun Application.configureSockets(){
 
 fun Application.configureTemplating(){
     routing{
+        fun Parameters.getDimenParam() =
+            get(confWeb.DIMEN_PARAM_NAME)?.toInt()
+                ?: conf.puzzle.DEFAULT_PUZZLE_DIMEN
+        fun Parameters.getTypeParam() =
+            get(confWeb.TYPE_PARAM_NAME)
+                ?: conf.puzzle.DEFAULT_PUZZLE_TYPE.name
+
         get("/styles.css"){
-            call.respondCss(CSS)
+            call.request.queryParameters.getDimenParam().let{dimen ->
+                call.respondText(CSS(dimen).toString(), ContentType.Text.CSS)}
         }
         get("/puzzler"){
             call.request.queryParameters.let{params->
-                (params[confWeb.DIMEN_PARAM_NAME]?.toInt()
-                        ?: conf.puzzle.DEFAULT_PUZZLE_DIMEN).let{dimen->
-                    (params[confWeb.TYPE_PARAM_NAME]
-                        ?: conf.puzzle.DEFAULT_PUZZLE_TYPE.name).let{type->
-                logger.debug{"dimenParamName:'$dimen', typeParamName: '$type'"}
-                call.respondHtmlTemplate(
-                    BodyTplt(readSolvedGamesCnt(), dimen,
-                        readPuzzleHistory().map{it.puzzleId},
-                        PuzzleType.valueOf(type.uppercase()))
-                ){
-                    puzzle
-                    // dph 866.2857 x dpw 411.42856 = 2,10 dp
-                    /* 1080x2400 2,22 */
-                }
+                params.getDimenParam().let{dimen->
+                    params.getTypeParam().let{type->
+                        logger.debug{
+                            "dimenParamName:'$dimen', typeParamName: '$type'"}
+                        call.respondHtmlTemplate(
+                            BodyTplt(readSolvedGamesCnt(), dimen,
+                                readPuzzleHistory().map{it.puzzleId},
+                                PuzzleType.valueOf(type.uppercase()))
+                        ){
+                            puzzle
+                        }
             }}}
         }
         staticResources("/css", "/css")
         staticResources("/imgs", "/imgs")
     }
-}
-
-suspend inline fun ApplicationCall.respondCss(builder: CSSBuilder.() -> Unit){
-    this.respondText(CSSBuilder().apply(builder).toString(),
-        ContentType.Text.CSS)
 }
 
 class SslWebView(private val pubKey: PublicKey?): WebViewClient(){

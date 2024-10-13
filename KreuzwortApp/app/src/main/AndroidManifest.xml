@@ -27,6 +27,7 @@
                 android:name=".MainActivity"
                 android:exported="true"
                 android:theme="@style/Theme.KreuzwortApp"
+                android:windowSoftInputMode="adjustResize"
                 android:configChanges="orientation|screenSize">
             <!-- todo: disable configChanges and implement restore from bundle?
                 no, it is handled automatically with this setting -->
