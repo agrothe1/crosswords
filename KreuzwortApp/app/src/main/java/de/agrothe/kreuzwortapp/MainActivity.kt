@@ -1,7 +1,6 @@
 package de.agrothe.kreuzwortapp
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.AssetManager
