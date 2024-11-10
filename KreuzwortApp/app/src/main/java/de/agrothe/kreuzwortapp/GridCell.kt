@@ -6,7 +6,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 val webAppConf = config.webApp
-private val cssConf = webAppConf.CSS
+val cssConf = webAppConf.CSS
 
 fun getRowColIdx(pRowIdx: Int, pColIdx: Int) = "${pRowIdx}_${pColIdx}"
 fun Int.lgndIdSuffxRow() = "${cssConf.LGND_ID_SUFFX_ROW}$this"
@@ -63,6 +63,7 @@ override fun FlowContent.apply(){
                 Pair(IDX_SLCT_ROT_SOUTH, IDX_SLCT_ROT_NORTH))
             div(classes=PUZZLE_CELL_CHAR_CONTAINER){
                 val iD = getRowColIdx(pRowIdx, pColIdx)
+                // todo does "new WS" reuse existing WS?
                 val wsdata = Json.encodeToString(
                     WSDataToSrvr('%', pRowIdx, pColIdx, pHashCode,
                         dimen=pDimen))
@@ -77,26 +78,13 @@ override fun FlowContent.apply(){
                     maxLength="1"
                     placeholder=if(webAppConf.SHOW_INPUT_HINT)
                         pChar.toString() else ""
-                    // todo does "new WS" reuse existing WS?
+                    // hide Android softkeyboard
                     onClick="""
-                        value=''
+                        blur()
                         """.trimIndent()
-                    /*
                     onFocus="""
-                        value=''
+                        onInputFocus('$wsdata')
                     """.trimIndent()
-                        Android.scrollToElement('${idxId}')
-                     */
-                    onInput="""
-                        if(value.length>1){value=value.charAt(0)}
-                        """.trimIndent()
-                        // todo move to global function
-                    onKeyUp="""
-                        value=value.toUpperCase()
-                        checkCellInput(value, '$wsdata', $pRowIdx, $pColIdx,
-                            '${pRowIdx.lgndIdSuffxRow()}', 
-                            '${pColIdx.lgndIdSuffxCol()}')
-                        """.trimIndent()
                 }
             }
             idx(pWordAtX?.ornt, pColIdx,

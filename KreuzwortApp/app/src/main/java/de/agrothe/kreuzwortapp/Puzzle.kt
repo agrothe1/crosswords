@@ -8,8 +8,8 @@ import kotlinx.serialization.json.Json
 private val confCss=confWeb.CSS
 
 class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
-        val pExcluded: Collection<String>? = null,
-        val pPuzzleType: PuzzleType): Template<HTML>{
+        val pExcluded: Collection<String>? = null, val pPuzzleType: PuzzleType,
+        val pWidth: Int, val pHght: Int): Template<HTML>{
     val header = Placeholder<FlowContent>()
     val puzzle = TemplatePlaceholder<PuzzleTplt>()
     override fun HTML.apply(){
@@ -22,7 +22,8 @@ class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
             }
             link{
                 rel="stylesheet"
-                href="/styles.css?dimen=$pDimen"
+                href="/styles.css"+String.format(confWeb.APP_URL_PARAMS,
+                    pDimen, pPuzzleType.name, pWidth, pHght)
                 type="text/css"
             }
             link{
@@ -30,12 +31,12 @@ class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
                 href="/css/anim.css"
                 type="text/css"
             }
-            /*
             link{
-                href="/Callbacks.js"
-                type="text/javascript"
+                rel="stylesheet"
+                href="/kbd/keyboard.css"
+                type="text/css"
             }
-             */
+            script(src="kbd/keyboard.js"){}
         }
         body{
             /*
@@ -44,15 +45,14 @@ class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
             }
              */
             insert(PuzzleTplt(pNumSolvedGames, pDimen, pExcluded,
-                pPuzzleType), puzzle)
+                pPuzzleType, pWidth, pHght), puzzle)
             script{unsafe{raw(scripts)}}
-            //script(src="js/Callbacks.js"){}
         }}
 }
 
 class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
-    pExcludedPuzzleNames: Collection<String>?, val pPuzzleType: PuzzleType)
-        : Template<FlowContent>{
+        pExcludedPuzzleNames: Collection<String>?, val pPuzzleType: PuzzleType,
+        val pWidth: Int, val pHght: Int): Template<FlowContent>{
     private val entries = dict.entries
         .map{(key, values)
             ->Pair(key.uppercase(), values)}.toMap()
@@ -132,6 +132,7 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                 }}}
 
             div{
+                id="content"
                 div(classes=PUZZLE_GRID){
                     button(classes=NEW_GAME){
                         id=SHOW_HELP_BUTTON_ID
@@ -229,6 +230,11 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                 """.trimIndent()
                         gameButton(confWeb.I18n.NEW_GAME, true)
                     }
+                    div(classes=SIMPLE_KEYBOARD_CLASS_NAME){
+                        script{unsafe{raw("""
+                        """.trimIndent()
+                        )}}
+                    }
                 }
             }
         }
@@ -267,7 +273,8 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                         else pCss.MENU_LAYER_NEXT_BUTTON){
                         val wsdata=Json.encodeToString(WSDataToSrvr(
                             newGame=true, dimen=dimen.toInt(),
-                            puzzleType=webAppConf.PUZZLE_TYPE_PLACEHOLDER))
+                            puzzleType=webAppConf.PUZZLE_TYPE_PLACEHOLDER,
+                            width=pWidth, height=pHght))
                         onClick=
                             """newGame('$wsdata')""".trimIndent()
                         +String.format(
@@ -307,6 +314,94 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
 
 @Suppress("SimplifiableCallChain")
 val scripts="""
+    let Keyboard=window.SimpleKeyboard.default
+    let keyboard=new Keyboard({
+        onChange:input=>onChange(input),
+        onKeyReleased: (button) => console.log("simple-keyboard button released", button),
+        maxLength:1,
+        layout:{
+            default:[
+                "Q W E R T Z U I O P",
+                "A S D F G H J K L",
+                "Y X C V B N M {backspace}",
+            ]
+        },
+        display:{"{backspace}": "⌫"},
+    })
+    function removeFocusedStyle(pDoc){
+        pDoc.querySelectorAll('[class^="${confCss.PUZZLE_CELL_CHAR}"]')
+            .forEach((e)=>{e.classList
+                .remove('${confCss.PUZZLE_CELL_FOCUSED}')})
+    }
+    function onInputFocus(pWSData){
+        keyboard.clearInput()
+        var d=document
+        var wsdata=JSON.parse(pWSData)
+        var inp=d.getElementById(wsdata.xPos+"_"+wsdata.yPos)
+        inp.value=''
+        removeFocusedStyle(d)
+        inp.classList.add('${confCss.PUZZLE_CELL_FOCUSED}')
+        keyboard.setOptions({WSData: wsdata})
+    }
+    function onChange(pInput){
+        var d=document
+        var wsdata=keyboard.options.WSData
+        var e=d.getElementById(wsdata.xPos+'_'+wsdata.yPos)
+        e.value=pInput.toUpperCase().replace(/[^A-Z]/,'')
+        checkCellInput(pInput, wsdata, d)
+    }
+    function checkCellInput(pValue, pWSData, pDoc){
+        var ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
+        ws.addEventListener("message",(ev)=>{
+            function rowColSolved(pId, pSel){
+                removeFocusedStyle(pDoc)
+                var l=pDoc.getElementById(pId)
+                l.className=l.className+"${confCss.LGND_ENTRIES_SOLVED_SFX}"
+                pDoc.querySelectorAll(pSel).forEach(e=>{
+                    e.disabled=true
+                    e.className='${confCss.PUZZLE_CELL_CHAR_SOLVED}'
+                })
+            }
+            var rpl=JSON.parse(ev.data)
+            if(rpl.rowSolved===true){
+                var xPos=pWSData.xPos
+                rowColSolved('${cssConf.LGND_ID_SUFFX_ROW}'+xPos,
+                    '[id^="'+xPos+'_"]')
+            }
+            if(rpl.colSolved===true){
+                var yPos=pWSData.yPos
+                rowColSolved('${cssConf.LGND_ID_SUFFX_COL}'+yPos,
+                    '[id$="_'+yPos+'"]')
+            }
+            if(rpl.puzzleSolved===true){
+                showNewButton(pDoc)
+                pDoc.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR_SOLVED}')
+                    .forEach((e)=>{e.classList.add(
+                        '${confCss.PUZZLE_CELL_CHAR_FINISHED}')})
+                pDoc.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR_CONTAINER}')
+                    .forEach((e)=>{e.classList.add(
+                        '${confCss.PUZZLE_CELL_CHAR_ALL_FINISHED}')})
+            }
+        })
+        pWSData.inpChar=pValue||" "
+        ws.onopen=(ev)=>{ws.send(JSON.stringify(pWSData))}
+    }
+    document.querySelectorAll('X.${confCss.PUZZLE_CELL_CHAR}')
+        .forEach((e)=>{
+            e.addEventListener('focus',function(){
+                let content=document.getElementById('content')
+                let windowHeight=window.innerHeight
+                content.style.minHeight=(windowHeight*2)+'px'
+                e.closest('.${confCss.PUZZLE_CELL_GRID_IDX}')
+                    .scrollIntoView(true,{block: 'start'})
+                console.log("focus 'scrollIntoView()' "+windowHeight*2)
+        })
+            e.addEventListener('blur',function(){
+                let content=document.getElementById('content')
+                let windowHeight=window.innerHeight
+                content.style.minHeight=(windowHeight/2)+'px'
+                console.log("blur 'scrollIntoView()' "+windowHeight/2)
+    })})
     function newGame(pWSData){
         function getGameType(){
             for(let t of document.getElementsByName(
@@ -325,40 +420,6 @@ val scripts="""
             .style.display='none'
         pDoc.getElementById('${confCss.NEW_GAME_BUTTON_ID}')
             .style.display='block'
-    }
-    function checkCellInput(pValue, pWSData, pRowIdx, pColIdx, pRowId, pColId){
-        var d=document
-        var ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
-        ws.addEventListener("message",(ev)=>{
-            function rowColSolved(pId, pSel){
-                var l=d.getElementById(pId)
-                l.className=l.className+"${confCss.LGND_ENTRIES_SOLVED_SFX}"
-                d.querySelectorAll(pSel).forEach(e=>{
-                    e.disabled=true
-                    e.className='${confCss.PUZZLE_CELL_CHAR_SOLVED}'
-                })
-            }
-            var rpl=JSON.parse(ev.data)
-            if(rpl.rowSolved===true){
-                rowColSolved(pRowId, '[id^="'+pRowIdx+'_"]')
-            }
-            if(rpl.colSolved===true){
-                rowColSolved(pColId, '[id$="_'+pColIdx+'"]')
-            }
-            if(rpl.puzzleSolved===true){
-                showNewButton(d)
-                d.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR_SOLVED}')
-                    .forEach((e)=>{
-                        e.classList.remove('${confCss.PUZZLE_CELL_CHAR_SOLVED}') 
-                        e.classList.add(
-                            '${confCss.PUZZLE_CELL_CHAR_FINISHED}')})
-                d.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR_CONTAINER}')
-                    .forEach((e)=>{
-                        e.classList.add(
-                            '${confCss.PUZZLE_CELL_CHAR_ALL_FINISHED}')})
-            }
-        })
-        ws.onopen=(ev)=>{ws.send(pWSData.replace("%",pValue||" "))}
     }
     function showHelp(pWSData){                  
         var d=document

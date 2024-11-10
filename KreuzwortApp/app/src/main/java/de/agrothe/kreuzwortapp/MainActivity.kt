@@ -1,14 +1,26 @@
 package de.agrothe.kreuzwortapp
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.AssetManager
 import android.net.http.SslError
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.ResultReceiver
+import android.text.InputType
+import android.util.AttributeSet
+import android.view.MotionEvent
+import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputConnection
+import android.view.inputmethod.InputMethodManager
 import android.webkit.*
 import android.webkit.WebView.setWebContentsDebuggingEnabled
 import androidx.activity.ComponentActivity
+import androidx.core.view.WindowInsetsCompat
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.*
 import io.ktor.network.tls.certificates.*
@@ -149,8 +161,12 @@ var restoredGame: Game? = null
 class MainActivity : ComponentActivity(){
     private lateinit var server: NettyApplicationEngine
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
+
+        val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
 
         appAssets=assets
 
@@ -198,9 +214,9 @@ class MainActivity : ComponentActivity(){
         sharedPrefs=getSharedPreferences(
             conf.webApp.SHARED_PREFS_NAME, Context.MODE_PRIVATE)
 
-        webViewReference = WeakReference(
+        webViewReference=WeakReference(
             WebView(this).apply{
-                class JavaScriptInterface {
+                addJavascriptInterface(object{
                     @android.webkit.JavascriptInterface
                     fun scrollToElement(pId: String){
                         runOnUiThread{
@@ -212,9 +228,8 @@ class MainActivity : ComponentActivity(){
                         })}
                     """.trimIndent()
                     )}}
-                }
+                }, "Android")
                 webViewClient=SslWebView(myPubKey)
-                //addJavascriptInterface(JavaScriptInterface(), "Android")
                 setContentView(this)
                 setWebContentsDebuggingEnabled(true)
                 with(settings){
@@ -226,17 +241,18 @@ class MainActivity : ComponentActivity(){
                 }
 
                 val displayMetrics = resources.displayMetrics
-                val dpHeight = displayMetrics.heightPixels /
-                    displayMetrics.density
-                val dpWidth = displayMetrics.widthPixels /
-                    displayMetrics.density
+                val dpHeight = displayMetrics.heightPixels // /
+                    // displayMetrics.density
+                val dpWidth = displayMetrics.widthPixels // /
+                    // displayMetrics.density
                 logger.debug{"dpHeight: $dpHeight, dpWidth: $dpWidth"}
                 confWeb.IS_PLUS_VERSION.let{
-                    loadUrl(String.format(confWeb.APP_URL,
+                    loadUrl(confWeb.APP_URL.format(
                         if(it) readPuzzleDimen()
-                            else conf.puzzle.DEFAULT_PUZZLE_DIMEN,
+                        else conf.puzzle.DEFAULT_PUZZLE_DIMEN,
                         if(it) readPuzzleType()
-                            else conf.puzzle.DEFAULT_PUZZLE_TYPE.name))
+                        else conf.puzzle.DEFAULT_PUZZLE_TYPE.name,
+                        dpWidth, dpHeight))
                 }
             })
     }
@@ -285,7 +301,8 @@ data class WSDataToSrvr(
     val hashCode: HashCode=-1,
     val newGame: Boolean=false, val dimen: Int=-1,
     val showHelp: Boolean=false,
-    val puzzleType: String="NOT SET")
+    val puzzleType: String="NOT SET",
+    val width: Int=-1, val height: Int=-1)
 
 @Serializable
 data class WSDataFromSrvrPlcHldrs(
@@ -346,9 +363,9 @@ fun Application.configureSockets(){
         webSocket(confWeb.WEB_SOCK_ENDPOINT){
             try{
                 for(frame in incoming){
-                    val f = frame as? Frame.Text ?: continue
-                    Json.decodeFromString<WSDataToSrvr>(f.readText()).let{wsd->
-                        logger.debug{"ws data recvd: '$this'"}
+                    val f = (frame as? Frame.Text ?: continue).readText()
+                    Json.decodeFromString<WSDataToSrvr>(f).let{wsd->
+                        logger.debug{"ws data recvd: '$f'"}
                         if(wsd.showHelp){
                             send(Frame.Text(Json.encodeToString(wsd.getHelp())))
                         }else if(wsd.newGame){
@@ -356,7 +373,8 @@ fun Application.configureSockets(){
                             savePuzzleType(PuzzleType.valueOf(wsd.puzzleType))
                             webViewReference.get()?.apply{post{
                                 with(String.format(confWeb.APP_URL,
-                                    wsd.dimen, wsd.puzzleType)){
+                                    wsd.dimen, wsd.puzzleType,
+                                    wsd.width, wsd.height)){
                                         logger.debug{
                                             "ws data post load url: '$this'"}
                                         loadUrl(this)
@@ -403,28 +421,48 @@ fun Application.configureTemplating(){
         fun Parameters.getTypeParam() =
             get(confWeb.TYPE_PARAM_NAME)
                 ?: conf.puzzle.DEFAULT_PUZZLE_TYPE.name
+        fun Parameters.getReslnWdthParam() =
+            get(confWeb.RESOLUTION_WDTH_PARAM_NAME) ?: ""
+        fun Parameters.getReslnHghtParam() =
+            get(confWeb.RESOLUTION_HGHT_PARAM_NAME) ?: ""
 
         get("/styles.css"){
-            call.request.queryParameters.getDimenParam().let{dimen ->
-                call.respondText(CSS(dimen).toString(), ContentType.Text.CSS)}
+            call.request.queryParameters.let{params->
+                params.getDimenParam().let{dimen->
+                params.getReslnWdthParam().let{reslnWdth->
+                params.getReslnHghtParam().let{reslnHght->
+                    logger.debug{"/styles: "+
+                            "dimenParam:'$dimen', "+
+                            "reslnWdthParam: $reslnWdth, "+
+                            "reslnHghtParam: $reslnHght"}
+                    call.respondText(CSS(dimen,
+                        reslnWdth.toInt(), reslnHght.toInt())
+                        .toString(), ContentType.Text.CSS)}}}}
         }
         get("/puzzler"){
             call.request.queryParameters.let{params->
                 params.getDimenParam().let{dimen->
                     params.getTypeParam().let{type->
-                        logger.debug{
-                            "dimenParamName:'$dimen', typeParamName: '$type'"}
+                    params.getReslnWdthParam().let{reslnWdth->
+                    params.getReslnHghtParam().let{reslnHght->
+                        logger.debug{"/puzzler: "+
+                            "dimenParam:'$dimen', typeParam: '$type', "+
+                            "reslnWdthParam: $reslnWdth, "+
+                            "reslnHghtParam: $reslnHght"}
                         call.respondHtmlTemplate(
                             BodyTplt(readSolvedGamesCnt(), dimen,
                                 readPuzzleHistory().map{it.puzzleId},
-                                PuzzleType.valueOf(type.uppercase()))
+                                PuzzleType.valueOf(type.uppercase()),
+                                    reslnWdth.toInt(), reslnHght.toInt()
+                            )
                         ){
                             puzzle
                         }
-            }}}
+            }}}}}
         }
         staticResources("/css", "/css")
         staticResources("/imgs", "/imgs")
+        staticResources("/kbd", "/kbd")
     }
 }
 
