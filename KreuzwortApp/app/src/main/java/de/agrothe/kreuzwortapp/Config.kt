@@ -156,6 +156,9 @@ class Css(
     val LGND_ENTRIES_SOLVED_SFX: String,
     val LGND_ID_SUFFX_ROW: String,
     val LGND_ID_SUFFX_COL: String,
+    val SIMPLE_KEYBOARD_ID: String,
+    val KEYBORD_HIDDEN: String,
+    val KEYBORD_HIDE_DURATION: Int,
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,
     val TRANSITION_DURATION: Float,

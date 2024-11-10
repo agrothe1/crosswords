@@ -231,15 +231,12 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                         gameButton(confWeb.I18n.NEW_GAME, true)
                     }
                     div(classes=SIMPLE_KEYBOARD_CLASS_NAME){
-                        script{unsafe{raw("""
-                        """.trimIndent()
-                        )}}
+                        id=SIMPLE_KEYBOARD_ID
                     }
                 }
             }
         }
     }
-
     fun DIV.menu(pCss: Css){
         table(classes=pCss.MENU_LAYER){
             style=NEW_GAME_DIALOG_STYLE
@@ -317,7 +314,6 @@ val scripts="""
     let Keyboard=window.SimpleKeyboard.default
     let keyboard=new Keyboard({
         onChange:input=>onChange(input),
-        onKeyReleased: (button) => console.log("simple-keyboard button released", button),
         maxLength:1,
         layout:{
             default:[
@@ -381,6 +377,12 @@ val scripts="""
                 pDoc.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR_CONTAINER}')
                     .forEach((e)=>{e.classList.add(
                         '${confCss.PUZZLE_CELL_CHAR_ALL_FINISHED}')})
+                var kbd=pDoc.getElementById('${confCss.SIMPLE_KEYBOARD_ID}')
+                kbd.classList.add('${confCss.KEYBORD_HIDDEN}')
+                setTimeout(()=>{
+                    kbd.style.display='none'
+                    kbd.classList.remove('${confCss.KEYBORD_HIDDEN}')
+                }, ${confCss.KEYBORD_HIDE_DURATION})
             }
         })
         pWSData.inpChar=pValue||" "

@@ -116,6 +116,10 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
                 duration=ANIMATION_DURATION.s,
                 iterationCount=IterationCount(ANIMATION_ITER_CNT))
         }
+        rule(KEYBORD_HIDDEN.cls()){
+            animation(name="keyboardFadeOut", duration=KEYBORD_HIDE_DURATION.ms,
+                fillMode=FillMode.both, timing=Timing.linear)
+        }
         LinearDimension("4vw").let{hght->
             rule(IDX_SLCT_ROT_SOUTH.cls()){
                 height=hght
