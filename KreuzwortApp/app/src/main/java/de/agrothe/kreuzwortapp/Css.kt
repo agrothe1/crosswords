@@ -513,7 +513,6 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
                 | input[type="radio"]:checked""".trimMargin()){
             borderWidth=0.5.vh
         }
-        val IDX_SLCT_ROT_HGHT=1.9.vh
         rule(IDX_SLCT_ROT_SOUTH.cls()){
             transform.rotate(0.grad)
         }
