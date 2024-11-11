@@ -9,6 +9,7 @@ private val logger by lazy{ KotlinLogging.logger{}}
 private val confCss=config.webApp.CSS
 
 // no support for these attributes in kotlin.css
+const val CELL_CHAR_FONT_FAMILY="monospace,sans-serif"
 const val NEW_GAME_BUTTON_STYLE =
     "writing-mode:vertical-lr;text-orientation:upright"
 const val NEW_GAME_DIALOG_STYLE =
@@ -67,7 +68,7 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
             padding="0"
             maxWidth=1.em
             maxHeight=1.em
-            fontFamily="monospace,sans-serif"
+            fontFamily=CELL_CHAR_FONT_FAMILY
             textAlign=TextAlign.center
             transition("color", TRANSITION_DURATION.s,
                 Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
@@ -390,7 +391,7 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
                 LinearDimension("1fr"))
         }
         rule(GRID_TABLE.cls()){
-            //fontFamily="monospace,sans-serif"
+            //fontFamily="monospace,sans-serif" CELL_CHAR_FONT_FAMILY
             fontFamily="sans-serif"
             borderWidth=0.6.vh
             borderStyle=BorderStyle.solid
@@ -528,6 +529,11 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         }
         rule(IDX_SLCT_ROT_WEST.cls()){
             transform.rotate(300.grad)
+        }
+        rule(".simple-keyboard.hg-theme-default.${KEYBORD_THEME_NAME}"){
+            color=colors.CELL_CHAR_COLR
+            fontWeight=FontWeight.w700
+            fontFamily=CELL_CHAR_FONT_FAMILY
         }
     }
 }

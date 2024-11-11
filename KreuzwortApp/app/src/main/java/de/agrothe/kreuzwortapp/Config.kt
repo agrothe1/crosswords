@@ -159,6 +159,7 @@ class Css(
     val SIMPLE_KEYBOARD_ID: String,
     val KEYBORD_HIDDEN: String,
     val KEYBORD_HIDE_DURATION: Int,
+    val KEYBORD_THEME_NAME: String,
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,
     val TRANSITION_DURATION: Float,

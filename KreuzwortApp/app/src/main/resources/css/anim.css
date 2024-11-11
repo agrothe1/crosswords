@@ -1,17 +1,11 @@
 @keyframes puzzleCellCharAllFinished1{
-    100% {
-        transform: rotateX(400grad)
-    }
+    100% {transform: rotateX(400grad)}
 }
 @keyframes puzzleCellCharAllFinished2{
-    100% {
-        transform: rotateY(400grad)
-    }
+    100% {transform: rotateY(400grad)}
 }
 @keyframes puzzleCellCharAllFinished3{
-    100% {
-        transform: rotateZ(400grad)
-    }
+    100% {transform: rotateZ(400grad)}
 }
 @keyframes keyboardFadeOut{
     25% {height: 75%}

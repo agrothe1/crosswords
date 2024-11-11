@@ -313,6 +313,7 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
 val scripts="""
     let Keyboard=window.SimpleKeyboard.default
     let keyboard=new Keyboard({
+        theme:"hg-theme-default hg-layout-default ${confCss.KEYBORD_THEME_NAME}",
         onChange:input=>onChange(input),
         maxLength:1,
         layout:{
