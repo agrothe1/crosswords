@@ -12,9 +12,9 @@
             android:roundIcon="@drawable/kreuzwortplus"
     -->
     <application
-            android:label="@string/app_name_plus"
-            android:icon="@drawable/kreuzwortplus"
-            android:roundIcon="@drawable/kreuzwortplus"
+            android:label="@string/app_name"
+            android:icon="@drawable/kreuzwort"
+            android:roundIcon="@drawable/kreuzwort"
             android:networkSecurityConfig="@xml/network_security_config"
             android:allowBackup="true"
             android:dataExtractionRules="@xml/data_extraction_rules"
@@ -28,10 +28,13 @@
                 android:exported="true"
                 android:theme="@style/Theme.KreuzwortApp"
                 android:windowSoftInputMode="stateAlwaysHidden"
-                android:configChanges="orientation|screenSize">
+                android:configChanges="orientation|screenSize"
+                android:screenOrientation="portrait">
             <!-- todo: disable configChanges and implement restore from bundle?
                 no, it is handled automatically with this setting
-                windowSoftInputMode="adjustPan|adjustResize" -->
+                windowSoftInputMode="adjustPan|adjustResize"
+                android:screenOrientation="portrait"
+                -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

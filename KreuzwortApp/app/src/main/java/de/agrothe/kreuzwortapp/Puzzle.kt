@@ -231,8 +231,7 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                         gameButton(confWeb.I18n.NEW_GAME, true)
                     }
                     div(classes=SIMPLE_KEYBOARD_CLASS_NAME){
-                        id=SIMPLE_KEYBOARD_ID
-                    }
+                        id=SIMPLE_KEYBOARD_ID}
                 }
             }
         }
@@ -288,6 +287,7 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
         val cellTmplt = TemplatePlaceholder<GridCell>()
         with(pConf.CSS){
             table(GRID_TABLE){
+                id=GRID_TABLE
                 tbody{
                     puzzle.forEachIndexed{rowIdx, row->
                         tr(GRID_TABLE_ROW){
@@ -321,22 +321,41 @@ val scripts="""
                 "Q W E R T Z U I O P",
                 "A S D F G H J K L",
                 "Y X C V B N M {backspace}",
+            ],
+            landscape:[
+                "A B C D E F G H I J K L M N",
+                "O P Q R S T U V W X Y Z {backspace}",
             ]
         },
         display:{"{backspace}": "⌫"},
     })
+    function keyboardStatus(pShow, pFx){
+        var kbd=document.getElementById('${confCss.SIMPLE_KEYBOARD_ID}')
+        function kbdDispl(pDisp){kbd.style.display=pDisp}
+        var displ
+        if(pShow){ displ='block'
+            kbd.classList.remove('${confCss.KEYBORD_HIDDEN}')
+            kbd.classList.add('${confCss.KEYBORD_SHOWN}')}
+        else{ displ='none'
+            kbd.classList.remove('${confCss.KEYBORD_SHOWN}')
+            kbd.classList.add('${confCss.KEYBORD_HIDDEN}')}
+        if(pFx) setTimeout(()=>{kbdDispl(displ)},
+            ${confCss.KEYBORD_ANIM_DURATION})
+        else kbdDispl(displ)
+    }
+    keyboardStatus(true, false)
     function removeFocusedStyle(pDoc){
         pDoc.querySelectorAll('[class^="${confCss.PUZZLE_CELL_CHAR}"]')
             .forEach((e)=>{e.classList
                 .remove('${confCss.PUZZLE_CELL_FOCUSED}')})
     }
     function onInputFocus(pWSData){
-        keyboard.clearInput()
         var d=document
+        removeFocusedStyle(d)
+        keyboard.clearInput()
         var wsdata=JSON.parse(pWSData)
         var inp=d.getElementById(wsdata.xPos+"_"+wsdata.yPos)
         inp.value=''
-        removeFocusedStyle(d)
         inp.classList.add('${confCss.PUZZLE_CELL_FOCUSED}')
         keyboard.setOptions({WSData: wsdata})
     }
@@ -371,6 +390,7 @@ val scripts="""
                     '[id$="_'+yPos+'"]')
             }
             if(rpl.puzzleSolved===true){
+                keyboardStatus(false, true)
                 showNewButton(pDoc)
                 pDoc.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR_SOLVED}')
                     .forEach((e)=>{e.classList.add(
@@ -378,39 +398,16 @@ val scripts="""
                 pDoc.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR_CONTAINER}')
                     .forEach((e)=>{e.classList.add(
                         '${confCss.PUZZLE_CELL_CHAR_ALL_FINISHED}')})
-                var kbd=pDoc.getElementById('${confCss.SIMPLE_KEYBOARD_ID}')
-                kbd.classList.add('${confCss.KEYBORD_HIDDEN}')
-                setTimeout(()=>{
-                    kbd.style.display='none'
-                    kbd.classList.remove('${confCss.KEYBORD_HIDDEN}')
-                }, ${confCss.KEYBORD_HIDE_DURATION})
             }
         })
         pWSData.inpChar=pValue||" "
         ws.onopen=(ev)=>{ws.send(JSON.stringify(pWSData))}
     }
-    document.querySelectorAll('X.${confCss.PUZZLE_CELL_CHAR}')
-        .forEach((e)=>{
-            e.addEventListener('focus',function(){
-                let content=document.getElementById('content')
-                let windowHeight=window.innerHeight
-                content.style.minHeight=(windowHeight*2)+'px'
-                e.closest('.${confCss.PUZZLE_CELL_GRID_IDX}')
-                    .scrollIntoView(true,{block: 'start'})
-                console.log("focus 'scrollIntoView()' "+windowHeight*2)
-        })
-            e.addEventListener('blur',function(){
-                let content=document.getElementById('content')
-                let windowHeight=window.innerHeight
-                content.style.minHeight=(windowHeight/2)+'px'
-                console.log("blur 'scrollIntoView()' "+windowHeight/2)
-    })})
     function newGame(pWSData){
         function getGameType(){
             for(let t of document.getElementsByName(
-                '${confCss.PUZZLE_TYPE_RADIO_GROUP_NAME}'))
-            {
-                if(t.checked){return t.value}
+                '${confCss.PUZZLE_TYPE_RADIO_GROUP_NAME}')){
+                    if(t.checked){return t.value}
             }
             return '${PuzzleType.SCHWEDEN.name}'
         }
@@ -439,4 +436,20 @@ val scripts="""
         })
         ws.onopen=(ev)=>{ws.send(pWSData)}
     }
+    function adjustFontSize(){
+        let d=document
+        let t=d.getElementById('${confCss.GRID_TABLE}')
+        let dim=t.rows[0].cells.length
+        let mw=Math.trunc(t.clientWidth/dim)+'px'
+        let mh=Math.trunc(t.clientHeight/dim)
+        let fs=mh-(mh/100*${confCss.PUZZLE_CELL_CHAR_DECR_HGHT_PERC})+'px'
+        mh=mh+'px'
+        d.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR}')
+            .forEach(c=>{
+                let s=c.style
+                s.fontSize=fs;s.maxWidth=mw;s.maxHeight=mh
+            })
+    }
+    //window.addEventListener('resize', adjustFontSize)
+    window.addEventListener('load', adjustFontSize)
 """.lines().map{it.trimStart().trimEnd()}.joinToString("\n")

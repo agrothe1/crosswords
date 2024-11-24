@@ -30,7 +30,7 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         val colors=COLOR_PALETTES.random()
         val gridBorderColor=colors.GRID_BORDER_COLR
         val gridLineColor=colors.GRID_LINES_COLR
-        val gridFocusColor=colors.CELL_CHAR_COLR.lighten(70)
+        val gridFocusColor=gridBorderColor
         val tableCellBackgroundColor1=Color.floralWhite.lighten((1..3)
             .random())//.changeAlpha((84..90).random()*0.01)
         val tableCellBackgroundColor2=Color.antiqueWhite.lighten((5..7)
@@ -43,6 +43,7 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         val PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE2 =
             PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE_TPLT
                 .replace(CLR_PLCH, tableCellBackgroundColor2.toString())
+        val PUZZLE_CELL_FOCUSED_BORDER_WIDTH=LinearDimension("4px")
 
         rule("html, body"){
             minHeight=100.vh
@@ -64,10 +65,10 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
             color=pColr
             backgroundColor=Color.transparent
             borderStyle=BorderStyle.none
-            lineHeight=LineHeight("3vh")
+            //lineHeight=LineHeight("3vh") todo
             padding="0"
-            maxWidth=1.em
-            maxHeight=1.em
+            //maxWidth=1.em
+            //maxHeight=1.em
             fontFamily=CELL_CHAR_FONT_FAMILY
             textAlign=TextAlign.center
             transition("color", TRANSITION_DURATION.s,
@@ -115,11 +116,11 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
                 "${PUZZLE_CELL_CHAR_ALL_FINISHED}${(1..ANIMATION_VARIATION_CNT)
                     .random()}",
                 duration=ANIMATION_DURATION.s,
-                iterationCount=IterationCount(ANIMATION_ITER_CNT))
+                iterationCount=IterationCount.infinite)
         }
         rule(KEYBORD_HIDDEN.cls()){
-            animation(name="keyboardFadeOut", duration=KEYBORD_HIDE_DURATION.ms,
-                fillMode=FillMode.both, timing=Timing.linear)
+            animation(name="keyboardFadeOut", duration=KEYBORD_ANIM_DURATION.ms,
+                fillMode=FillMode.forwards, timing=Timing.ease)
         }
         LinearDimension("4vw").let{hght->
             rule(IDX_SLCT_ROT_SOUTH.cls()){
@@ -135,16 +136,6 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
                 height=hght
         }}
         //media("only screen and (orientation: portrait)"){
-            val CELL_CHAR_HGHT_PRT=24
-            rule(PUZZLE_CELL_CHAR.cls()){
-                fontSize=CELL_CHAR_HGHT_PRT.sizePercnt(100, "cqw")
-            }
-            rule((PUZZLE_CELL_CHAR+":focus-within").cls()){
-                fontSize=CELL_CHAR_HGHT_PRT.sizePercnt(80, "cqh")
-            }
-            rule(PUZZLE_CELL_CHAR_SOLVED.cls()){
-                fontSize=CELL_CHAR_HGHT_PRT.sizePercnt(100, "cqw")
-            }
             rule(PUZZLE_GRID.cls()){
                 height=100.vh
                 display=Display.grid
@@ -252,19 +243,13 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         //media("only screen and (orientation: landscape)"){
         media("(orientation: landscape) and (max-width: 812px)" +
                 " and (min-aspect-ratio: 16/9)"){
-            val CELL_CHAR_HGHT_LNDSCP=24
-            rule(PUZZLE_CELL_CHAR.cls()){
-                fontSize=CELL_CHAR_HGHT_LNDSCP.sizePercnt(100, "cqh")
-            }
-            rule((PUZZLE_CELL_CHAR+":focus-within").cls()){
-                fontSize=CELL_CHAR_HGHT_LNDSCP.sizePercnt(10, "cqw")
-            }
             rule(PUZZLE_GRID.cls()){
                 display=Display.grid
                 gridTemplateColumns=GridTemplateColumns(
                     LinearDimension("45fr"), LinearDimension("45fr"),
                     LinearDimension("88fr"), LinearDimension("1fr"))
-                gridTemplateRows=GridTemplateRows(LinearDimension("1fr"))
+                gridTemplateRows=GridTemplateRows(
+                    LinearDimension("4fr"), LinearDimension("2fr"))
             }
             rule(LGND_GRID_HORIZ.cls()){
                 //display=Display.grid
@@ -391,7 +376,6 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
                 LinearDimension("1fr"))
         }
         rule(GRID_TABLE.cls()){
-            //fontFamily="monospace,sans-serif" CELL_CHAR_FONT_FAMILY
             fontFamily="sans-serif"
             borderWidth=0.6.vh
             borderStyle=BorderStyle.solid
@@ -434,7 +418,9 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         rule(PUZZLE_CELL_FOCUSED.cls()){
             borderBottomStyle=BorderStyle.solid
             borderColor=gridFocusColor
-            borderWidth=LinearDimension("3px")
+            borderWidth=PUZZLE_CELL_FOCUSED_BORDER_WIDTH
+            paddingTop=PUZZLE_CELL_FOCUSED_BORDER_WIDTH
+            boxSizing=BoxSizing.borderBox
         }
         rule(PUZZLE_CELL_CHAR_CONTAINER.cls()){
             textAlign=TextAlign.center

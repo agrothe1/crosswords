@@ -83,6 +83,7 @@ override fun FlowContent.apply(){
                         blur()
                         """.trimIndent()
                     onFocus="""
+                        blur()
                         onInputFocus('$wsdata')
                     """.trimIndent()
                 }
@@ -91,5 +92,4 @@ override fun FlowContent.apply(){
                 Pair(IDX_SLCT_ROT_WEST, IDX_SLCT_ROT_EAST))
         }
     }
-}
-}
+}}

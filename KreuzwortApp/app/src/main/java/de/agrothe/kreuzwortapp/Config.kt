@@ -128,6 +128,7 @@ class Css(
     val PUZZLE_CELL_GRID_IDX: String,
     val PUZZLE_CELL_CHAR_CONTAINER: String,
     val PUZZLE_CELL_CHAR: String,
+    val PUZZLE_CELL_CHAR_DECR_HGHT_PERC: Int,
     val PUZZLE_CELL_CHAR_SOLVED: String,
     val PUZZLE_CELL_CHAR_FINISHED: String,
     val PUZZLE_CELL_CHAR_ALL_FINISHED: String,
@@ -158,7 +159,8 @@ class Css(
     val LGND_ID_SUFFX_COL: String,
     val SIMPLE_KEYBOARD_ID: String,
     val KEYBORD_HIDDEN: String,
-    val KEYBORD_HIDE_DURATION: Int,
+    val KEYBORD_SHOWN: String,
+    val KEYBORD_ANIM_DURATION: Float,
     val KEYBORD_THEME_NAME: String,
 
     val COLOR_PALETTES: List<ColorPalletteConfig>,

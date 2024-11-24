@@ -6324,7 +6324,7 @@ guttun;zugutekommen;bereichern (geh., fig.);(jemandem) in die Arme spielen (ugs.
 (Missstand) abstellen;es richten (ugs.);abhelfen;Abhilfe schaffen;(Fehler) ausmerzen;bereinigen;klären;(wieder) geradebiegen;aus der Welt schaffen;(Gefahr) bannen;(wieder) ins Lot bringen (fig.);(Problem) bewältigen;(die) Kuh vom Eis holen (fig.);in Ordnung bringen;lösen;(Mangel) beheben;(Problem) beseitigen;(wieder) ins Reine bringen
 Fronarbeiter;Sklave;Leibeigener;Untertan
 Aspekt;Fassette (alte Schreibung bis 2011);Facette;Seite
-vergleichsweise;hinlänglich (geh.);einigermaßen (Gradadverb) (Hauptform);schon ganz (ugs.);ziemlich;ganz schön (ugs.);verhältnismäßig;eher;ganz (ugs.);mäßig (geh.);reichlich;leidlich (geh.);durchaus;in Grenzen (geh.);halb;nicht un...;relativ;halbwegs (ugs.);recht (ugs.)
+vergleichsweise;hinlänglich (geh.);einigermaßen (Gradadverb) (Hauptform);schon ganz (ugs.);ziemlich;ganz schön (ugs.);verhältnismäßig;eher;ganz (ugs.);mäßig (geh.);reichlich;leidlich (geh.);durchaus;in Grenzen (geh.);halb;relativ;halbwegs (ugs.);recht (ugs.)
 Akkuladegerät;Ladegerät;Batterieladegerät
 räumen;verlagern;ausräumen;migrieren;auslagern
 Todesopfer;Tote;Opfer
