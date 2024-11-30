@@ -21,8 +21,8 @@ const val SIMPLE_KEYBOARD_CLASS_NAME="simple-keyboard"
 
 val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
     fun String.cls()=".$this"
-    fun Number.sizePercnt(pPrct: Int, pUnit: String)=
-        LinearDimension("${this.toFloat()/100*pPrct}$pUnit")
+    fun Float.decrPercnt(pPrct: Float, pUnit: String)=
+        toFloat().run{LinearDimension("${this-this/100*pPrct}$pUnit")}
 
     logger.debug{"CSS params dimen:'$pDimen' width:'$pWidth' hght:'$pHght'"}
 
@@ -30,7 +30,7 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         val colors=COLOR_PALETTES.random()
         val gridBorderColor=colors.GRID_BORDER_COLR
         val gridLineColor=colors.GRID_LINES_COLR
-        val gridFocusColor=gridBorderColor
+        val gridFocusColor=gridLineColor.darken(20)
         val tableCellBackgroundColor1=Color.floralWhite.lighten((1..3)
             .random())//.changeAlpha((84..90).random()*0.01)
         val tableCellBackgroundColor2=Color.antiqueWhite.lighten((5..7)
@@ -46,14 +46,11 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         val PUZZLE_CELL_FOCUSED_BORDER_WIDTH=LinearDimension("4px")
 
         rule("html, body"){
-            minHeight=100.vh
-            maxHeight=100.vw
-            height=100.vh
-            width=100.vw
-            marginTop=0.vh
-            marginBottom=0.vh
-            marginLeft=0.vh
-            marginRight=0.vh
+            //minHeight=100.vh
+            //maxHeight=100.vw
+            //height=100.vh
+            //width=100.vw
+            margin="0"
             paddingLeft=LinearDimension("0.2vh")
             paddingRight=LinearDimension("0.2vh")
         }
@@ -65,11 +62,15 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
             color=pColr
             backgroundColor=Color.transparent
             borderStyle=BorderStyle.none
-            //lineHeight=LineHeight("3vh") todo
             padding="0"
-            //maxWidth=1.em
-            //maxHeight=1.em
             fontFamily=CELL_CHAR_FONT_FAMILY
+            (100f/pDimen).decrPercnt(
+                    PUZZLE_CELL_CHAR_DECR_HGHT_PERC, "vw").let{
+                fontSize=it
+                maxWidth=it
+                maxHeight=it
+                //lineHeight=LineHeight("$it")
+            }
             textAlign=TextAlign.center
             transition("color", TRANSITION_DURATION.s,
                 Timing("cubic-bezier(0.4, 0, 0.2, 1)"), 0.s)
@@ -118,10 +119,6 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
                 duration=ANIMATION_DURATION.s,
                 iterationCount=IterationCount.infinite)
         }
-        rule(KEYBORD_HIDDEN.cls()){
-            animation(name="keyboardFadeOut", duration=KEYBORD_ANIM_DURATION.ms,
-                fillMode=FillMode.forwards, timing=Timing.ease)
-        }
         LinearDimension("4vw").let{hght->
             rule(IDX_SLCT_ROT_SOUTH.cls()){
                 height=hght
@@ -137,52 +134,24 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         }}
         //media("only screen and (orientation: portrait)"){
             rule(PUZZLE_GRID.cls()){
-                height=100.vh
                 display=Display.grid
-                gridTemplateColumns=GridTemplateColumns(
-                    LinearDimension("4fr"), LinearDimension("4fr"),
-                    LinearDimension("1fr"))
             }
             rule(LGND_GRID_HORIZ.cls()){
-                //display=Display.grid
-                //overflow=Overflow.auto
-                gridRowStart=GridRowStart("1")
-                gridColumnStart=GridColumnStart("1")
-                gridColumnEnd=GridColumnEnd("2")
                 alignSelf=Align.selfStart
             }
             rule(LGND_GRID_VERT.cls()){
-                //display=Display.grid
-                gridRowStart=GridRowStart("1")
-                gridColumnStart=GridColumnStart("2")
-                gridColumnEnd=GridColumnEnd("3")
                 alignSelf=Align.selfStart
                 marginLeft=LinearDimension.auto
                 marginRight=LinearDimension("0")
             }
             rule(NEW_GAME.cls()){
-                gridRowStart=GridRowStart("1")
-                gridColumnStart=GridColumnStart("3")
                 nextButton()
                 border="none"
                 marginLeft=0.5.vh
                 marginRight=1.0.vh
             }
             rule(FIELD_GRID.cls()){
-                overflowY=Overflow.auto
-                display=Display.grid
-                gridColumnStart=GridColumnStart("1")
-                gridColumnEnd=GridColumnEnd("4")
-                gridRowStart=GridRowStart("2")
-                gridRowEnd=GridRowEnd("3")
                 padding="0.2vh"
-            }
-            rule(SIMPLE_KEYBOARD_CLASS_NAME.cls()){
-                display=Display.grid
-                gridColumnStart=GridColumnStart("1")
-                gridColumnEnd=GridColumnEnd("4")
-                gridRowStart=GridRowStart("3")
-                gridRowEnd=GridRowEnd("4")
             }
             rule(LGND_TABLE.cls()){
                 fontSize=2.5.vh
@@ -421,6 +390,12 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
             borderWidth=PUZZLE_CELL_FOCUSED_BORDER_WIDTH
             paddingTop=PUZZLE_CELL_FOCUSED_BORDER_WIDTH
             boxSizing=BoxSizing.borderBox
+            /* too annoying, makes cell char jump todo: fix? */
+            /*
+            animation(name="puzzleCellFocused",
+                duration=PUZZLE_CELL_FOCUSED_ANIM_DURTN.s,
+                iterationCount=IterationCount.infinite, timing=Timing.easeIn)
+             */
         }
         rule(PUZZLE_CELL_CHAR_CONTAINER.cls()){
             textAlign=TextAlign.center
@@ -459,20 +434,22 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
             newGameBoder()
             borderWidth=0.4.vh
             margin="none"
-            fontSize=2.7.vh
-            lineHeight=LineHeight("5.0vh")
+            fontSize=3.vh
+            lineHeight=LineHeight("5.2vh")
             color=gridBorderColor.darken(60)
             alignContent=Align.center
-            width=87.pct
-            padding="1.0vh"
+            padding="2.0vh"
             textAlign=TextAlign.center
             backgroundColor=Color.white
         }
         fun StyledElement.menuLayerNextButton(){apply{
             newGameBoder()
             nextButton()
+            fontSize=3.vh
             borderColor=gridLineColor
-            padding="0.5vh"
+            borderWidth=0.5.vh
+            padding="0.9vh"
+            margin="1vh"
             whiteSpace=WhiteSpace.nowrap
         }}
         rule(MENU_LAYER_NEXT_BUTTON.cls()){
@@ -480,7 +457,7 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         }
         rule(MENU_LAYER_NEXT_BUTTON_ACTIVE.cls()){
             menuLayerNextButton()
-            borderWidth=0.5.vh
+            borderWidth=0.7.vh
             fontWeight=FontWeight.w900
         }
         rule(MENU_FIELD_SET_ENTRY.cls()){
@@ -488,7 +465,7 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
             borderStyle=BorderStyle.none
             margin="0"
             padding="0"
-            lineHeight=LineHeight("3.7vh")
+            lineHeight=LineHeight("4.0vh")
             textAlign=TextAlign.left
         }
         rule("""${MENU_FIELD_SET_ENTRY.cls()}
@@ -520,6 +497,10 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
             color=colors.CELL_CHAR_COLR
             fontWeight=FontWeight.w700
             fontFamily=CELL_CHAR_FONT_FAMILY
+        }
+        rule(KEYBORD_HIDDEN.cls()){
+            animation(name="keyboardFadeOut", duration=KEYBORD_ANIM_DURATION.ms,
+                fillMode=FillMode.forwards, timing=Timing.ease)
         }
     }
 }

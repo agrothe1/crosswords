@@ -1,0 +1,26 @@
+.puzzleGrid{
+    grid-template-areas:
+        "lgndHor lgndVer newGame"
+        "fieldGrid fieldGrid fieldGrid"
+        "keyBoard keyBoard keyBoard";
+    grid-template-columns: 1fr 1fr auto;
+    /*grid-template-rows: 1fr 2fr 1fr;*/
+}
+.legendGridHoriz{
+    grid-area: lgndHor
+}
+.lgndGridVert{
+    grid-area: lgndVer
+}
+.newGame{
+    grid-area: newGame
+}
+.fieldGrid{
+    grid-area: fieldGrid
+}
+.simple-keyboard{
+    grid-area: keyBoard
+}
+
+
+

@@ -28,6 +28,11 @@ class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
             }
             link{
                 rel="stylesheet"
+                href="/css/areas.css"
+                type="text/css"
+            }
+            link{
+                rel="stylesheet"
                 href="/css/anim.css"
                 type="text/css"
             }
@@ -131,109 +136,106 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                             src=webAppConf.DIRCTN_IMG)
                 }}}
 
-            div{
-                id="content"
-                div(classes=PUZZLE_GRID){
-                    button(classes=NEW_GAME){
-                        id=SHOW_HELP_BUTTON_ID
-                        hidden=false
-                        val wsdata=Json.encodeToString(
-                            WSDataToSrvr(
-                                showHelp=true, dimen=pDimen,
-                                hashCode=puzzle.hashCode()
-                            )
+            div(classes=PUZZLE_GRID){
+                button(classes=NEW_GAME){
+                    id=SHOW_HELP_BUTTON_ID
+                    hidden=false
+                    val wsdata=Json.encodeToString(
+                        WSDataToSrvr(
+                            showHelp=true, dimen=pDimen,
+                            hashCode=puzzle.hashCode()
                         )
-                        onClick="showHelp('$wsdata')"
-                        gameButton(confWeb.I18n.SHOW_HELP)
-                    }
-                    button(classes=NEW_GAME){
-                        id=NEW_GAME_BUTTON_ID
-                        hidden=true
-                        val wsdata=Json.encodeToString(
-                            WSDataToSrvr(newGame=true, dimen=pDimen,
-                                puzzleType=pPuzzleType.name)
-                        )
-                        onClick=
-                            """
-                    if(${confWeb.IS_PLUS_VERSION})
-                        document.getElementById('$GLASS_LAYER')
-                            .style.display='grid'
-                    else{
-                        let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
-                        ws.onopen=(ev)=>{ws.send('${wsdata}')}
-                    }
-                """.trimIndent()
-                        gameButton(confWeb.I18n.NEW_GAME, true)
-                    }
-                    div(classes=LGND_GRID_HORIZ){
-                        table(classes=LGND_TABLE){
-                            tr{
-                                th(classes=LGND_TABLE_HEADER_HOR)
-                                    {colSpan="2"; +confWeb.I18n.HORIZONTAL}
-                            }
-                            puzzle.forEachIndexed{rowIdx, horWord->
-                                tr{
-                                    entries[puzzle.getStringAt(Axis.X, rowIdx)]
-                                        ?.let{synms->
-                                            legendIdx(rowIdx, 0, synms,
-                                                Pair(IDX_SLCT_ROT_WEST,
-                                                    IDX_SLCT_ROT_EAST)
-                                                )
-                                            td{legendEntries(horWord, synms,
-                                                rowIdx.lgndIdSuffxRow(),
-                                                rowIdx==pDimen-1,
-                                                false)}
-                            }}}
-                        }
-                    }
-                    div(classes=FIELD_GRID){
-                        insert(PuzzleGrid(entries, puzzle, pDimen, confWeb),
-                            gridTmplt)
-                    }
-                    div(classes=LGND_GRID_VERT){
-                        table(classes=LGND_TABLE){
-                            tr{
-                                th(classes=LGND_TABLE_HEADER_VER)
-                                    {colSpan="2"; +confWeb.I18n.VERTICAL}
-                            }
-                            puzzle.forEachIndexed{colIdx, _->
-                                tr{
-                                    puzzle.getStringAt(Axis.Y, colIdx)
-                                        .let{vertWord->
-                                    entries[puzzle.getStringAt(Axis.Y, colIdx)]
-                                        ?.let{synms->
-                                            legendIdx(0, colIdx, synms,
-                                                Pair(IDX_SLCT_ROT_SOUTH,
-                                                    IDX_SLCT_ROT_NORTH))
-                                            td{legendEntries(
-                                                vertWord.toCharArray(),
-                                                synms, colIdx.lgndIdSuffxCol(),
-                                                colIdx==pDimen-1,
-                                                true)}
-                            }}}}
-                        }
-                    }
-                    div(classes=GLASS_LAYER){
-                        id=GLASS_LAYER
-                        menu(confCss)
-                    }
-                    button(classes=NEW_GAME){
-                        id=NEW_GAME_BUTTON_ID
-                        hidden=true
-                        val wsdata=Json.encodeToString(
-                            WSDataToSrvr(newGame=true, dimen=pDimen)
-                        )
-                        onClick=
-                            """
+                    )
+                    onClick="showHelp('$wsdata')"
+                    gameButton(confWeb.I18n.SHOW_HELP)
+                }
+                button(classes=NEW_GAME){
+                    id=NEW_GAME_BUTTON_ID
+                    hidden=true
+                    val wsdata=Json.encodeToString(
+                        WSDataToSrvr(newGame=true, dimen=pDimen,
+                            puzzleType=pPuzzleType.name)
+                    )
+                    onClick=
+                        """
+                if(${confWeb.IS_PLUS_VERSION})
+                    document.getElementById('$GLASS_LAYER')
+                        .style.display='grid'
+                else{
                     let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
                     ws.onopen=(ev)=>{ws.send('${wsdata}')}
-                """.trimIndent()
-                        gameButton(confWeb.I18n.NEW_GAME, true)
+                }
+            """.trimIndent()
+                    gameButton(confWeb.I18n.NEW_GAME, true)
+                }
+                div(classes=LGND_GRID_HORIZ){
+                    table(classes=LGND_TABLE){
+                        tr{
+                            th(classes=LGND_TABLE_HEADER_HOR)
+                                {colSpan="2"; +confWeb.I18n.HORIZONTAL}
+                        }
+                        puzzle.forEachIndexed{rowIdx, horWord->
+                            tr{
+                                entries[puzzle.getStringAt(Axis.X, rowIdx)]
+                                    ?.let{synms->
+                                        legendIdx(rowIdx, 0, synms,
+                                            Pair(IDX_SLCT_ROT_WEST,
+                                                IDX_SLCT_ROT_EAST)
+                                            )
+                                        td{legendEntries(horWord, synms,
+                                            rowIdx.lgndIdSuffxRow(),
+                                            rowIdx==pDimen-1,
+                                            false)}
+                        }}}
                     }
-                    div(classes=SIMPLE_KEYBOARD_CLASS_NAME){
-                        id=SIMPLE_KEYBOARD_ID}
+                }
+                div(classes=FIELD_GRID){
+                    insert(PuzzleGrid(entries, puzzle, pDimen, confWeb),
+                        gridTmplt)
+                }
+                div(classes=LGND_GRID_VERT){
+                    table(classes=LGND_TABLE){
+                        tr{
+                            th(classes=LGND_TABLE_HEADER_VER)
+                                {colSpan="2"; +confWeb.I18n.VERTICAL}
+                        }
+                        puzzle.forEachIndexed{colIdx, _->
+                            tr{
+                                puzzle.getStringAt(Axis.Y, colIdx)
+                                    .let{vertWord->
+                                entries[puzzle.getStringAt(Axis.Y, colIdx)]
+                                    ?.let{synms->
+                                        legendIdx(0, colIdx, synms,
+                                            Pair(IDX_SLCT_ROT_SOUTH,
+                                                IDX_SLCT_ROT_NORTH))
+                                        td{legendEntries(
+                                            vertWord.toCharArray(),
+                                            synms, colIdx.lgndIdSuffxCol(),
+                                            colIdx==pDimen-1,
+                                            true)}
+                        }}}}
+                    }
+                }
+                div(classes=GLASS_LAYER){
+                    id=GLASS_LAYER
+                    menu(confCss)
+                }
+                button(classes=NEW_GAME){
+                    id=NEW_GAME_BUTTON_ID
+                    hidden=true
+                    val wsdata=Json.encodeToString(
+                        WSDataToSrvr(newGame=true, dimen=pDimen)
+                    )
+                    onClick=
+                        """
+                let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
+                ws.onopen=(ev)=>{ws.send('${wsdata}')}
+            """.trimIndent()
+                    gameButton(confWeb.I18n.NEW_GAME, true)
                 }
             }
+            div(classes=SIMPLE_KEYBOARD_CLASS_NAME){
+                id=SIMPLE_KEYBOARD_ID}
         }
     }
     fun DIV.menu(pCss: Css){
@@ -308,7 +310,6 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
         }
     }
 }
-
 @Suppress("SimplifiableCallChain")
 val scripts="""
     let Keyboard=window.SimpleKeyboard.default
@@ -440,16 +441,21 @@ val scripts="""
         let d=document
         let t=d.getElementById('${confCss.GRID_TABLE}')
         let dim=t.rows[0].cells.length
-        let mw=Math.trunc(t.clientWidth/dim)+'px'
-        let mh=Math.trunc(t.clientHeight/dim)
-        let fs=mh-(mh/100*${confCss.PUZZLE_CELL_CHAR_DECR_HGHT_PERC})+'px'
+        let mw=Math.trunc(t.clientWidth/dim)
+        let mh=Math.trunc((t.clientHeight-d.getElementById('${confCss.SIMPLE_KEYBOARD_ID}').clientHeight)/dim)
+        console.log(d.documentElement.clientHeight+' '+d.getElementById('${confCss.SIMPLE_KEYBOARD_ID}').clientHeight)
+        let fs=mh+'px'//-(mh/100*${confCss.PUZZLE_CELL_CHAR_DECR_HGHT_PERC})+'px'
         mh=mh+'px'
+        mw=mw+'px'
         d.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR}')
             .forEach(c=>{
                 let s=c.style
                 s.fontSize=fs;s.maxWidth=mw;s.maxHeight=mh
             })
     }
+    /*
+    d.body.scrollHeight<d.documentElement.clientHeight
+    */
     //window.addEventListener('resize', adjustFontSize)
-    window.addEventListener('load', adjustFontSize)
+    //window.addEventListener('load', adjustFontSize)
 """.lines().map{it.trimStart().trimEnd()}.joinToString("\n")
