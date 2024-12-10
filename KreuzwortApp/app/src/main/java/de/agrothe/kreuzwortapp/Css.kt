@@ -10,6 +10,7 @@ private val confCss=config.webApp.CSS
 
 // no support for these attributes in kotlin.css
 const val CELL_CHAR_FONT_FAMILY="monospace,sans-serif"
+const val CONTENT_STYLE="transform-origin:top left"
 const val NEW_GAME_BUTTON_STYLE =
     "writing-mode:vertical-lr;text-orientation:upright"
 const val NEW_GAME_DIALOG_STYLE =
@@ -30,7 +31,8 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         val colors=COLOR_PALETTES.random()
         val gridBorderColor=colors.GRID_BORDER_COLR
         val gridLineColor=colors.GRID_LINES_COLR
-        val gridFocusColor=gridLineColor.darken(20)
+        val puzzleCellFocusedColor=gridLineColor.darken(20)
+            .saturate(20)
         val tableCellBackgroundColor1=Color.floralWhite.lighten((1..3)
             .random())//.changeAlpha((84..90).random()*0.01)
         val tableCellBackgroundColor2=Color.antiqueWhite.lighten((5..7)
@@ -43,16 +45,13 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         val PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE2 =
             PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE_TPLT
                 .replace(CLR_PLCH, tableCellBackgroundColor2.toString())
-        val PUZZLE_CELL_FOCUSED_BORDER_WIDTH=LinearDimension("4px")
+        val PUZZLE_CELL_FOCUSED_BORDER_WIDTH=LinearDimension("0.7vh")
 
         rule("html, body"){
-            //minHeight=100.vh
-            //maxHeight=100.vw
-            //height=100.vh
-            //width=100.vw
+            height=100.pct
+            width=100.pct
             margin="0"
-            paddingLeft=LinearDimension("0.2vh")
-            paddingRight=LinearDimension("0.2vh")
+            overflow=Overflow.hidden
         }
         fun cellChar(pSel: String, pColr: Color)=rule(pSel.cls()){
             position=Position.absolute
@@ -210,8 +209,8 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
                 }}
         //}
         //media("only screen and (orientation: landscape)"){
-        media("(orientation: landscape) and (max-width: 812px)" +
-                " and (min-aspect-ratio: 16/9)"){
+        media("(orientation: Xlandscape) and (max-width: 812px)" +
+                " and (min-aspect-ratio: 16/9)"){ // todo
             rule(PUZZLE_GRID.cls()){
                 display=Display.grid
                 gridTemplateColumns=GridTemplateColumns(
@@ -219,6 +218,7 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
                     LinearDimension("88fr"), LinearDimension("1fr"))
                 gridTemplateRows=GridTemplateRows(
                     LinearDimension("4fr"), LinearDimension("2fr"))
+                overflow=Overflow.auto
             }
             rule(LGND_GRID_HORIZ.cls()){
                 //display=Display.grid
@@ -240,6 +240,7 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
                 gridRowStart=GridRowStart("1")
                 gridRowEnd=GridRowEnd("2")
                 paddingTop=0.7.vh
+                overflowY=Overflow.auto
             }
             rule(NEW_GAME.cls()){
                 gridColumnStart=GridColumnStart("4")
@@ -254,7 +255,7 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
             fun lgndEntries(pSel: String, pTextDecoLine: TextDecorationLine,
                     pBorderBottomStyle: BorderStyle, pColor: Color)
                         = rule(pSel.cls()){
-                borderWidth=0.3.vh
+                borderWidth=0.3.vh // lgndBorderWidth -> todo constant
                 borderColor=pColor
                 borderStyle=BorderStyle.none
                 borderBottomStyle=pBorderBottomStyle
@@ -384,12 +385,13 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         rule(PUZZLE_CELL_GRID_IDX_BACKGRD+"2".cls()){
             background=PUZZLE_CELL_GRID_IDX_BACKGRD_STYLE2
         }
-        rule(PUZZLE_CELL_FOCUSED.cls()){
-            borderBottomStyle=BorderStyle.solid
-            borderColor=gridFocusColor
+        rule("td:has(${PUZZLE_CELL_FOCUSED.cls()})"){
+            borderStyle=BorderStyle.solid
+            borderColor=puzzleCellFocusedColor
             borderWidth=PUZZLE_CELL_FOCUSED_BORDER_WIDTH
-            paddingTop=PUZZLE_CELL_FOCUSED_BORDER_WIDTH
-            boxSizing=BoxSizing.borderBox
+            //paddingTop=PUZZLE_CELL_FOCUSED_BORDER_WIDTH
+        }
+        rule(PUZZLE_CELL_FOCUSED.cls()){
             /* too annoying, makes cell char jump todo: fix? */
             /*
             animation(name="puzzleCellFocused",

@@ -18,7 +18,8 @@ class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
             meta{
                 charset="utf-8"
                 name="viewport"
-                content="height=device-height,width=device-width" // todo initial-scale ?
+                content="height=device-height,width=device-width," +
+                    "initial-scale=1.0"
             }
             link{
                 rel="stylesheet"
@@ -49,9 +50,13 @@ class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
                 insert(header)
             }
              */
-            insert(PuzzleTplt(pNumSolvedGames, pDimen, pExcluded,
-                pPuzzleType, pWidth, pHght), puzzle)
-            script{unsafe{raw(scripts)}}
+            div{
+                id=confCss.ROOT_ID
+                style=CONTENT_STYLE
+                insert(PuzzleTplt(pNumSolvedGames, pDimen, pExcluded,
+                    pPuzzleType, pWidth, pHght), puzzle)
+                script{unsafe{raw(scripts)}}
+            }
         }}
 }
 
@@ -137,37 +142,6 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                 }}}
 
             div(classes=PUZZLE_GRID){
-                button(classes=NEW_GAME){
-                    id=SHOW_HELP_BUTTON_ID
-                    hidden=false
-                    val wsdata=Json.encodeToString(
-                        WSDataToSrvr(
-                            showHelp=true, dimen=pDimen,
-                            hashCode=puzzle.hashCode()
-                        )
-                    )
-                    onClick="showHelp('$wsdata')"
-                    gameButton(confWeb.I18n.SHOW_HELP)
-                }
-                button(classes=NEW_GAME){
-                    id=NEW_GAME_BUTTON_ID
-                    hidden=true
-                    val wsdata=Json.encodeToString(
-                        WSDataToSrvr(newGame=true, dimen=pDimen,
-                            puzzleType=pPuzzleType.name)
-                    )
-                    onClick=
-                        """
-                if(${confWeb.IS_PLUS_VERSION})
-                    document.getElementById('$GLASS_LAYER')
-                        .style.display='grid'
-                else{
-                    let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
-                    ws.onopen=(ev)=>{ws.send('${wsdata}')}
-                }
-            """.trimIndent()
-                    gameButton(confWeb.I18n.NEW_GAME, true)
-                }
                 div(classes=LGND_GRID_HORIZ){
                     table(classes=LGND_TABLE){
                         tr{
@@ -181,58 +155,73 @@ class PuzzleTplt(private val pNumSolvedGames: Int, val pDimen: Int,
                                         legendIdx(rowIdx, 0, synms,
                                             Pair(IDX_SLCT_ROT_WEST,
                                                 IDX_SLCT_ROT_EAST)
-                                            )
+                                        )
                                         td{legendEntries(horWord, synms,
                                             rowIdx.lgndIdSuffxRow(),
                                             rowIdx==pDimen-1,
                                             false)}
-                        }}}
+                                    }}}
                     }
-                }
-                div(classes=FIELD_GRID){
-                    insert(PuzzleGrid(entries, puzzle, pDimen, confWeb),
-                        gridTmplt)
                 }
                 div(classes=LGND_GRID_VERT){
                     table(classes=LGND_TABLE){
                         tr{
                             th(classes=LGND_TABLE_HEADER_VER)
-                                {colSpan="2"; +confWeb.I18n.VERTICAL}
+                            {colSpan="2"; +confWeb.I18n.VERTICAL}
                         }
                         puzzle.forEachIndexed{colIdx, _->
                             tr{
                                 puzzle.getStringAt(Axis.Y, colIdx)
                                     .let{vertWord->
-                                entries[puzzle.getStringAt(Axis.Y, colIdx)]
-                                    ?.let{synms->
-                                        legendIdx(0, colIdx, synms,
-                                            Pair(IDX_SLCT_ROT_SOUTH,
-                                                IDX_SLCT_ROT_NORTH))
-                                        td{legendEntries(
-                                            vertWord.toCharArray(),
-                                            synms, colIdx.lgndIdSuffxCol(),
-                                            colIdx==pDimen-1,
-                                            true)}
-                        }}}}
+                                        entries[puzzle.getStringAt(Axis.Y,
+                                                colIdx)]
+                                            ?.let{synms->
+                                                legendIdx(0, colIdx,
+                                                    synms,
+                                                    Pair(IDX_SLCT_ROT_SOUTH,
+                                                        IDX_SLCT_ROT_NORTH))
+                                                td{legendEntries(
+                                                    vertWord.toCharArray(),
+                                                    synms,
+                                                    colIdx.lgndIdSuffxCol(),
+                                                    colIdx==pDimen-1,
+                                                    true)}
+                                            }}}}
                     }
                 }
-                div(classes=GLASS_LAYER){
-                    id=GLASS_LAYER
-                    menu(confCss)
+                button(classes=NEW_GAME){
+                    id=SHOW_HELP_BUTTON_ID
+                    hidden=false
+                    val wsdata=Json.encodeToString(
+                        WSDataToSrvr(
+                            showHelp=true, dimen=pDimen,
+                            hashCode=puzzle.hashCode()
+                        ))
+                    onClick="showHelp('$wsdata')"
+                    gameButton(confWeb.I18n.SHOW_HELP)
                 }
                 button(classes=NEW_GAME){
                     id=NEW_GAME_BUTTON_ID
                     hidden=true
                     val wsdata=Json.encodeToString(
-                        WSDataToSrvr(newGame=true, dimen=pDimen)
-                    )
-                    onClick=
-                        """
-                let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
-                ws.onopen=(ev)=>{ws.send('${wsdata}')}
+                        WSDataToSrvr(newGame=true, dimen=pDimen,
+                            puzzleType=pPuzzleType.name))
+                    onClick="""
+                if(${confWeb.IS_PLUS_VERSION})
+                    document.getElementById('$GLASS_LAYER')
+                        .style.display='grid'
+                else{
+                    let ws=new WebSocket('${webAppConf.WEB_SOCK_URL}')
+                    ws.onopen=(ev)=>{ws.send('${wsdata}')}}
             """.trimIndent()
                     gameButton(confWeb.I18n.NEW_GAME, true)
                 }
+                div(classes=FIELD_GRID){
+                    insert(PuzzleGrid(entries, puzzle, pDimen, confWeb),
+                        gridTmplt)}
+                div(classes=GLASS_LAYER){
+                    id=GLASS_LAYER
+                    menu(confCss)}
             }
             div(classes=SIMPLE_KEYBOARD_CLASS_NAME){
                 id=SIMPLE_KEYBOARD_ID}
@@ -303,7 +292,7 @@ class PuzzleGrid(val pEntries: DictEntry, val puzzle: Puzzle, val pDimen: Int,
                                         pEntries[
                                             puzzle.getStringAt(Axis.Y, colIdx)],
                                         pDimen, puzzle.hashCode(), bckgdColor),
-                                            cellTmplt)
+                                        cellTmplt)
                                 }}
                             }
             }}}}
@@ -359,6 +348,7 @@ val scripts="""
         inp.value=''
         inp.classList.add('${confCss.PUZZLE_CELL_FOCUSED}')
         keyboard.setOptions({WSData: wsdata})
+        onChange(' ')
     }
     function onChange(pInput){
         var d=document
@@ -437,25 +427,11 @@ val scripts="""
         })
         ws.onopen=(ev)=>{ws.send(pWSData)}
     }
-    function adjustFontSize(){
-        let d=document
-        let t=d.getElementById('${confCss.GRID_TABLE}')
-        let dim=t.rows[0].cells.length
-        let mw=Math.trunc(t.clientWidth/dim)
-        let mh=Math.trunc((t.clientHeight-d.getElementById('${confCss.SIMPLE_KEYBOARD_ID}').clientHeight)/dim)
-        console.log(d.documentElement.clientHeight+' '+d.getElementById('${confCss.SIMPLE_KEYBOARD_ID}').clientHeight)
-        let fs=mh+'px'//-(mh/100*${confCss.PUZZLE_CELL_CHAR_DECR_HGHT_PERC})+'px'
-        mh=mh+'px'
-        mw=mw+'px'
-        d.querySelectorAll('.${confCss.PUZZLE_CELL_CHAR}')
-            .forEach(c=>{
-                let s=c.style
-                s.fontSize=fs;s.maxWidth=mw;s.maxHeight=mh
-            })
+    function scaleContent(){
+        let content=document.getElementById('${confCss.ROOT_ID}')
+        let scalX=window.innerWidth/content.offsetWidth
+        let scalY=window.innerHeight/content.offsetHeight
+        content.style.transform='scale('+scalX+','+scalY+')'
     }
-    /*
-    d.body.scrollHeight<d.documentElement.clientHeight
-    */
-    //window.addEventListener('resize', adjustFontSize)
-    //window.addEventListener('load', adjustFontSize)
+    window.addEventListener('load', scaleContent)
 """.lines().map{it.trimStart().trimEnd()}.joinToString("\n")

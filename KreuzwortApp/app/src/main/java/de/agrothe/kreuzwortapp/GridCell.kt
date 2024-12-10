@@ -62,9 +62,9 @@ override fun FlowContent.apply(){
             idx(pWordAtY?.ornt, pRowIdx,
                 Pair(IDX_SLCT_ROT_SOUTH, IDX_SLCT_ROT_NORTH))
             div(classes=PUZZLE_CELL_CHAR_CONTAINER){
-                val iD = getRowColIdx(pRowIdx, pColIdx)
+                val iD=getRowColIdx(pRowIdx, pColIdx)
                 // todo does "new WS" reuse existing WS?
-                val wsdata = Json.encodeToString(
+                val wsdata=Json.encodeToString(
                     WSDataToSrvr('%', pRowIdx, pColIdx, pHashCode,
                         dimen=pDimen))
                 input(

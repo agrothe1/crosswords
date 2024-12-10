@@ -204,19 +204,6 @@ class MainActivity : ComponentActivity(){
 
         webViewReference=WeakReference(
             WebView(this).apply{
-                addJavascriptInterface(object{
-                    @android.webkit.JavascriptInterface
-                    fun scrollToElement(pId: String){
-                        runOnUiThread{
-                            loadUrl(
-                    """javascript:{
-                        console.debug('scrolling to: $pId')
-                        document.querySelector('#${pId}').scrollIntoView({
-                            behavior:'smooth', block:'end'
-                        })}
-                    """.trimIndent()
-                    )}}
-                }, "Android")
                 webViewClient=SslWebView(myPubKey)
                 setContentView(this)
                 setWebContentsDebuggingEnabled(true)

@@ -4,7 +4,6 @@
         "fieldGrid fieldGrid fieldGrid"
         "keyBoard keyBoard keyBoard";
     grid-template-columns: 1fr 1fr auto;
-    /*grid-template-rows: 1fr 2fr 1fr;*/
 }
 .legendGridHoriz{
     grid-area: lgndHor
@@ -21,6 +20,3 @@
 .simple-keyboard{
     grid-area: keyBoard
 }
-
-
-

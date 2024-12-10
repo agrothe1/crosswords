@@ -105,6 +105,7 @@ class I18n(
 )
 
 class Css(
+    val ROOT_ID: String,
     val PUZZLE_GRID: String,
     val CELL_GRID: String,
     val SHOW_HELP_BUTTON_ID: String,
