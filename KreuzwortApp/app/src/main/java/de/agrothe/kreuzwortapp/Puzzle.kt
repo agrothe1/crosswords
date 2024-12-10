@@ -10,7 +10,7 @@ private val confCss=confWeb.CSS
 class BodyTplt(val pNumSolvedGames: Int, val pDimen: Int,
         val pExcluded: Collection<String>? = null, val pPuzzleType: PuzzleType,
         val pWidth: Int, val pHght: Int): Template<HTML>{
-    val header = Placeholder<FlowContent>()
+    //val header = Placeholder<FlowContent>()
     val puzzle = TemplatePlaceholder<PuzzleTplt>()
     override fun HTML.apply(){
         lang="de"

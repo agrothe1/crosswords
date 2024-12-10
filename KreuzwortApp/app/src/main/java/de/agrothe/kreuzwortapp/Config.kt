@@ -168,7 +168,7 @@ class Css(
     val COLOR_PALETTES: List<ColorPalletteConfig>,
     val TRANSITION_DURATION: Float,
     val ANIMATION_DURATION: Float,
-    val ANIMATION_ITER_CNT: String,
+    //val ANIMATION_ITER_CNT: String,
     val ANIMATION_VARIATION_CNT: Int,
 )
 
