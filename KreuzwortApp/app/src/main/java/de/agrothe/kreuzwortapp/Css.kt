@@ -1,4 +1,4 @@
-package de.agrothe.kreuzwortapp
+package de.agrothe.kreuzwortapp2
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.css.*

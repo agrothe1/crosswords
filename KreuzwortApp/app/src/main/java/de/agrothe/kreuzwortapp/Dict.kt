@@ -1,6 +1,6 @@
-package de.agrothe.kreuzwortapp
+package de.agrothe.kreuzwortapp2
 
-import de.agrothe.kreuzwortapp.MainActivity.Companion.appAssets
+import de.agrothe.kreuzwortapp2.MainActivity.Companion.appAssets
 
 typealias DictWord = String
 typealias DictSynms = Collection<String>

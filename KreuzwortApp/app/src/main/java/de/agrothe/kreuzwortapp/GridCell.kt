@@ -1,4 +1,4 @@
-package de.agrothe.kreuzwortapp
+package de.agrothe.kreuzwortapp2
 
 import io.ktor.server.html.*
 import kotlinx.html.*

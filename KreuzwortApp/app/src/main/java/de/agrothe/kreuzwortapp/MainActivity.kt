@@ -1,4 +1,4 @@
-package de.agrothe.kreuzwortapp
+package de.agrothe.kreuzwortapp2
 
 import android.annotation.SuppressLint
 import android.content.Context

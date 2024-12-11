@@ -1,4 +1,4 @@
-package de.agrothe.kreuzwortapp
+package de.agrothe.kreuzwortapp2
 
 import com.typesafe.config.ConfigFactory
 import io.github.config4k.extract

@@ -1,7 +1,7 @@
-package de.agrothe.kreuzwortapp
+package de.agrothe.kreuzwortapp2
 
-import de.agrothe.kreuzwortapp.Axis.*
-import de.agrothe.kreuzwortapp.MainActivity.Companion.appAssets
+import de.agrothe.kreuzwortapp2.Axis.*
+import de.agrothe.kreuzwortapp2.MainActivity.Companion.appAssets
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.io.File
 import java.io.InputStream
