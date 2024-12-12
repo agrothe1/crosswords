@@ -76,7 +76,7 @@ val CSS = fun(pDimen: Int, pWidth: Int, pHght: Int) = CSSBuilder().apply{
         }
         fun StyledElement.nextButton(){apply{
             fontFamily="sans-serif"
-            fontSize=2.6.vh
+            fontSize=3.5.vh
             margin="auto"
             padding="0.2vh"
             lineHeight=LineHeight("2.0vh")
